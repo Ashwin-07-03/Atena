@@ -1,0 +1,156 @@
+{
+  "sessions": [
+    {
+      "user_id": "user123",
+      "context": {
+        "subject": "Mathematics",
+        "difficulty": 8,
+        "energy_level": 7,
+        "time_of_day": 14,
+        "day_of_week": 2
+      },
+      "settings": {
+        "pomodoro_duration": 25,
+        "break_duration": 5
+      },
+      "results": {
+        "focus_score": 8,
+        "task_completion": 0.8,
+        "satisfaction": 7
+      }
+    },
+    {
+      "user_id": "user123",
+      "context": {
+        "subject": "Computer Science",
+        "difficulty": 9,
+        "energy_level": 9,
+        "time_of_day": 10,
+        "day_of_week": 1
+      },
+      "settings": {
+        "pomodoro_duration": 30,
+        "break_duration": 7
+      },
+      "results": {
+        "focus_score": 9,
+        "task_completion": 0.9,
+        "satisfaction": 8
+      }
+    },
+    {
+      "user_id": "user123",
+      "context": {
+        "subject": "Physics",
+        "difficulty": 7,
+        "energy_level": 5,
+        "time_of_day": 18,
+        "day_of_week": 4
+      },
+      "settings": {
+        "pomodoro_duration": 20,
+        "break_duration": 8
+      },
+      "results": {
+        "focus_score": 6,
+        "task_completion": 0.7,
+        "satisfaction": 6
+      }
+    },
+    {
+      "user_id": "user123",
+      "context": {
+        "subject": "History",
+        "difficulty": 5,
+        "energy_level": 6,
+        "time_of_day": 15,
+        "day_of_week": 3
+      },
+      "settings": {
+        "pomodoro_duration": 25,
+        "break_duration": 5
+      },
+      "results": {
+        "focus_score": 7,
+        "task_completion": 0.85,
+        "satisfaction": 7
+      }
+    },
+    {
+      "user_id": "user456",
+      "context": {
+        "subject": "Literature",
+        "difficulty": 6,
+        "energy_level": 8,
+        "time_of_day": 9,
+        "day_of_week": 5
+      },
+      "settings": {
+        "pomodoro_duration": 35,
+        "break_duration": 10
+      },
+      "results": {
+        "focus_score": 8,
+        "task_completion": 0.8,
+        "satisfaction": 8
+      }
+    },
+    {
+      "user_id": "user456",
+      "context": {
+        "subject": "Biology",
+        "difficulty": 8,
+        "energy_level": 4,
+        "time_of_day": 20,
+        "day_of_week": 2
+      },
+      "settings": {
+        "pomodoro_duration": 15,
+        "break_duration": 5
+      },
+      "results": {
+        "focus_score": 5,
+        "task_completion": 0.6,
+        "satisfaction": 6
+      }
+    },
+    {
+      "user_id": "user789",
+      "context": {
+        "subject": "Chemistry",
+        "difficulty": 9,
+        "energy_level": 7,
+        "time_of_day": 11,
+        "day_of_week": 3
+      },
+      "settings": {
+        "pomodoro_duration": 25,
+        "break_duration": 7
+      },
+      "results": {
+        "focus_score": 7,
+        "task_completion": 0.75,
+        "satisfaction": 7
+      }
+    },
+    {
+      "user_id": "user789",
+      "context": {
+        "subject": "Mathematics",
+        "difficulty": 7,
+        "energy_level": 8,
+        "time_of_day": 16,
+        "day_of_week": 1
+      },
+      "settings": {
+        "pomodoro_duration": 30,
+        "break_duration": 5
+      },
+      "results": {
+        "focus_score": 8,
+        "task_completion": 0.85,
+        "satisfaction": 8
+      }
+    }
+  ]
+} 

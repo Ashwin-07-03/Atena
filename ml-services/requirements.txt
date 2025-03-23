@@ -1,0 +1,9 @@
+# ML Service Requirements
+Flask==2.2.3
+Flask-Cors==3.0.10
+numpy==1.23.5
+pandas==1.5.3
+scikit-learn==1.2.2
+gunicorn==20.1.0
+setuptools>=65.5.1
+wheel>=0.38.0 
