@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Metadata } from "next";
 import { 
   Plus, 
   Search, 
@@ -31,11 +30,6 @@ import {
 import { DeckForm } from "@/components/flashcards/deck-form";
 import { DeckDetail } from "@/components/flashcards/deck-detail";
 import { StudySession } from "@/components/flashcards/study-session";
-
-export const metadata: Metadata = {
-  title: "Flashcards | Atena",
-  description: "Create and study flashcards with spaced repetition",
-};
 
 export default function FlashcardsPage() {
   const [decks, setDecks] = useState<Deck[]>([]);
