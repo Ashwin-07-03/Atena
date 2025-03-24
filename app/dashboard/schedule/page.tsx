@@ -1,12 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Plus, Clock, Pencil, CheckSquare, BookOpen, Calendar as CalendarIcon, ChevronLeft, ChevronRight, MoreHorizontal, X, Brain } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useScheduleStore, ScheduleEvent } from "@/lib/services/schedule-service";
+import { ScheduleCalendar } from "@/components/dashboard/schedule-calendar";
+import { ScheduleEventForm } from "@/components/dashboard/schedule-event-form";
+import { formatDate, formatTimeAgo } from "@/lib/utils";
 
 // Simplified events for demo purposes
 const INITIAL_EVENTS = [
@@ -180,41 +185,155 @@ const typeIcons: Record<string, string> = {
 };
 
 export default function SchedulePage() {
-  const [events] = useState(INITIAL_EVENTS);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [currentDate] = useState(new Date());
-
-  // Calculate days for the current week
-  const getDaysInWeek = () => {
-    const days = [];
-    const day = new Date(currentDate);
-    day.setDate(day.getDate() - day.getDay()); // Start with Sunday
+  const { events, addEvent, updateEvent, deleteEvent, getEvents } = useScheduleStore();
+  
+  const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
+  const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false);
+  const [isEditEventDialogOpen, setIsEditEventDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("calendar");
+  const [calendarEvents, setCalendarEvents] = useState<ScheduleEvent[]>([]);
+  const [isCalendarCompact, setIsCalendarCompact] = useState(false);
+  
+  // Check screen size for responsive layout
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsCalendarCompact(window.innerWidth < 1024);
+    };
     
-    for (let i = 0; i < 7; i++) {
-      days.push(new Date(day));
-      day.setDate(day.getDate() + 1);
+    // Initial check
+    checkScreenSize();
+    
+    // Add listener for resize
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+  
+  // Initialize with demo events if no events exist
+  useEffect(() => {
+    if (events.length === 0) {
+      try {
+        // Add some sample events with proper error handling
+        const INITIAL_EVENTS = [
+          {
+            title: 'Introduction to Computer Science',
+            start: new Date(new Date().setHours(10, 0)),
+            end: new Date(new Date().setHours(11, 30)),
+            allDay: false,
+            color: 'primary',
+            location: 'Room 302B',
+            description: 'Weekly lecture on computer science fundamentals'
+          },
+          {
+            title: 'Mathematics Assignment Due',
+            start: new Date(new Date().setDate(new Date().getDate() + 1)),
+            end: new Date(new Date().setDate(new Date().getDate() + 1)),
+            allDay: true,
+            color: 'accent',
+            description: 'Submit assignment online through the portal'
+          },
+          {
+            title: 'Study Group: Physics',
+            start: new Date(new Date().setDate(new Date().getDate() + 3)),
+            end: new Date(new Date().setDate(new Date().getDate() + 3)),
+            allDay: false,
+            color: 'secondary',
+            location: 'Library, Table 12',
+            description: 'Group study session for upcoming physics exam'
+          }
+        ];
+        
+        INITIAL_EVENTS.forEach(event => {
+          addEvent(event);
+        });
+      } catch (error) {
+        console.error('Error initializing events:', error);
+      }
     }
-    return days;
+  }, [addEvent, events.length]);
+  
+  // Update calendar events when the store changes, with memoization
+  useEffect(() => {
+    const formattedEvents = events.map(event => ({
+      ...event,
+      className: `fc-event-${event.color || 'primary'}`
+    }));
+    setCalendarEvents(formattedEvents);
+  }, [events]);
+  
+  // Get the upcoming events (next 7 days)
+  const upcomingEvents = getEvents(new Date(), new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+  
+  // Handle event selection in the calendar
+  const handleEventClick = useCallback((info: any) => {
+    const eventId = info.event.id;
+    const selectedEvent = events.find(event => event.id === eventId);
+    if (selectedEvent) {
+      setSelectedEvent(selectedEvent);
+      setIsEditEventDialogOpen(true);
+    }
+  }, [events]);
+  
+  // Handle date selection in the calendar
+  const handleDateSelect = useCallback((info: any) => {
+    try {
+      const startDate = new Date(info.start);
+      // Ensure end date is valid, or use start date + 1 hour as fallback
+      let endDate;
+      try {
+        endDate = info.end ? new Date(info.end) : new Date(startDate.getTime() + 60 * 60 * 1000);
+      } catch (e) {
+        console.error('Error parsing end date:', e);
+        endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+      }
+      
+      // Check if dates are valid
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        console.error('Invalid date selection');
+        return;
+      }
+      
+      // Create default event with selected dates
+      const defaultEvent = {
+        title: "",
+        start: startDate,
+        end: endDate,
+        allDay: info.allDay,
+        color: "primary",
+        location: "",
+        description: ""
+      } as any; // Use type assertion to avoid TS errors with the ScheduleEvent interface
+      
+      setSelectedEvent(defaultEvent);
+      setIsAddEventDialogOpen(true);
+    } catch (error) {
+      console.error('Error handling date selection:', error);
+    }
+  }, []);
+  
+  // Handle save event
+  const handleSaveEvent = (eventData: any) => {
+    addEvent(eventData);
+    setIsAddEventDialogOpen(false);
   };
   
-  const days = getDaysInWeek();
-  
-  // Get events for a specific date
-  const getEventsForDate = (date: Date) => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start);
-      return eventDate.getDate() === date.getDate() && 
-             eventDate.getMonth() === date.getMonth() && 
-             eventDate.getFullYear() === date.getFullYear();
-    });
+  // Handle update event
+  const handleUpdateEvent = (eventData: any) => {
+    if (selectedEvent) {
+      updateEvent(selectedEvent.id, eventData);
+    }
+    setIsEditEventDialogOpen(false);
+    setSelectedEvent(null);
   };
   
-  // Format time from date string
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  // Handle delete event
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      deleteEvent(selectedEvent.id);
+    }
+    setIsEditEventDialogOpen(false);
+    setSelectedEvent(null);
   };
-
+  
   return (
     <div className="flex flex-col gap-6">
       {/* Page header */}
@@ -222,359 +341,179 @@ export default function SchedulePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight mb-1">Schedule</h1>
           <p className="text-muted-foreground">
-            Manage your assignments, exams, and study sessions
+            Plan your study sessions, assignments, and deadlines
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button>
-            <span className="mr-2">+</span>
-            Add Event
-          </Button>
-        </div>
+        <Button onClick={() => setIsAddEventDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Event
+        </Button>
       </div>
-
+      
       {/* Main content */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Column - Calendar */}
-        <div className="lg:col-span-3">
+      <Tabs defaultValue="calendar" onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+          <TabsTrigger value="assignments">Assignments</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="calendar" className="space-y-4">
           <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle>
-                  {currentMonth} {currentYear}
-                </CardTitle>
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" size="icon" className="h-8 w-8">
-                    <span className="sr-only">Previous month</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4"
-                    >
-                      <path d="m15 18-6-6 6-6" />
-                    </svg>
-                  </Button>
-                  <Button variant="outline" size="icon" className="h-8 w-8">
-                    <span className="sr-only">Next month</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4"
-                    >
-                      <path d="m9 18 6-6-6-6" />
-                    </svg>
-                  </Button>
-                  <Button variant="outline" size="sm" className="ml-2">
-                    Today
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Week View */}
-              <div className="calendar-container overflow-x-auto">
-                <div className="grid grid-cols-7 border-b border-border">
-                  {days.map((day, index) => (
-                    <div 
-                      key={index}
-                      className={`text-center py-2 font-medium ${
-                        day.getDate() === new Date().getDate() ? 
-                        'bg-primary/10 text-primary' : 
-                        'text-foreground/70'
-                      }`}
-                    >
-                      <div className="text-xs text-foreground/70">
-                        {day.toLocaleDateString(undefined, { weekday: 'short' })}
-                      </div>
-                      <div className="text-lg">{day.getDate()}</div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Time slots */}
-                <div className="relative min-h-[600px]">
-                  {Array.from({ length: 12 }).map((_, hourIndex) => (
-                    <div 
-                      key={hourIndex} 
-                      className="grid grid-cols-7 border-b border-border"
-                      style={{ height: '100px' }}
-                    >
-                      {days.map((day, dayIndex) => {
-                        const dayEvents = getEventsForDate(day);
-                        const hourEvents = dayEvents.filter(event => {
-                          const eventDate = new Date(event.start);
-                          return eventDate.getHours() === hourIndex + 8; // 8 AM to 8 PM
-                        });
-                        
-                        return (
-                          <div 
-                            key={dayIndex} 
-                            className="relative border-r border-border hover:bg-secondary/30 transition-colors"
-                          >
-                            {hourIndex === 0 && (
-                              <div className="absolute top-0 left-0 w-full text-xs text-foreground/70 p-1">
-                                {day.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                              </div>
-                            )}
-                            
-                            <div className="absolute top-0 left-0 text-xs text-foreground/70 p-1">
-                              {`${hourIndex + 8}:00`}
-                            </div>
-                            
-                            {hourEvents.map(event => (
-                              <div 
-                                key={event.id}
-                                className={`absolute top-5 left-0 right-0 mx-1 p-1 rounded-md cursor-pointer overflow-hidden ${
-                                  event.color === 'primary' ? 'bg-primary/10 border-l-4 border-primary' :
-                                  event.color === 'accent' ? 'bg-accent/20 border-l-4 border-accent' :
-                                  'bg-secondary border-l-4 border-foreground/30'
-                                }`}
-                                style={{ 
-                                  height: '70px',
-                                  zIndex: 10
-                                }}
-                                onClick={() => setSelectedEvent(event)}
-                              >
-                                <div className="font-medium text-xs truncate">
-                                  {event.title}
-                                </div>
-                                <div className="text-xs text-foreground/70 truncate">
-                                  {formatTime(event.start)} {event.end && `- ${formatTime(event.end)}`}
-                                </div>
-                                {event.location && (
-                                  <div className="text-xs text-foreground/70 truncate">
-                                    {event.location}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Schedule legend */}
-              <div className="flex flex-wrap gap-2 mt-4">
-                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
-                  Quiz
-                </Badge>
-                <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20">
-                  Assignment
-                </Badge>
-                <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
-                  Exam
-                </Badge>
-                <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20">
-                  Study Session
-                </Badge>
+            <CardContent className="p-0 sm:p-2">
+              <div className={isCalendarCompact ? "h-[450px]" : "h-[550px]"}>
+                <ScheduleCalendar
+                  events={calendarEvents}
+                  onEventClick={handleEventClick}
+                  onDateSelect={handleDateSelect}
+                  onEventChange={(updatedEvent) => {
+                    if (updatedEvent.id) {
+                      updateEvent(updatedEvent.id, updatedEvent);
+                    }
+                  }}
+                  compact={isCalendarCompact}
+                />
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Right Column - Event Details & Quick Add */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Event Details */}
+        </TabsContent>
+        
+        <TabsContent value="upcoming" className="space-y-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>Event Details</CardTitle>
+            <CardHeader>
+              <CardTitle>Upcoming Events</CardTitle>
+              <CardDescription>
+                Events scheduled for the next 7 days
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {selectedEvent ? (
+              {upcomingEvents.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="space-y-1">
-                    <div className="text-sm text-foreground/70">Title</div>
-                    <div className="font-medium">{selectedEvent.title}</div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="text-sm text-foreground/70">Date & Time</div>
-                    <div className="font-medium">
-                      {selectedEvent.allDay 
-                        ? new Date(selectedEvent.start).toLocaleDateString() 
-                        : `${new Date(selectedEvent.start).toLocaleDateString()} ${formatTime(selectedEvent.start)}`
-                      }
-                      {selectedEvent.end && !selectedEvent.allDay && ` - ${formatTime(selectedEvent.end)}`}
+                  {upcomingEvents.map((event) => (
+                    <div 
+                      key={event.id}
+                      className="flex items-start gap-4 p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsEditEventDialogOpen(true);
+                      }}
+                    >
+                      <div className={`w-10 h-10 rounded-full bg-${event.color || 'primary'}/10 flex items-center justify-center`}>
+                        <Calendar className={`h-5 w-5 text-${event.color || 'primary'}`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{event.title}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {event.allDay 
+                            ? formatDate(event.start, 'PPP') 
+                            : `${formatDate(event.start, 'PPP')} • ${formatDate(event.start, 'p')} - ${formatDate(event.end, 'p')}`}
+                        </div>
+                        {event.location && (
+                          <div className="text-sm mt-1">{event.location}</div>
+                        )}
+                      </div>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </div>
-                  
-                  {selectedEvent.location && (
-                    <div className="space-y-1">
-                      <div className="text-sm text-foreground/70">Location</div>
-                      <div className="font-medium">{selectedEvent.location}</div>
-                    </div>
-                  )}
-                  
-                  {selectedEvent.description && (
-                    <div className="space-y-1">
-                      <div className="text-sm text-foreground/70">Description</div>
-                      <div className="font-medium">{selectedEvent.description}</div>
-                    </div>
-                  )}
-                  
-                  <div className="pt-2 flex space-x-2">
-                    <Button variant="outline" size="sm">Edit</Button>
-                    <Button variant="destructive" size="sm">Delete</Button>
-                  </div>
+                  ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>Select an event to view details</p>
+                <div className="text-center py-8">
+                  <Calendar className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                  <h3 className="font-medium text-lg mb-1">No upcoming events</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Plan your week by adding events to your schedule
+                  </p>
+                  <Button onClick={() => setIsAddEventDialogOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Event
+                  </Button>
                 </div>
               )}
             </CardContent>
           </Card>
-          
-          {/* Upcoming events column */}
+        </TabsContent>
+        
+        <TabsContent value="assignments" className="space-y-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>Upcoming</CardTitle>
-              <CardDescription>Your schedule for the next 7 days</CardDescription>
+            <CardHeader>
+              <CardTitle>Assignments</CardTitle>
+              <CardDescription>
+                Track your assignments and deadlines
+              </CardDescription>
             </CardHeader>
-            <CardContent className="px-2">
-              <Tabs defaultValue="events">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="events">Events</TabsTrigger>
-                  <TabsTrigger value="tasks">Tasks</TabsTrigger>
-                </TabsList>
-                <TabsContent value="events" className="pt-4">
-                  <div className="space-y-2">
-                    {upcomingEvents.slice(0, 3).map((event) => {
-                      const colorClass = subjectColors[event.subject] || "bg-gray-100 text-gray-800";
-                      
-                      return (
-                        <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass.split(' ')[0]}`}>
-                            <span className={`h-5 w-5 ${colorClass.split(' ')[1]}`}>📅</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h4 className="font-medium text-sm">{event.title}</h4>
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {event.date} • {event.time} • {event.location}
-                                </div>
-                              </div>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 -mt-1 -mr-1">
-                                <span className="sr-only">Options</span>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="h-4 w-4"
-                                >
-                                  <circle cx="12" cy="12" r="1" />
-                                  <circle cx="19" cy="12" r="1" />
-                                  <circle cx="5" cy="12" r="1" />
-                                </svg>
-                              </Button>
-                            </div>
-                            <div className="mt-2 flex items-center gap-1">
-                              <Badge variant="outline" className={colorClass}>
-                                {event.subject}
-                              </Badge>
-                            </div>
+            <CardContent>
+              <div className="space-y-4">
+                {events
+                  .filter(event => event.title.toLowerCase().includes('assignment') || event.description?.toLowerCase().includes('assignment'))
+                  .map((event) => (
+                    <div 
+                      key={event.id}
+                      className="flex items-start justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsEditEventDialogOpen(true);
+                      }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="mt-0.5">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <CheckSquare className="h-4 w-4 text-primary" />
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </TabsContent>
-                <TabsContent value="tasks" className="pt-4">
-                  <div className="space-y-2">
-                    {tasks.slice(0, 3).map((task) => {
-                      const colorClass = subjectColors[task.subject] || "bg-gray-100 text-gray-800";
-                      const priorityColors = {
-                        high: "bg-red-500/10 text-red-500 border-red-500/20",
-                        medium: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-                        low: "bg-green-500/10 text-green-500 border-green-500/20",
-                      };
-                      
-                      return (
-                        <div key={task.id} className="flex items-start gap-2 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="pt-0.5">
-                            <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="h-4 w-4"
-                              >
-                                <rect width="16" height="16" x="4" y="4" rx="2" />
-                                <path d="m9 12 2 2 4-4" />
-                              </svg>
-                            </Button>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start">
-                              <h4 className="font-medium text-sm">{task.title}</h4>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 -mt-1 -mr-1">
-                                <span className="sr-only">Options</span>
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="h-4 w-4"
-                                >
-                                  <circle cx="12" cy="12" r="1" />
-                                  <circle cx="19" cy="12" r="1" />
-                                  <circle cx="5" cy="12" r="1" />
-                                </svg>
-                              </Button>
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Due: {task.dueDate}
-                            </div>
-                            <div className="mt-2 flex items-center gap-1">
-                              <Badge variant="outline" className={colorClass}>
-                                {task.subject}
-                              </Badge>
-                              <Badge variant="outline" className={priorityColors[task.priority as keyof typeof priorityColors]}>
-                                {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
-                              </Badge>
-                            </div>
+                        <div>
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Due: {formatDate(event.start, 'PPP')}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </TabsContent>
-              </Tabs>
+                      </div>
+                      <Badge>Pending</Badge>
+                    </div>
+                  ))}
+              </div>
             </CardContent>
-            <CardFooter className="border-t pt-4">
-              <Button className="w-full" variant="outline" size="sm">
-                <span className="mr-1">+</span>
-                Add New Task
-              </Button>
-            </CardFooter>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
+      
+      {/* Add Event Dialog */}
+      <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Event</DialogTitle>
+            <DialogDescription>
+              Create a new event in your schedule
+            </DialogDescription>
+          </DialogHeader>
+          <ScheduleEventForm
+            onSave={handleSaveEvent}
+            onCancel={() => setIsAddEventDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Event Dialog */}
+      <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+            <DialogDescription>
+              Make changes to your scheduled event
+            </DialogDescription>
+          </DialogHeader>
+          {selectedEvent && (
+            <ScheduleEventForm
+              event={selectedEvent}
+              isEditing={true}
+              onSave={handleUpdateEvent}
+              onCancel={() => setIsEditEventDialogOpen(false)}
+              onDelete={handleDeleteEvent}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

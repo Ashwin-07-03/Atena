@@ -2,5 +2,5 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Schedule | Atena',
-  description: 'Manage your class schedule, study sessions, and deadlines in one place.',
+  description: 'Manage your study schedule and plan your learning activities',
 }; 

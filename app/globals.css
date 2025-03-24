@@ -269,4 +269,175 @@
   opacity: 0;
   transform: translateY(-20px);
   transition: opacity 300ms, transform 300ms;
+}
+
+/* FullCalendar Styles */
+.fc .fc-toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.fc .fc-button {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 500;
+  text-transform: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.fc .fc-button:hover {
+  background-color: hsl(var(--primary) / 0.9);
+  border-color: hsl(var(--primary) / 0.9);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: hsl(var(--primary) / 0.8);
+  border-color: hsl(var(--primary) / 0.8);
+  color: hsl(var(--primary-foreground));
+}
+
+.fc .fc-button:focus,
+.fc .fc-button-primary:focus {
+  box-shadow: 0 0 0 0.2rem hsl(var(--ring) / 0.25);
+}
+
+.fc .fc-button-primary:disabled {
+  background-color: hsl(var(--primary) / 0.5);
+  border-color: hsl(var(--primary) / 0.5);
+}
+
+.fc-theme-standard .fc-scrollgrid,
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: hsl(var(--border));
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: hsl(var(--accent) / 0.7);
+}
+
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number {
+  color: hsl(var(--foreground));
+  text-decoration: none;
+}
+
+.fc-event {
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Compact mode styling */
+.compact-calendar .fc-toolbar {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  margin-bottom: 0.5rem !important;
+}
+
+.compact-calendar .fc-toolbar-title {
+  font-size: 1rem;
+}
+
+.compact-calendar .fc .fc-button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.compact-calendar .fc-header-toolbar {
+  margin-bottom: 0.5em !important;
+}
+
+.compact-calendar .fc .fc-daygrid-day {
+  height: 3rem;
+}
+
+.compact-calendar .fc .fc-timegrid-slot {
+  height: 2rem !important;
+}
+
+/* Colors for events */
+.fc-event.fc-event-primary {
+  background-color: hsl(var(--primary) / 0.8);
+  color: hsl(var(--primary-foreground));
+}
+
+.fc-event.fc-event-accent {
+  background-color: hsl(var(--accent) / 0.8);
+  color: hsl(var(--accent-foreground));
+}
+
+.fc-event.fc-event-secondary {
+  background-color: hsl(var(--secondary) / 0.8);
+  color: hsl(var(--secondary-foreground));
+}
+
+.fc-event.fc-event-blue {
+  background-color: hsl(215, 90%, 62%, 0.8);
+  color: white;
+}
+
+.fc-event.fc-event-green {
+  background-color: hsl(142, 71%, 45%, 0.8);
+  color: white;
+}
+
+.fc-event.fc-event-yellow {
+  background-color: hsl(47, 96%, 67%, 0.8);
+  color: black;
+}
+
+.fc-event.fc-event-purple {
+  background-color: hsl(283, 39%, 53%, 0.8);
+  color: white;
+}
+
+.fc-event.fc-event-orange {
+  background-color: hsl(27, 96%, 61%, 0.8);
+  color: white;
+}
+
+.fc .fc-timegrid-slot {
+  height: 3rem;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  border-color: red;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .fc .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .fc .fc-daygrid-day-number {
+    padding: 0.1rem;
+  }
+
+  .fc .fc-col-header-cell-cushion {
+    padding: 0.1rem;
+  }
+  
+  .fc .fc-timegrid-slot {
+    height: 2rem;
+  }
+  
+  .fc-timegrid-event {
+    min-height: 1.5rem !important;
+  }
 } 
