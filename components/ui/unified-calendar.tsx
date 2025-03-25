@@ -219,6 +219,13 @@ export function UnifiedCalendar({ initialView = "month" }: UnifiedCalendarProps)
     }
   };
 
+  const handleClearAllEvents = () => {
+    if (confirm("Are you sure you want to delete all events? This cannot be undone.")) {
+      CalendarService.clearEvents();
+      setEvents([]);
+    }
+  };
+
   // Helper to get title text based on current view
   const getViewTitle = () => {
     if (view === "month") {
@@ -347,6 +354,15 @@ export function UnifiedCalendar({ initialView = "month" }: UnifiedCalendarProps)
             >
               <PlusCircleIcon className="h-4 w-4" />
               <span>New Event</span>
+            </Button>
+
+            <Button
+              onClick={handleClearAllEvents}
+              variant="outline"
+              className="h-8"
+              size="sm"
+            >
+              Clear All
             </Button>
           </div>
         </div>
