@@ -1,6 +1,7 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
+import { generateChatResponse, isGeminiInitialized, initializeFromStoredKey } from "@/lib/services/gemini-service";
 
 export interface Message {
   id: string;
@@ -51,8 +52,8 @@ const ACTIVE_CHAT_SESSION_KEY = "atena-ai-active-chat-session";
 const STUDY_PLANS_STORAGE_KEY = "atena-ai-study-plans";
 const SAVED_PROMPTS_STORAGE_KEY = "atena-ai-saved-prompts";
 
-// Mock AI response generator
-const generateAIResponse = async (prompt: string): Promise<string> => {
+// Mock AI response generator - this will be replaced by Gemini API
+const generateMockAIResponse = async (prompt: string): Promise<string> => {
   // In a real implementation, this would call an API to get a response from an AI model
   
   // For demo purposes, we'll use a simple mapping of prompts to responses
@@ -118,6 +119,42 @@ const generateAIResponse = async (prompt: string): Promise<string> => {
   
   // Default fallback response
   return "I don't have specific information about that topic. Could you provide more details or ask another question? I can help with explanations across many academic subjects, create study plans, generate practice questions, analyze learning styles, or create flashcards for better retention.";
+};
+
+// Actual AI response generator that uses Gemini if available, falls back to mock responses
+const generateAIResponse = async (prompt: string, messages: Message[] = []): Promise<string> => {
+  // Try to initialize Gemini from stored key if not already initialized
+  if (!isGeminiInitialized()) {
+    initializeFromStoredKey();
+  }
+  
+  // If Gemini is initialized, use it for responses
+  if (isGeminiInitialized()) {
+    try {
+      // Convert messages to format expected by Gemini
+      const chatHistory = [...messages].map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      // Add the current prompt as a user message
+      chatHistory.push({
+        role: "user",
+        content: prompt
+      });
+      
+      // Generate response using Gemini
+      const response = await generateChatResponse(chatHistory);
+      return response;
+    } catch (error) {
+      console.error("Error generating response with Gemini:", error);
+      // Fall back to mock responses if Gemini fails
+      return generateMockAIResponse(prompt);
+    }
+  } else {
+    // Fall back to mock responses if Gemini is not initialized
+    return generateMockAIResponse(prompt);
+  }
 };
 
 // Generate study plan based on subject
@@ -338,13 +375,17 @@ export const AIAssistantService = {
     }
   },
   
-  // AI Response
+  // AI Response (updated to use messages history)
   getAIResponse: async (prompt: string): Promise<Message> => {
     // Add user message
     AIAssistantService.addMessage("user", prompt);
     
-    // Get AI response
-    const response = await generateAIResponse(prompt);
+    // Get active session and its messages
+    const activeSession = AIAssistantService.getActiveSession();
+    const messages = activeSession ? activeSession.messages : AIAssistantService.getMessages();
+    
+    // Get AI response using all previous messages for context
+    const response = await generateAIResponse(prompt, messages);
     
     // Add AI response to chat
     return AIAssistantService.addMessage("assistant", response);

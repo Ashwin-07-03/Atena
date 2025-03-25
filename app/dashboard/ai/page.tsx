@@ -7,7 +7,9 @@ import {
   AITool 
 } from "@/components/ui/chat-layout";
 import { AIAssistantService, ChatSession, SavedPrompt } from "@/lib/services/ai-assistant-service";
+import { isGeminiInitialized, initializeFromStoredKey } from "@/lib/services/gemini-service";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { 
   Lightbulb, 
   Sparkles, 
@@ -17,7 +19,8 @@ import {
   BookOpen,
   BookMarked,
   Layers,
-  LineChart
+  LineChart,
+  Settings
 } from "lucide-react";
 
 // Sample recommended prompts for quick access
@@ -112,11 +115,16 @@ export default function AIAssistantPage() {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
+  const [isUsingGemini, setIsUsingGemini] = useState(false);
 
   // Load chat sessions and saved prompts on component mount
   useEffect(() => {
     // Try to migrate old messages first (if any)
     AIAssistantService.migrateOldMessages();
+    
+    // Try to initialize Gemini from stored key
+    const geminiInitialized = initializeFromStoredKey();
+    setIsUsingGemini(geminiInitialized);
     
     // Get all sessions
     const allSessions = AIAssistantService.getChatSessions();
@@ -140,6 +148,15 @@ export default function AIAssistantPage() {
       setSessions([newSession]);
       setActiveSession(newSession);
     }
+  }, []);
+
+  // Check Gemini status periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsUsingGemini(isGeminiInitialized());
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Create a new chat session
@@ -271,6 +288,16 @@ export default function AIAssistantPage() {
             <GraduationCap className="h-3.5 w-3.5" />
             <span>Create Plan</span>
           </Button>
+          <Link href="/dashboard/ai/settings">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">API Settings</span>
+            </Button>
+          </Link>
         </div>
       </div>
       
@@ -283,6 +310,8 @@ export default function AIAssistantPage() {
         recommendedPrompts={recommendedPrompts}
         aiTools={aiTools}
         savedPrompts={savedPrompts}
+        isUsingGemini={isUsingGemini}
+        apiSettingsLink="/dashboard/ai/settings"
         onNewSession={handleNewSession}
         onSelectSession={handleSelectSession}
         onEditSessionTitle={handleEditSessionTitle}

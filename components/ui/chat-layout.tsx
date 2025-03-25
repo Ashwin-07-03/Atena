@@ -15,7 +15,8 @@ import {
   X,
   BookmarkPlus,
   Grid3X3,
-  Wand2
+  Wand2,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ import {
   Message,
   SavedPrompt
 } from "@/lib/services/ai-assistant-service";
+import Link from "next/link";
 
 export interface RecommendedPrompt {
   id: string;
@@ -100,6 +102,10 @@ export interface ChatLayoutProps {
   onSavePrompt?: (text: string) => void;
   /** Function to delete a saved prompt */
   onDeleteSavedPrompt?: (id: string) => void;
+  /** Whether the assistant is using Gemini API */
+  isUsingGemini?: boolean;
+  /** Link to API settings page */
+  apiSettingsLink?: string;
 }
 
 export function ChatLayout({
@@ -121,6 +127,8 @@ export function ChatLayout({
   onAITool,
   onSavePrompt,
   onDeleteSavedPrompt,
+  isUsingGemini = false,
+  apiSettingsLink,
 }: ChatLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
   const [editingSession, setEditingSession] = useState<string | null>(null);
@@ -301,6 +309,27 @@ export function ChatLayout({
               {activeSession ? activeSession.title : "New Chat"}
             </h2>
           </div>
+          
+          {/* Gemini indicator */}
+          {apiSettingsLink && (
+            <Link href={apiSettingsLink} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+              {isUsingGemini ? (
+                <>
+                  <span className="flex items-center gap-1 text-blue-600">
+                    <Sparkles className="h-3 w-3" />
+                    <span>Gemini</span>
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-amber-500"></span>
+                    <span>Using fallback responses</span>
+                  </span>
+                </>
+              )}
+            </Link>
+          )}
         </div>
 
         {/* Messages area */}
@@ -468,18 +497,30 @@ export function ChatLayout({
                 )}
               </div>
               <div className="ml-auto flex gap-1">
-                {recommendedPrompts.slice(0, 2).map((prompt) => (
+                {recommendedPrompts.length > 0 && (
                   <Button
-                    key={prompt.id}
+                    key={recommendedPrompts[0].id}
                     variant="outline"
                     size="sm"
                     className="text-xs h-7 bg-muted/50 truncate max-w-[200px]"
-                    onClick={() => onRecommendedPrompt?.(prompt.text)}
+                    onClick={() => onRecommendedPrompt?.(recommendedPrompts[0].text)}
                   >
-                    {prompt.icon && <span className="mr-1">{prompt.icon}</span>}
-                    {prompt.text}
+                    {recommendedPrompts[0].icon && <span className="mr-1">{recommendedPrompts[0].icon}</span>}
+                    {recommendedPrompts[0].text}
                   </Button>
-                ))}
+                )}
+                {recommendedPrompts.length > 1 && (
+                  <Button
+                    key={recommendedPrompts[1].id}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7 bg-muted/50 truncate max-w-[200px]"
+                    onClick={() => onRecommendedPrompt?.(recommendedPrompts[1].text)}
+                  >
+                    {recommendedPrompts[1].icon && <span className="mr-1">{recommendedPrompts[1].icon}</span>}
+                    {recommendedPrompts[1].text}
+                  </Button>
+                )}
               </div>
             </div>
           )}
