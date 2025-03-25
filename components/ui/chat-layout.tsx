@@ -16,7 +16,9 @@ import {
   BookmarkPlus,
   Grid3X3,
   Wand2,
-  Sparkles
+  Sparkles,
+  Moon,
+  Sun
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -49,6 +51,7 @@ import {
   SavedPrompt
 } from "@/lib/services/ai-assistant-service";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export interface RecommendedPrompt {
   id: string;
@@ -108,6 +111,50 @@ export interface ChatLayoutProps {
   apiSettingsLink?: string;
 }
 
+// Custom hook to handle sidebar hover effect
+function useSidebarHover(defaultOpen: boolean) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [hoverTimerId, setHoverTimerId] = useState<NodeJS.Timeout | null>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const hoverAreaRef = useRef<HTMLDivElement>(null);
+  
+  const handleMouseEnter = () => {
+    if (hoverTimerId) clearTimeout(hoverTimerId);
+    if (!isOpen) {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 300); // Delay to prevent accidental triggers
+      setHoverTimerId(timer);
+    }
+  };
+  
+  const handleMouseLeave = () => {
+    if (hoverTimerId) clearTimeout(hoverTimerId);
+    if (isOpen && window.innerWidth > 1024) { // Only for desktop
+      const timer = setTimeout(() => {
+        setIsOpen(false);
+      }, 500); // Delay before closing
+      setHoverTimerId(timer);
+    }
+  };
+  
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerId) clearTimeout(hoverTimerId);
+    };
+  }, [hoverTimerId]);
+  
+  return {
+    isOpen,
+    setIsOpen,
+    sidebarRef,
+    hoverAreaRef,
+    handleMouseEnter,
+    handleMouseLeave
+  };
+}
+
 export function ChatLayout({
   sessions = [],
   activeSession = null,
@@ -130,13 +177,22 @@ export function ChatLayout({
   isUsingGemini = false,
   apiSettingsLink,
 }: ChatLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
+  const {
+    isOpen: sidebarOpen,
+    setIsOpen: setSidebarOpen,
+    sidebarRef,
+    hoverAreaRef,
+    handleMouseEnter: handleSidebarMouseEnter,
+    handleMouseLeave: handleSidebarMouseLeave
+  } = useSidebarHover(defaultSidebarOpen);
+  
   const [editingSession, setEditingSession] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [featuresTab, setFeaturesTab] = useState<string>("recommended");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { theme, setTheme } = useTheme();
 
   // Filter sessions based on search query
   const filteredSessions = searchQuery 
@@ -182,11 +238,23 @@ export function ChatLayout({
     setFeaturesOpen(true);
   };
 
+  // Toggle theme function
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
-    <div className="flex h-[calc(100vh-10rem)] overflow-hidden rounded-lg border bg-background shadow">
+    <div className="flex h-[calc(100vh-8rem)] overflow-hidden rounded-xl border bg-background shadow-lg transition-all duration-300 ease-in-out">
+      {/* Sidebar hover area for desktop */}
+      <div 
+        ref={hoverAreaRef}
+        className="hidden lg:block w-2 h-full absolute left-0 z-20" 
+        onMouseEnter={handleSidebarMouseEnter}
+      />
+
       {/* Mobile sidebar toggle */}
       <button 
-        className="absolute left-2 top-2 z-10 rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground lg:hidden"
+        className="absolute left-2 top-2 z-30 rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground lg:hidden"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
@@ -194,10 +262,13 @@ export function ChatLayout({
 
       {/* Chat sessions sidebar */}
       <div 
+        ref={sidebarRef}
         className={cn(
-          "w-full max-w-xs flex-col border-r bg-muted/30 transition-all duration-300 ease-in-out",
-          sidebarOpen ? "flex" : "hidden lg:flex"
+          "w-full max-w-xs flex-col border-r bg-muted/30 transition-all duration-500 ease-in-out z-10",
+          sidebarOpen ? "flex lg:w-80 translate-x-0" : "hidden lg:flex lg:w-0 lg:-translate-x-full"
         )}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
       >
         {/* New chat button and search */}
         <div className="flex flex-col space-y-2 border-b p-4">
@@ -303,19 +374,34 @@ export function ChatLayout({
       {/* Chat content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Chat header */}
-        <div className="flex h-14 items-center justify-between border-b px-4">
-          <div className="flex items-center gap-2">
+        <div className="flex h-16 items-center justify-between border-b px-4 md:px-6 bg-background/95 backdrop-blur-sm sticky top-0 z-10 transition-all duration-300">
+          <div className="flex items-center gap-3">
             <h2 className="text-lg font-medium">
               {activeSession ? activeSession.title : "New Chat"}
             </h2>
+            
+            {/* Theme toggle */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0 ml-2 rounded-full" 
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
           </div>
           
           {/* Gemini indicator */}
           {apiSettingsLink && (
-            <Link href={apiSettingsLink} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+            <Link href={apiSettingsLink} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               {isUsingGemini ? (
                 <>
-                  <span className="flex items-center gap-1 text-blue-600">
+                  <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
                     <Sparkles className="h-3 w-3" />
                     <span>Gemini</span>
                   </span>
@@ -333,37 +419,38 @@ export function ChatLayout({
         </div>
 
         {/* Messages area */}
-        <div className="flex-1 overflow-auto p-4">
+        <div className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
           {activeSession && activeSession.messages.length > 0 ? (
-            <div className="space-y-6">
-              {activeSession.messages.map((message) => (
+            <div className="space-y-6 max-w-4xl mx-auto">
+              {activeSession.messages.map((message, index) => (
                 <div
                   key={message.id}
                   className={cn(
-                    "flex",
-                    message.role === "user" ? "justify-end" : "justify-start"
+                    "flex animate-fade-in",
+                    message.role === "user" ? "justify-end" : "justify-start",
+                    index > 0 && "animate-slide-up stagger-item"
                   )}
                 >
                   <div
                     className={cn(
-                      "flex max-w-[80%] rounded-lg px-4 py-3",
+                      "flex max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm transition-all",
                       message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                        ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground"
+                        : "bg-muted dark:bg-secondary/80 border border-border dark:border-secondary"
                     )}
                   >
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         {message.role === "assistant" && (
-                          <Avatar className="h-6 w-6">
-                            <div className="flex h-full w-full items-center justify-center rounded-full bg-muted text-muted-foreground">
+                          <Avatar className="h-7 w-7 ring-2 ring-background">
+                            <div className="flex h-full w-full items-center justify-center rounded-full bg-primary/10 text-primary dark:bg-primary/20">
                               A
                             </div>
                           </Avatar>
                         )}
                         <p className={cn(
-                          "text-xs",
-                          message.role === "user" ? "text-primary-foreground/70" : "text-muted-foreground"
+                          "text-xs font-medium",
+                          message.role === "user" ? "text-primary-foreground/80" : "text-muted-foreground"
                         )}>
                           {message.role === "assistant" ? "Assistant" : "You"}
                         </p>
@@ -372,7 +459,7 @@ export function ChatLayout({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-5 w-5 p-0 text-primary-foreground/50 hover:text-primary-foreground rounded-full ml-auto"
+                            className="h-5 w-5 p-0 text-primary-foreground/60 hover:text-primary-foreground/90 rounded-full ml-auto transition-all"
                             onClick={() => onSavePrompt(message.content)}
                             title="Save prompt"
                           >
@@ -380,10 +467,12 @@ export function ChatLayout({
                           </Button>
                         )}
                       </div>
-                      <div className="whitespace-pre-wrap break-words">{message.content}</div>
+                      <div className="whitespace-pre-wrap break-words text-sm md:text-base leading-relaxed">
+                        {message.content}
+                      </div>
                       <p className={cn(
-                        "text-xs text-right mt-1",
-                        message.role === "user" ? "text-primary-foreground/50" : "text-muted-foreground/60"
+                        "text-xs text-right mt-1 opacity-70 transition-opacity group-hover:opacity-100",
+                        message.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground/70"
                       )}>
                         {message.timestamp}
                       </p>
@@ -394,15 +483,17 @@ export function ChatLayout({
               
               {/* Loading indicator */}
               {isLoading && (
-                <div className="flex justify-start">
-                  <div className="flex max-w-[80%] items-center gap-3 rounded-lg bg-muted px-4 py-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted-foreground/20 text-muted-foreground">
-                      A
-                    </div>
+                <div className="flex justify-start animate-fade-in">
+                  <div className="flex max-w-[85%] md:max-w-[75%] items-center gap-3 rounded-2xl border bg-muted/30 dark:bg-secondary/40 px-5 py-4 shadow-sm">
+                    <Avatar className="h-7 w-7 ring-2 ring-background">
+                      <div className="flex h-full w-full items-center justify-center rounded-full bg-primary/10 text-primary dark:bg-primary/20">
+                        A
+                      </div>
+                    </Avatar>
                     <div className="flex items-center space-x-2">
-                      <div className="h-2 w-2 rounded-full bg-foreground/50 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="h-2 w-2 rounded-full bg-foreground/50 animate-bounce" style={{ animationDelay: "200ms" }}></div>
-                      <div className="h-2 w-2 rounded-full bg-foreground/50 animate-bounce" style={{ animationDelay: "400ms" }}></div>
+                      <div className="h-2 w-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="h-2 w-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "200ms" }}></div>
+                      <div className="h-2 w-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "400ms" }}></div>
                     </div>
                   </div>
                 </div>
@@ -412,46 +503,46 @@ export function ChatLayout({
               <div ref={messagesEndRef} />
             </div>
           ) : (
-            <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
-              <div className="rounded-full bg-primary/10 p-3">
-                <MessageSquare className="h-6 w-6 text-primary" />
+            <div className="flex h-full flex-col items-center justify-center space-y-6 text-center max-w-xl mx-auto animate-fade-in">
+              <div className="rounded-full bg-primary/10 p-5 shadow-inner dark:bg-primary/20">
+                <MessageSquare className="h-8 w-8 text-primary" />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Start a new conversation</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-3">
+                <h3 className="text-2xl font-semibold">Start a new conversation</h3>
+                <p className="text-muted-foreground">
                   Ask a question or start a conversation with the AI assistant.
                 </p>
               </div>
               {(recommendedPrompts.length > 0 || aiTools.length > 0) && (
-                <div className="flex flex-wrap gap-2 justify-center mt-4 max-w-md">
+                <div className="flex flex-wrap gap-3 justify-center mt-6 w-full">
                   {recommendedPrompts.slice(0, 2).map((prompt) => (
                     <Button
                       key={prompt.id}
                       variant="outline"
                       size="sm"
-                      className="text-xs h-7"
+                      className="text-sm h-9 shadow-sm hover-lift transition-all duration-300"
                       onClick={() => onRecommendedPrompt?.(prompt.text)}
                     >
                       {prompt.icon}
-                      <span className="ml-1 truncate max-w-[160px]">{prompt.text}</span>
+                      <span className="ml-2 truncate max-w-[180px]">{prompt.text}</span>
                     </Button>
                   ))}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs h-7 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100"
+                    className="text-sm h-9 shadow-sm hover-lift bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/40 dark:to-blue-950/40 border-purple-200 dark:border-purple-900 hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-950/60 dark:hover:to-blue-950/60 transition-all duration-300"
                     onClick={() => openFeatures('recommended')}
                   >
-                    <Wand2 className="h-3 w-3 mr-1 text-purple-500" />
+                    <Wand2 className="h-4 w-4 mr-2 text-purple-500" />
                     <span>More Prompts</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs h-7 bg-gradient-to-r from-amber-50 to-emerald-50 border-amber-200 hover:bg-gradient-to-r hover:from-amber-100 hover:to-emerald-100"
+                    className="text-sm h-9 shadow-sm hover-lift bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/40 dark:to-emerald-950/40 border-amber-200 dark:border-amber-900 hover:bg-gradient-to-r hover:from-amber-100 hover:to-emerald-100 dark:hover:from-amber-950/60 dark:hover:to-emerald-950/60 transition-all duration-300"
                     onClick={() => openFeatures('tools')}
                   >
-                    <Grid3X3 className="h-3 w-3 mr-1 text-amber-500" />
+                    <Grid3X3 className="h-4 w-4 mr-2 text-amber-500" />
                     <span>AI Tools</span>
                   </Button>
                 </div>
@@ -461,7 +552,7 @@ export function ChatLayout({
         </div>
 
         {/* Input area */}
-        <div className="border-t">
+        <div className="border-t bg-background/95 backdrop-blur-sm transition-all duration-300">
           {/* Feature chips (recommended prompts, saved prompts) */}
           {(recommendedPrompts.length > 0 || aiTools.length > 0 || savedPrompts.length > 0) && (
             <div className="p-2 px-4 border-b flex items-center overflow-x-auto scrollbar-hide">
@@ -469,83 +560,71 @@ export function ChatLayout({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 text-xs text-purple-600 hover:bg-purple-50 hover:text-purple-700 flex items-center"
+                  className="h-8 text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300 flex items-center transition-colors"
                   onClick={() => openFeatures('recommended')}
                 >
-                  <Wand2 className="h-3 w-3 mr-1" />
+                  <Wand2 className="h-3.5 w-3.5 mr-1.5" />
                   <span>Prompts</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 text-xs text-amber-600 hover:bg-amber-50 hover:text-amber-700 flex items-center"
+                  className="h-8 text-xs text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-700 dark:hover:text-amber-300 flex items-center transition-colors"
                   onClick={() => openFeatures('tools')}
                 >
-                  <Grid3X3 className="h-3 w-3 mr-1" />
+                  <Grid3X3 className="h-3.5 w-3.5 mr-1.5" />
                   <span>Tools</span>
                 </Button>
                 {savedPrompts.length > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-xs text-blue-600 hover:bg-blue-50 hover:text-blue-700 flex items-center"
+                    className="h-8 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 flex items-center transition-colors"
                     onClick={() => openFeatures('saved')}
                   >
-                    <BookmarkPlus className="h-3 w-3 mr-1" />
+                    <BookmarkPlus className="h-3.5 w-3.5 mr-1.5" />
                     <span>Saved ({savedPrompts.length})</span>
                   </Button>
                 )}
               </div>
-              <div className="ml-auto flex gap-1">
-                {recommendedPrompts.length > 0 && (
+              <div className="ml-auto flex gap-2 overflow-x-auto scrollbar-hide">
+                {recommendedPrompts.slice(0, 2).map((prompt) => (
                   <Button
-                    key={recommendedPrompts[0].id}
+                    key={prompt.id}
                     variant="outline"
                     size="sm"
-                    className="text-xs h-7 bg-muted/50 truncate max-w-[200px]"
-                    onClick={() => onRecommendedPrompt?.(recommendedPrompts[0].text)}
+                    className="text-xs h-8 bg-muted/50 dark:bg-muted/30 truncate max-w-[230px] hover-lift transition-all duration-300"
+                    onClick={() => onRecommendedPrompt?.(prompt.text)}
                   >
-                    {recommendedPrompts[0].icon && <span className="mr-1">{recommendedPrompts[0].icon}</span>}
-                    {recommendedPrompts[0].text}
+                    {prompt.icon && <span className="mr-1.5">{prompt.icon}</span>}
+                    <span className="truncate">{prompt.text}</span>
                   </Button>
-                )}
-                {recommendedPrompts.length > 1 && (
-                  <Button
-                    key={recommendedPrompts[1].id}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 bg-muted/50 truncate max-w-[200px]"
-                    onClick={() => onRecommendedPrompt?.(recommendedPrompts[1].text)}
-                  >
-                    {recommendedPrompts[1].icon && <span className="mr-1">{recommendedPrompts[1].icon}</span>}
-                    {recommendedPrompts[1].text}
-                  </Button>
-                )}
+                ))}
               </div>
             </div>
           )}
           
-          <div className="p-4">
-            <div className="flex items-end gap-2">
-              <div className="relative flex-1">
+          <div className="p-4 md:p-6">
+            <div className="flex items-end gap-2 max-w-4xl mx-auto">
+              <div className="relative flex-1 transition-all duration-300">
                 <Textarea
                   placeholder="Type your message..."
                   value={inputMessage}
                   onChange={(e) => onInputChange?.(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="min-h-24 resize-none rounded-lg border-input bg-background pr-12 text-sm focus-visible:ring-offset-background"
+                  className="min-h-32 resize-none rounded-xl border-input bg-background pr-14 text-sm md:text-base focus-visible:ring-offset-background shadow-sm transition-all duration-300"
                 />
                 <Button
                   size="icon"
-                  className="absolute bottom-3 right-3 h-8 w-8 rounded-full"
+                  className="absolute bottom-3 right-3 h-10 w-10 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                   disabled={!inputMessage?.trim() || isLoading}
                   onClick={handleSendMessage}
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-5 w-5" />
                 </Button>
               </div>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground text-center max-w-4xl mx-auto">
               The AI assistant will respond based on the context of your conversation.
             </p>
           </div>
@@ -554,35 +633,44 @@ export function ChatLayout({
       
       {/* AI Features Dialog */}
       <Dialog open={featuresOpen} onOpenChange={setFeaturesOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>AI Assistant Features</DialogTitle>
+        <DialogContent className="sm:max-w-[700px] p-0 gap-0 overflow-hidden rounded-xl backdrop-blur-md bg-background/95 shadow-lg border animate-scale-in transition-all duration-300">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="text-xl">AI Assistant Features</DialogTitle>
             <DialogDescription>
               Explore recommended prompts, AI tools and your saved prompts
             </DialogDescription>
           </DialogHeader>
           
           <Tabs value={featuresTab} onValueChange={setFeaturesTab} className="mt-2">
-            <TabsList className="w-full">
-              <TabsTrigger value="recommended" className="flex-1">Recommended Prompts</TabsTrigger>
-              <TabsTrigger value="tools" className="flex-1">AI Tools</TabsTrigger>
-              <TabsTrigger value="saved" className="flex-1">Saved Prompts</TabsTrigger>
+            <TabsList className="w-full px-3 bg-muted/50 dark:bg-secondary/50 border-y">
+              <TabsTrigger value="recommended" className="flex-1 py-3 rounded-none data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                Recommended Prompts
+              </TabsTrigger>
+              <TabsTrigger value="tools" className="flex-1 py-3 rounded-none data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                AI Tools
+              </TabsTrigger>
+              <TabsTrigger value="saved" className="flex-1 py-3 rounded-none data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                Saved Prompts
+              </TabsTrigger>
             </TabsList>
             
             {/* Recommended Prompts Tab */}
-            <TabsContent value="recommended" className="max-h-[60vh] overflow-y-auto space-y-2 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {recommendedPrompts.map((prompt) => (
+            <TabsContent value="recommended" className="max-h-[60vh] overflow-y-auto p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {recommendedPrompts.map((prompt, index) => (
                   <Button
                     key={prompt.id}
                     variant="outline"
-                    className="justify-start h-auto py-2 px-3"
+                    className="justify-start h-auto py-3 px-4 text-left rounded-xl border border-border/80 shadow-sm hover:shadow hover:bg-muted/50 dark:hover:bg-secondary/70 hover-lift stagger-item transition-all duration-300"
+                    style={{ animationDelay: `${index * 0.05}s` }}
                     onClick={() => {
                       onRecommendedPrompt?.(prompt.text);
                       setFeaturesOpen(false);
                     }}
                   >
-                    {prompt.icon && <span className="mr-2">{prompt.icon}</span>}
+                    {prompt.icon && (
+                      <span className="mr-3 p-2 rounded-full bg-primary/10 dark:bg-primary/20 text-primary">{prompt.icon}</span>
+                    )}
                     <span className="truncate">{prompt.text}</span>
                   </Button>
                 ))}
@@ -590,33 +678,35 @@ export function ChatLayout({
             </TabsContent>
             
             {/* AI Tools Tab */}
-            <TabsContent value="tools" className="max-h-[60vh] overflow-y-auto space-y-4 mt-4">
-              <div className="grid grid-cols-1 gap-3">
-                {aiTools.map((tool) => (
+            <TabsContent value="tools" className="max-h-[60vh] overflow-y-auto p-6 space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                {aiTools.map((tool, index) => (
                   <div 
                     key={tool.id}
                     className={cn(
-                      "relative rounded-lg border p-4 transition-all hover:shadow",
-                      tool.color ? tool.color : "bg-muted/30"
+                      "relative rounded-xl border p-5 transition-all hover:shadow-md stagger-item",
+                      tool.color ? tool.color : "bg-muted/50 dark:bg-secondary/50",
+                      "hover-lift"
                     )}
+                    style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-4">
                       {tool.icon && (
                         <div className={cn(
-                          "flex h-10 w-10 items-center justify-center rounded-full bg-background",
+                          "flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm",
                           tool.color ? tool.color.replace("bg-", "border-").replace("/10", "/30") : "border-primary"
                         )}>
                           {tool.icon}
                         </div>
                       )}
                       <div className="flex-1">
-                        <h3 className="font-medium mb-1">{tool.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">{tool.description}</p>
+                        <h3 className="font-medium text-lg mb-2">{tool.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-4">{tool.description}</p>
                         <Button 
                           variant="outline" 
                           size="sm"
                           className={cn(
-                            "text-xs",
+                            "text-sm transition-all duration-300",
                             tool.color ? tool.color.replace("bg-", "border-").replace("/10", "/30") : ""
                           )}
                           onClick={() => {
@@ -634,52 +724,58 @@ export function ChatLayout({
             </TabsContent>
             
             {/* Saved Prompts Tab */}
-            <TabsContent value="saved" className="max-h-[60vh] overflow-y-auto mt-4">
+            <TabsContent value="saved" className="max-h-[60vh] overflow-y-auto p-6">
               {savedPrompts.length > 0 ? (
-                <div className="space-y-3">
-                  {savedPrompts.map((prompt) => (
-                    <div key={prompt.id} className="relative rounded-lg border p-3">
-                      <p className="text-sm mr-8 mb-3">{prompt.text}</p>
+                <div className="space-y-4">
+                  {savedPrompts.map((prompt, index) => (
+                    <div 
+                      key={prompt.id} 
+                      className="relative rounded-xl border p-4 hover:shadow-sm transition-all stagger-item hover-lift bg-muted/30 dark:bg-secondary/30"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <p className="text-sm mr-8 mb-4">{prompt.text}</p>
                       <div className="flex justify-end gap-2">
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
-                          className="h-7 px-2"
+                          className="h-8 px-3 transition-all duration-300"
                           onClick={() => {
                             onRecommendedPrompt?.(prompt.text);
                             setFeaturesOpen(false);
                           }}
                         >
-                          <Send className="h-3 w-3 mr-1" />
+                          <Send className="h-3.5 w-3.5 mr-1.5" />
                           <span className="text-xs">Use</span>
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
-                          className="h-7 px-2 text-destructive hover:text-destructive"
+                          className="h-8 px-3 text-destructive hover:text-destructive border-destructive/30 hover:border-destructive/80 hover:bg-destructive/10 transition-all duration-300"
                           onClick={() => onDeleteSavedPrompt?.(prompt.id)}
                         >
-                          <Trash className="h-3 w-3 mr-1" />
+                          <Trash className="h-3.5 w-3.5 mr-1.5" />
                           <span className="text-xs">Delete</span>
                         </Button>
                       </div>
-                      <span className="absolute top-3 right-3 text-xs text-muted-foreground">
+                      <span className="absolute top-4 right-4 text-xs text-muted-foreground">
                         {new Date(prompt.savedAt).toLocaleDateString()}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>No saved prompts yet. Click the bookmark icon on any of your messages to save them for later use.</p>
+                <div className="text-center py-12 text-muted-foreground">
+                  <BookmarkPlus className="h-10 w-10 mx-auto mb-4 opacity-30" />
+                  <p>No saved prompts yet.</p>
+                  <p className="text-sm mt-2">Click the bookmark icon on any of your messages to save them for later use.</p>
                 </div>
               )}
             </TabsContent>
           </Tabs>
           
-          <DialogFooter>
+          <DialogFooter className="p-6 pt-2 border-t bg-muted/30 dark:bg-secondary/30">
             <DialogClose asChild>
-              <Button>Close</Button>
+              <Button size="sm" variant="outline" className="w-full sm:w-auto">Close</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
