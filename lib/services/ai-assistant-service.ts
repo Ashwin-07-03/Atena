@@ -37,7 +37,17 @@ export interface SavedPrompt {
   savedAt: string;
 }
 
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 const MESSAGES_STORAGE_KEY = "atena-ai-messages";
+const CHAT_SESSIONS_STORAGE_KEY = "atena-ai-chat-sessions";
+const ACTIVE_CHAT_SESSION_KEY = "atena-ai-active-chat-session";
 const STUDY_PLANS_STORAGE_KEY = "atena-ai-study-plans";
 const SAVED_PROMPTS_STORAGE_KEY = "atena-ai-saved-prompts";
 
@@ -166,10 +176,106 @@ const generateStudyPlan = (subject: string): StudyPlan => {
 };
 
 export const AIAssistantService = {
-  // Message Management
-  getMessages: (): Message[] => {
+  // Session Management
+  createNewSession: (): ChatSession => {
+    const newSession: ChatSession = {
+      id: uuidv4(),
+      title: "New Chat",
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    const sessions = AIAssistantService.getChatSessions();
+    sessions.push(newSession);
+    
+    localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    localStorage.setItem(ACTIVE_CHAT_SESSION_KEY, newSession.id);
+    
+    return newSession;
+  },
+  
+  getChatSessions: (): ChatSession[] => {
     if (typeof window === "undefined") return [];
     
+    const storedSessions = localStorage.getItem(CHAT_SESSIONS_STORAGE_KEY);
+    if (!storedSessions) return [];
+    
+    try {
+      return JSON.parse(storedSessions);
+    } catch (error) {
+      console.error("Error parsing chat sessions:", error);
+      return [];
+    }
+  },
+  
+  getActiveSessionId: (): string | null => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(ACTIVE_CHAT_SESSION_KEY);
+  },
+  
+  setActiveSession: (sessionId: string): void => {
+    localStorage.setItem(ACTIVE_CHAT_SESSION_KEY, sessionId);
+  },
+  
+  getActiveSession: (): ChatSession | null => {
+    const activeSessionId = AIAssistantService.getActiveSessionId();
+    if (!activeSessionId) return null;
+    
+    const sessions = AIAssistantService.getChatSessions();
+    return sessions.find(session => session.id === activeSessionId) || null;
+  },
+  
+  getSession: (sessionId: string): ChatSession | null => {
+    const sessions = AIAssistantService.getChatSessions();
+    return sessions.find(session => session.id === sessionId) || null;
+  },
+  
+  updateSessionTitle: (sessionId: string, title: string): boolean => {
+    const sessions = AIAssistantService.getChatSessions();
+    const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+    
+    if (sessionIndex === -1) return false;
+    
+    sessions[sessionIndex].title = title;
+    sessions[sessionIndex].updatedAt = new Date().toISOString();
+    
+    localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    return true;
+  },
+  
+  deleteSession: (sessionId: string): boolean => {
+    const sessions = AIAssistantService.getChatSessions();
+    const filteredSessions = sessions.filter(s => s.id !== sessionId);
+    
+    if (filteredSessions.length === sessions.length) return false;
+    
+    localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(filteredSessions));
+    
+    // If we deleted the active session, set a new active session
+    const activeSessionId = AIAssistantService.getActiveSessionId();
+    if (activeSessionId === sessionId) {
+      if (filteredSessions.length > 0) {
+        AIAssistantService.setActiveSession(filteredSessions[0].id);
+      } else {
+        localStorage.removeItem(ACTIVE_CHAT_SESSION_KEY);
+      }
+    }
+    
+    return true;
+  },
+  
+  // Message Management (updated to work with sessions)
+  getMessages: (): Message[] => {
+    // For backward compatibility
+    if (typeof window === "undefined") return [];
+    
+    const activeSession = AIAssistantService.getActiveSession();
+    if (activeSession) {
+      return activeSession.messages;
+    }
+    
+    // Legacy support - return messages from old storage key
     const storedMessages = localStorage.getItem(MESSAGES_STORAGE_KEY);
     if (!storedMessages) return [];
     
@@ -189,15 +295,47 @@ export const AIAssistantService = {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
-    const messages = AIAssistantService.getMessages();
-    messages.push(newMessage);
+    // Get active session or create one if it doesn't exist
+    let activeSession = AIAssistantService.getActiveSession();
+    if (!activeSession) {
+      activeSession = AIAssistantService.createNewSession();
+    }
     
-    localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
+    // Add message to session
+    const sessions = AIAssistantService.getChatSessions();
+    const sessionIndex = sessions.findIndex(s => s.id === activeSession?.id);
+    
+    if (sessionIndex !== -1) {
+      // Update session 
+      sessions[sessionIndex].messages.push(newMessage);
+      sessions[sessionIndex].updatedAt = new Date().toISOString();
+      
+      // Update session title for user messages if this is the first message
+      if (role === "user" && sessions[sessionIndex].messages.length === 1) {
+        const title = content.length > 30 ? content.substring(0, 27) + "..." : content;
+        sessions[sessionIndex].title = title;
+      }
+      
+      localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    }
+    
     return newMessage;
   },
   
   clearMessages: (): void => {
-    localStorage.removeItem(MESSAGES_STORAGE_KEY);
+    const activeSession = AIAssistantService.getActiveSession();
+    if (activeSession) {
+      const sessions = AIAssistantService.getChatSessions();
+      const sessionIndex = sessions.findIndex(s => s.id === activeSession.id);
+      
+      if (sessionIndex !== -1) {
+        sessions[sessionIndex].messages = [];
+        sessions[sessionIndex].updatedAt = new Date().toISOString();
+        localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+      }
+    } else {
+      localStorage.removeItem(MESSAGES_STORAGE_KEY);
+    }
   },
   
   // AI Response
@@ -210,6 +348,51 @@ export const AIAssistantService = {
     
     // Add AI response to chat
     return AIAssistantService.addMessage("assistant", response);
+  },
+  
+  // Migration from old format to new format (if needed)
+  migrateOldMessages: (): void => {
+    if (typeof window === "undefined") return;
+    
+    // Check if we need to migrate old messages
+    const oldMessages = localStorage.getItem(MESSAGES_STORAGE_KEY);
+    if (!oldMessages) return;
+    
+    try {
+      const parsedMessages = JSON.parse(oldMessages);
+      
+      // Only migrate if there are messages and we don't have sessions yet
+      if (parsedMessages.length > 0 && AIAssistantService.getChatSessions().length === 0) {
+        // Create a new session with the old messages
+        const newSession = AIAssistantService.createNewSession();
+        
+        // Get the session to update
+        const sessions = AIAssistantService.getChatSessions();
+        const sessionIndex = sessions.findIndex(s => s.id === newSession.id);
+        
+        if (sessionIndex !== -1) {
+          // Update the session with old messages
+          sessions[sessionIndex].messages = parsedMessages;
+          sessions[sessionIndex].title = "Migrated Chat";
+          
+          // Update the title based on first message if available
+          if (parsedMessages.length > 0 && parsedMessages[0].role === "user") {
+            const firstMessage = parsedMessages[0].content;
+            sessions[sessionIndex].title = firstMessage.length > 30 
+              ? firstMessage.substring(0, 30) + "..." 
+              : firstMessage;
+          }
+          
+          // Save updated sessions
+          localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+          
+          // Remove old messages
+          localStorage.removeItem(MESSAGES_STORAGE_KEY);
+        }
+      }
+    } catch (error) {
+      console.error("Error migrating old messages:", error);
+    }
   },
   
   // Study Plans
@@ -317,6 +500,8 @@ export const AIAssistantService = {
   
   clearAllData: (): void => {
     localStorage.removeItem(MESSAGES_STORAGE_KEY);
+    localStorage.removeItem(CHAT_SESSIONS_STORAGE_KEY);
+    localStorage.removeItem(ACTIVE_CHAT_SESSION_KEY);
     localStorage.removeItem(STUDY_PLANS_STORAGE_KEY);
     localStorage.removeItem(SAVED_PROMPTS_STORAGE_KEY);
   }
