@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
           const element = analyticsContentRef.current.cloneNode(true) as HTMLElement;
           document.body.appendChild(element);
           
-          // Style the clone for better PDF output
+          // Apply additional styling to ensure colors are preserved
           element.style.width = '1200px';
           element.style.padding = '20px';
           element.style.position = 'absolute';
@@ -136,20 +136,108 @@ export default function AnalyticsPage() {
           element.style.left = '-9999px';
           element.style.background = 'white';
           
+          // Force applying computed styles to all children
+          const allElements = element.querySelectorAll('*');
+          allElements.forEach(el => {
+            if (el instanceof HTMLElement) {
+              // Ensure any SVG elements have proper attributes for PDF export
+              if (el.tagName.toLowerCase() === 'svg') {
+                el.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+              }
+              
+              // Force color-related CSS to be applied directly
+              const computedStyle = window.getComputedStyle(el);
+              const importantProps = [
+                'color', 'background-color', 'background', 'fill', 'stroke',
+                'border-color', 'box-shadow'
+              ];
+              
+              importantProps.forEach(prop => {
+                const value = computedStyle.getPropertyValue(prop);
+                if (value && value !== 'none' && value !== 'rgba(0, 0, 0, 0)') {
+                  el.style.setProperty(prop, value, 'important');
+                }
+              });
+              
+              // Handle specific TailwindCSS color classes
+              if (el.className && typeof el.className === 'string') {
+                const classStr = el.className;
+                
+                // Extract and apply bg colors
+                const bgColorMatch = classStr.match(/bg-(blue|green|amber|purple|rose|red|slate|indigo|emerald)-\d+/);
+                if (bgColorMatch) {
+                  const colorClass = bgColorMatch[0];
+                  const colorMap: Record<string, string> = {
+                    'bg-blue-500': '#3b82f6',
+                    'bg-blue-200': '#bfdbfe',
+                    'bg-green-500': '#22c55e',
+                    'bg-green-200': '#bbf7d0',
+                    'bg-amber-500': '#f59e0b',
+                    'bg-amber-200': '#fde68a',
+                    'bg-purple-500': '#a855f7',
+                    'bg-purple-200': '#e9d5ff',
+                    'bg-rose-500': '#f43f5e',
+                    'bg-rose-200': '#fecdd3',
+                    'bg-red-500': '#ef4444',
+                    'bg-red-200': '#fecaca',
+                    'bg-slate-500': '#64748b',
+                    'bg-slate-200': '#e2e8f0',
+                  };
+                  
+                  // Apply the color directly
+                  if (colorMap[colorClass]) {
+                    el.style.backgroundColor = colorMap[colorClass];
+                  }
+                }
+                
+                // Extract and apply text colors
+                const textColorMatch = classStr.match(/text-(blue|green|amber|purple|rose|red|slate|indigo|emerald)-\d+/);
+                if (textColorMatch) {
+                  const colorClass = textColorMatch[0];
+                  const colorMap: Record<string, string> = {
+                    'text-blue-500': '#3b82f6',
+                    'text-green-500': '#22c55e',
+                    'text-amber-500': '#f59e0b',
+                    'text-purple-500': '#a855f7',
+                    'text-rose-500': '#f43f5e',
+                    'text-red-500': '#ef4444',
+                    'text-slate-500': '#64748b',
+                  };
+                  
+                  // Apply the color directly
+                  if (colorMap[colorClass]) {
+                    el.style.color = colorMap[colorClass];
+                  }
+                }
+              }
+            }
+          });
+          
+          // Apply better canvas settings for quality
           const canvas = await html2canvasLib(element, {
-            scale: 1.5, // Higher resolution
+            scale: 2, // Higher resolution
             useCORS: true, // Enable CORS for external images
+            allowTaint: true, // Allow tainted canvas
             logging: false,
             backgroundColor: '#ffffff',
+            imageTimeout: 0, // No timeout
+            onclone: (clonedDoc) => {
+              // Additional processing on the cloned document if needed
+              const clonedElement = clonedDoc.body.querySelector('[data-analytics-content]');
+              if (clonedElement) {
+                // Additional styling can be applied here
+              }
+            }
           });
           
           document.body.removeChild(element);
           
-          const imgData = canvas.toDataURL('image/png');
+          const imgData = canvas.toDataURL('image/png', 1.0); // Max quality
           const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
-            format: 'a4'
+            format: 'a4',
+            compress: false // Better quality
           });
           
           const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -191,7 +279,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6" ref={analyticsContentRef}>
+    <div className="flex flex-col gap-6" ref={analyticsContentRef} data-analytics-content="true">
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
