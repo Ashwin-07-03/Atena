@@ -22,7 +22,7 @@ const navigation = [
   { name: "Study Sessions", href: "/dashboard/study", icon: BookOpen },
   { name: "AI Assistant", href: "/dashboard/ai", icon: BrainCircuit },
   { name: "Analytics", href: "/dashboard/analytics", icon: Zap },
-  { name: "Collaboration", href: "/dashboard/collaboration", icon: Users },
+  { name: "Collaboration", href: "/dashboard/collaborate", icon: Users },
 ]
 
 interface SidebarProps {

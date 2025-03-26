@@ -1,16 +1,43 @@
+"use client";
+
+import { useState } from "react";
 import { Metadata } from "next";
-import { Users, Plus, UserPlus, File, MessageSquare, Calendar, Clock, Link, Search, MoreHorizontal, Grid3X3, ListFilter, Brain } from "lucide-react";
+import { Users, Plus, UserPlus, File, MessageSquare, Calendar, Clock, Link, Search, MoreHorizontal, Grid3X3, ListFilter, Brain, UserRound, FileText, UserPlusIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 
-export const metadata: Metadata = {
-  title: "Collaborate | Atena",
-  description: "Study with peers and share resources",
-};
+// Import our custom components
+import { Chat } from "@/components/collaborate/chat";
+import { ConversationList } from "@/components/collaborate/conversation-list";
+import { SharedResources } from "@/components/collaborate/shared-resources";
+
+// Import collaboration service
+import { 
+  getStudyGroups, 
+  createStudyGroup, 
+  joinStudyGroup, 
+  getUserStudyGroups, 
+  getSharedCalendarEvents, 
+  createCalendarEvent, 
+  getCurrentUser,
+  getConversations,
+  getDirectConversation, 
+  getGroupConversation, 
+  createDirectConversation,
+  getFriends,
+  sendFriendRequest,
+  getPendingFriendRequests,
+  respondToFriendRequest,
+  getUserById,
+  User,
+  StudyGroup,
+  SharedCalendarEvent
+} from "@/lib/services/collaboration-service";
 
 // Sample data
 const studyGroups = [
@@ -176,7 +203,402 @@ const getSubjectColor = (subject: string) => {
   return colorMap[subject] || "bg-gray-500/10 text-gray-500 border-gray-500/20";
 };
 
+// Mock user data to support getUserById if it's not working
+const mockUserData: Record<string, { name: string, avatar?: string }> = {
+  'user-1': { name: 'Current User', avatar: '/avatars/user.jpg' },
+  'user-2': { name: 'Emma S', avatar: '/avatars/emma.jpg' },
+  'user-3': { name: 'Liam K', avatar: '/avatars/liam.jpg' },
+  'user-4': { name: 'Sophia T', avatar: '/avatars/sophia.jpg' },
+  'user-5': { name: 'Noah P', avatar: '/avatars/noah.jpg' },
+};
+
+// Fallback implementation for getUserById if the imported one fails
+const getUserByIdFallback = (userId: string) => {
+  const mockUser = mockUserData[userId];
+  return mockUser ? {
+    id: userId,
+    name: mockUser.name,
+    avatar: mockUser.avatar,
+    email: `${mockUser.name.toLowerCase().replace(' ', '.')}@example.com`,
+    status: 'online' as const,
+  } : undefined;
+};
+
 export default function CollaboratePage() {
+  const [activeTab, setActiveTab] = useState<"messages" | "groups" | "resources" | "calendar">("messages");
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [userStudyGroups, setUserStudyGroups] = useState<StudyGroup[]>(getUserStudyGroups());
+  const [allStudyGroups, setAllStudyGroups] = useState<StudyGroup[]>(getStudyGroups());
+  const [calendarEvents, setCalendarEvents] = useState<SharedCalendarEvent[]>(getSharedCalendarEvents());
+  const [friends, setFriends] = useState<User[]>(getFriends());
+  const [pendingRequests, setPendingRequests] = useState(getPendingFriendRequests());
+  const [conversationView, setConversationView] = useState<"list" | "chat">("list");
+  const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupDescription, setNewGroupDescription] = useState("");
+  const [newGroupSubject, setNewGroupSubject] = useState("Computer Science");
+  
+  // Handle creating a new group
+  const handleCreateGroup = () => {
+    if (!newGroupName.trim() || !newGroupSubject.trim()) return;
+    
+    const newGroup = createStudyGroup({
+      name: newGroupName.trim(),
+      description: newGroupDescription.trim() || `A study group for ${newGroupSubject}`,
+      subject: newGroupSubject,
+      members: [getCurrentUser().id],
+      isPublic: true,
+      tags: [newGroupSubject.toLowerCase()],
+    });
+    
+    setAllStudyGroups([...allStudyGroups, newGroup]);
+    setUserStudyGroups([...userStudyGroups, newGroup]);
+    setNewGroupName("");
+    setNewGroupDescription("");
+  };
+  
+  // Handle joining a group
+  const handleJoinGroup = (groupId: string) => {
+    const success = joinStudyGroup(groupId);
+    if (success) {
+      const group = allStudyGroups.find(g => g.id === groupId);
+      if (group && !userStudyGroups.some(g => g.id === groupId)) {
+        setUserStudyGroups([...userStudyGroups, group]);
+      }
+    }
+  };
+  
+  // Handle selecting a conversation
+  const handleSelectConversation = (conversationId: string) => {
+    setSelectedConversationId(conversationId);
+    setConversationView("chat");
+  };
+  
+  // Handle selecting a group
+  const handleSelectGroup = (groupId: string) => {
+    setSelectedGroupId(groupId);
+    setShowGroupInfo(true);
+  };
+  
+  // Handle friend request
+  const handleSendFriendRequest = (userId: string) => {
+    sendFriendRequest(userId);
+    // In a real app, we would update the UI or show a notification
+  };
+  
+  // Handle responding to friend request
+  const handleRespondToRequest = (requestId: string, accept: boolean) => {
+    respondToFriendRequest(requestId, accept);
+    setPendingRequests(getPendingFriendRequests());
+    if (accept) {
+      setFriends(getFriends());
+    }
+  };
+  
+  // Get the right content to display based on active tab and view state
+  const renderContent = () => {
+    switch (activeTab) {
+      case "messages":
+        if (conversationView === "list" || !selectedConversationId) {
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-220px)]">
+              <div className="md:col-span-1 h-full">
+                <ConversationList 
+                  onSelectConversation={handleSelectConversation}
+                  selectedConversationId={selectedConversationId || undefined}
+                />
+              </div>
+              <div className="md:col-span-2 h-full flex items-center justify-center bg-muted/20 rounded-lg p-8">
+                <div className="text-center">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <h3 className="text-xl font-medium mb-2">Select a conversation</h3>
+                  <p className="text-muted-foreground">
+                    Choose a conversation from the list to start chatting
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-220px)]">
+              <div className="md:col-span-1 h-full">
+                <ConversationList 
+                  onSelectConversation={handleSelectConversation}
+                  selectedConversationId={selectedConversationId}
+                />
+              </div>
+              <div className="md:col-span-2 h-full">
+                {selectedConversationId && (
+                  <Chat conversationId={selectedConversationId} />
+                )}
+              </div>
+            </div>
+          );
+        }
+        
+      case "groups":
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {userStudyGroups.map(group => (
+                <Card key={group.id} className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold">{group.name}</h3>
+                          <p className="text-sm text-muted-foreground mt-1">{group.description}</p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8" 
+                          onClick={() => handleSelectGroup(group.id)}
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                        <div className="flex -space-x-2">
+                          {group.members.slice(0, 3).map((memberId, index) => (
+                            <Avatar key={index} className="border-2 border-background">
+                              <AvatarFallback>U{index + 1}</AvatarFallback>
+                            </Avatar>
+                          ))}
+                          {group.members.length > 3 && (
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-xs font-medium border-2 border-background">
+                              +{group.members.length - 3}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => {
+                            const groupConv = getGroupConversation(group.id);
+                            if (groupConv) {
+                              setSelectedConversationId(groupConv.id);
+                              setActiveTab("messages");
+                              setConversationView("chat");
+                            }
+                          }}>
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Chat
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => {
+                            setSelectedGroupId(group.id);
+                            setActiveTab("resources");
+                          }}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Resources
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="overflow-hidden border-dashed cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col items-center justify-center p-6 h-full min-h-[220px]">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                          <Plus className="h-6 w-6 text-primary" />
+                        </div>
+                        <h3 className="font-medium">Create Study Group</h3>
+                        <p className="text-sm text-muted-foreground text-center mt-1">
+                          Start a new study group to collaborate with peers
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create a Study Group</DialogTitle>
+                    <DialogDescription>
+                      Create a new study group to collaborate with your peers.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="name" className="text-right">
+                        Name
+                      </label>
+                      <Input
+                        id="name"
+                        placeholder="Group name"
+                        className="col-span-3"
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="description" className="text-right">
+                        Description
+                      </label>
+                      <Input
+                        id="description"
+                        placeholder="Group description"
+                        className="col-span-3"
+                        value={newGroupDescription}
+                        onChange={(e) => setNewGroupDescription(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="subject" className="text-right">
+                        Subject
+                      </label>
+                      <select
+                        id="subject"
+                        className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={newGroupSubject}
+                        onChange={(e) => setNewGroupSubject(e.target.value)}
+                      >
+                        <option>Computer Science</option>
+                        <option>Mathematics</option>
+                        <option>Physics</option>
+                        <option>Literature</option>
+                        <option>Biology</option>
+                        <option>Chemistry</option>
+                        <option>History</option>
+                        <option>Art</option>
+                        <option>Music</option>
+                        <option>Languages</option>
+                      </select>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleCreateGroup} disabled={!newGroupName.trim()}>
+                      Create Group
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Discover Study Groups</h2>
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search for study groups..."
+                  className="pl-9"
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {allStudyGroups
+                  .filter(group => !userStudyGroups.some(g => g.id === group.id))
+                  .map(group => (
+                    <Card key={group.id} className="overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="p-6">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-semibold">{group.name}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">{group.description}</p>
+                            </div>
+                            <div 
+                              className={`px-2 py-1 text-xs rounded-full ${
+                                group.subject === "Computer Science" ? "bg-green-100 text-green-800" :
+                                group.subject === "Mathematics" ? "bg-blue-100 text-blue-800" :
+                                group.subject === "Physics" ? "bg-purple-100 text-purple-800" :
+                                group.subject === "Literature" ? "bg-amber-100 text-amber-800" :
+                                "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {group.subject}
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4 pt-4 border-t flex justify-between items-center">
+                            <div className="text-sm text-muted-foreground">
+                              {group.members.length} members
+                            </div>
+                            <Button size="sm" onClick={() => handleJoinGroup(group.id)}>
+                              <UserPlus className="h-4 w-4 mr-2" />
+                              Join Group
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            </div>
+          </div>
+        );
+        
+      case "resources":
+        return <SharedResources groupId={selectedGroupId || undefined} />;
+        
+      case "calendar":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Study Sessions Calendar</h2>
+              <Button>
+                <Calendar className="mr-2 h-4 w-4" />
+                Add Event
+              </Button>
+            </div>
+            
+            <div className="grid gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4">Upcoming Sessions</h3>
+                  <div className="space-y-4">
+                    {calendarEvents.length === 0 ? (
+                      <p className="text-muted-foreground">No upcoming sessions scheduled.</p>
+                    ) : (
+                      calendarEvents.map(event => (
+                        <div key={event.id} className="flex justify-between items-start pb-4 border-b">
+                          <div className="flex gap-4">
+                            <div className="w-14 h-14 rounded-lg bg-primary/10 flex flex-col items-center justify-center">
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(event.startTime).toLocaleDateString(undefined, { month: 'short' })}
+                              </span>
+                              <span className="text-xl font-bold">
+                                {new Date(event.startTime).getDate()}
+                              </span>
+                            </div>
+                            <div>
+                              <h4 className="font-medium">{event.title}</h4>
+                              <p className="text-sm text-muted-foreground">{event.description}</p>
+                              <div className="flex items-center gap-4 mt-2">
+                                <div className="flex items-center text-xs">
+                                  <Calendar className="h-3 w-3 mr-1" />
+                                  {new Date(event.startTime).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center text-xs">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                                  {new Date(event.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Join
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+        
+      default:
+        return null;
+    }
+  };
+  
   return (
     <div className="flex flex-col gap-6">
       {/* Page header */}
@@ -188,428 +610,138 @@ export default function CollaboratePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Join Group
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <UserPlusIcon className="mr-2 h-4 w-4" />
+                Find Friends
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Connect with Other Students</DialogTitle>
+                <DialogDescription>
+                  Find and connect with other students to study together.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search for other students..."
+                    className="pl-9"
+                  />
+                </div>
+                
+                {pendingRequests.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Pending Requests</h3>
+                    {pendingRequests.map(request => {
+                      const sender = getUserById(request.senderId) || getUserByIdFallback(request.senderId);
+                      return (
+                        <div key={request.id} className="flex items-center justify-between p-2 rounded-md border">
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarFallback>{sender?.name?.[0] || "U"}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{sender?.name || "Unknown User"}</p>
+                              <p className="text-xs text-muted-foreground">Sent a friend request</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline" onClick={() => handleRespondToRequest(request.id, false)}>
+                              Decline
+                            </Button>
+                            <Button size="sm" onClick={() => handleRespondToRequest(request.id, true)}>
+                              Accept
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                
+                <div className="grid gap-2">
+                  <h3 className="text-sm font-medium">People you may know</h3>
+                  {allStudyGroups.flatMap(group => group.members)
+                    .filter((memberId, index, self) => 
+                      self.indexOf(memberId) === index && // Deduplicate
+                      memberId !== getCurrentUser().id && // Not current user
+                      !friends.some(f => f.id === memberId) // Not already friends
+                    )
+                    .slice(0, 5) // Limit to 5 suggestions
+                    .map(memberId => {
+                      const user = getUserById(memberId) || getUserByIdFallback(memberId);
+                      if (!user) return null;
+                      
+                      return (
+                        <div key={user.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage src={user.avatar} />
+                              <AvatarFallback>{user.name[0]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{user.name}</p>
+                              <p className="text-xs text-muted-foreground">Student</p>
+                            </div>
+                          </div>
+                          <Button size="sm" variant="outline" onClick={() => handleSendFriendRequest(user.id)}>
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Connect
+                          </Button>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Create Group
-          </Button>
-        </div>
-      </div>
-
-      {/* Search and filter bar */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search study groups or resources..."
-            className="pl-9"
-          />
-        </div>
-        <Button variant="outline" className="sm:w-auto w-full">
-          <ListFilter className="mr-2 h-4 w-4" />
-          Filter
-        </Button>
-        <div className="flex gap-1">
-          <Button variant="outline" size="icon" className="h-10 w-10">
-            <Grid3X3 className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon" className="h-10 w-10 bg-muted/50">
-            <ListFilter className="h-4 w-4" />
+            New Group
           </Button>
         </div>
       </div>
 
       {/* Main content */}
-      <Tabs defaultValue="groups" className="space-y-6">
+      <Tabs defaultValue="messages" value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
         <TabsList>
-          <TabsTrigger value="groups">Study Groups</TabsTrigger>
-          <TabsTrigger value="resources">Shared Resources</TabsTrigger>
-          <TabsTrigger value="sessions">Upcoming Sessions</TabsTrigger>
+          <TabsTrigger value="messages">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Messages
+          </TabsTrigger>
+          <TabsTrigger value="groups">
+            <Users className="h-4 w-4 mr-2" />
+            Study Groups
+          </TabsTrigger>
+          <TabsTrigger value="resources">
+            <FileText className="h-4 w-4 mr-2" />
+            Resources
+          </TabsTrigger>
+          <TabsTrigger value="calendar">
+            <Calendar className="h-4 w-4 mr-2" />
+            Calendar
+          </TabsTrigger>
         </TabsList>
         
-        {/* Study Groups Tab */}
+        <TabsContent value="messages">
+          {renderContent()}
+        </TabsContent>
+        
         <TabsContent value="groups">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            {studyGroups.map((group) => (
-              <Card key={group.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle>{group.name}</CardTitle>
-                      <CardDescription className="mt-1">{group.description}</CardDescription>
-                    </div>
-                    <Badge variant="outline" className={getSubjectColor(group.subject)}>
-                      {group.subject}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pb-3">
-                  <div className="flex justify-between text-sm mb-4">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span>{group.members} members</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span>{group.nextSession}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex -space-x-2">
-                      {group.avatars.map((avatar, i) => (
-                        <Avatar key={i} className="border-2 border-background h-8 w-8">
-                          <AvatarImage src={avatar.image} alt={avatar.name} />
-                          <AvatarFallback>{avatar.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                      ))}
-                      {group.members > group.avatars.length && (
-                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-xs font-medium">
-                          +{group.members - group.avatars.length}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className={`${
-                        group.activity === "high" ? "bg-green-500/10 text-green-500" :
-                        group.activity === "medium" ? "bg-amber-500/10 text-amber-500" :
-                        "bg-red-500/10 text-red-500"
-                      }`}>
-                        {group.activity.charAt(0).toUpperCase() + group.activity.slice(1)} Activity
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t pt-3 flex justify-between">
-                  <Button variant="outline" size="sm">
-                    <MessageSquare className="mr-1 h-4 w-4" />
-                    Chat
-                  </Button>
-                  <Button size="sm">
-                    View Group
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-          
-          {/* Create Group Card */}
-          <Card className="mt-4 border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-10">
-              <div className="bg-primary/10 h-12 w-12 rounded-full flex items-center justify-center mb-4">
-                <Plus className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-medium mb-2">Create Study Group</h3>
-              <p className="text-muted-foreground text-center mb-6 max-w-md">
-                Start a new study group for your class, project, or topic of interest.
-                Invite peers and share resources to learn together.
-              </p>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Group
-              </Button>
-            </CardContent>
-          </Card>
+          {renderContent()}
         </TabsContent>
         
-        {/* Shared Resources Tab */}
         <TabsContent value="resources">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle>Shared Resources</CardTitle>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Upload Resource
-                </Button>
-              </div>
-              <CardDescription>Files and documents shared in your study groups</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {sharedResources.map((resource) => (
-                  <div key={resource.id} className="flex items-start p-3 hover:bg-muted/50 rounded-lg transition-colors">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 mr-3">
-                      <File className="h-5 w-5 text-primary" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="font-medium truncate">{resource.name}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <span>{resource.type} • {resource.size}</span>
-                            <span>•</span>
-                            <span>{resource.group}</span>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center gap-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={resource.avatar} alt={resource.sharedBy} />
-                            <AvatarFallback>{resource.sharedBy.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <span className="text-xs text-muted-foreground">
-                            Shared by {resource.sharedBy}, {resource.sharedOn}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center">
-                          <Button variant="ghost" size="sm" className="h-7 text-xs">
-                            <Link className="mr-1 h-3 w-3" />
-                            Copy Link
-                          </Button>
-                          <Button variant="outline" size="sm" className="h-7 text-xs">
-                            Download
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="border-t pt-4 flex justify-between">
-              <div className="text-sm text-muted-foreground">
-                Showing {sharedResources.length} of {sharedResources.length} resources
-              </div>
-              <Button variant="outline" size="sm">
-                View All Resources
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          {/* AI Resource Recommendations */}
-          <Card className="mt-6 bg-primary/5 border-primary/20">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-primary" />
-                <CardTitle>Resource Recommendations</CardTitle>
-              </div>
-              <CardDescription>AI-suggested resources based on your study groups</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 bg-card border rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-blue-500/10 h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0">
-                      <File className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Quantum Physics Lecture Notes</h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Comprehensive notes on quantum mechanics principles relevant to your Physics group
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-blue-500/10 text-blue-500">
-                          Physics
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">From MIT OpenCourseWare</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-4 bg-card border rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-green-500/10 h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0">
-                      <File className="h-4 w-4 text-green-500" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Algorithm Visualization Tools</h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Interactive tools to visualize sorting and pathfinding algorithms for your CS group
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-green-500/10 text-green-500">
-                          Computer Science
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">From AlgoViz.org</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="border-t border-primary/10 pt-4">
-              <Button size="sm" className="ml-auto">
-                Get More Recommendations
-              </Button>
-            </CardFooter>
-          </Card>
+          {renderContent()}
         </TabsContent>
         
-        {/* Upcoming Sessions Tab */}
-        <TabsContent value="sessions">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle>Upcoming Study Sessions</CardTitle>
-                <CardDescription>Scheduled meetings with your study groups</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {upcomingSessions.map((session) => {
-                  const groupData = studyGroups.find(g => g.name === session.group);
-                  const colorClass = groupData ? getSubjectColor(groupData.subject) : "";
-                  
-                  return (
-                    <div key={session.id} className="p-4 border rounded-lg hover:border-primary/50 transition-colors">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-medium">{session.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{session.group}</p>
-                        </div>
-                        <Badge variant="outline" className={colorClass}>
-                          {groupData?.subject || "Other"}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4 mt-4">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{session.date}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{session.time}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{session.attendees} attending</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">Group chat available</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                        <div className="text-sm">
-                          <span className="text-muted-foreground">Location: </span>
-                          <span>{session.location}</span>
-                        </div>
-                        <Button size="sm">
-                          Join Session
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </CardContent>
-              <CardFooter className="border-t pt-4">
-                <Button variant="outline" className="w-full" size="sm">
-                  View All Sessions
-                </Button>
-              </CardFooter>
-            </Card>
-            
-            <div className="space-y-6">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Schedule a Session</CardTitle>
-                  <CardDescription>Plan a study session with your group</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-1 block">Select Study Group</label>
-                      <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                        <option>Physics Study Group</option>
-                        <option>Computer Science Club</option>
-                        <option>Literature Analysis</option>
-                        <option>Calculus Masters</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-1 block">Session Title</label>
-                      <Input placeholder="e.g., Exam Preparation Session" />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Date</label>
-                        <Input type="date" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1 block">Time</label>
-                        <Input type="time" />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-1 block">Location</label>
-                      <Input placeholder="e.g., Library Study Room or Zoom Link" />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t pt-4">
-                  <Button className="w-full">
-                    Schedule Study Session
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              <Card className="bg-muted/50">
-                <CardHeader className="pb-3">
-                  <CardTitle>Study Statistics</CardTitle>
-                  <CardDescription>Insights from your collaborative study sessions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-primary/10 h-8 w-8 rounded-full flex items-center justify-center">
-                          <Clock className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>Total Collaborative Hours</span>
-                      </div>
-                      <span className="font-bold">26.5 hours</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pb-2 border-b">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-primary/10 h-8 w-8 rounded-full flex items-center justify-center">
-                          <Users className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>Active Groups</span>
-                      </div>
-                      <span className="font-bold">4 groups</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pb-2 border-b">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-primary/10 h-8 w-8 rounded-full flex items-center justify-center">
-                          <File className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>Shared Resources</span>
-                      </div>
-                      <span className="font-bold">18 files</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-primary/10 h-8 w-8 rounded-full flex items-center justify-center">
-                          <MessageSquare className="h-4 w-4 text-primary" />
-                        </div>
-                        <span>Messages Exchanged</span>
-                      </div>
-                      <span className="font-bold">342</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+        <TabsContent value="calendar">
+          {renderContent()}
         </TabsContent>
       </Tabs>
     </div>
