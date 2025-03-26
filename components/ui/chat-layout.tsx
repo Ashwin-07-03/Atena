@@ -109,10 +109,16 @@ export interface ChatLayoutProps {
   onSendMessage?: (message: string) => void;
   /** Function called when input message changes */
   onInputChange?: (message: string) => void;
+  /** Function to set input message */
+  setInputMessage?: (message: string) => void;
   /** Function called when a recommended prompt is selected */
   onRecommendedPrompt?: (prompt: string) => void;
+  /** Function called when a recommended prompt is selected (alternate name) */
+  onUsePrompt?: (prompt: string) => void;
   /** Function called when an AI tool is selected */
   onAITool?: (prompt: string) => void;
+  /** Function called when an AI tool is selected (alternate name) */
+  onUseTool?: (prompt: string) => void;
   /** Function to save a prompt */
   onSavePrompt?: (text: string) => void;
   /** Function to delete a saved prompt */
@@ -123,6 +129,10 @@ export interface ChatLayoutProps {
   apiSettingsLink?: string;
   /** Function to export chat as PDF */
   onExportPDF?: () => void;
+  /** Custom header action element */
+  headerAction?: React.ReactNode;
+  /** Model status indicator element */
+  modelStatus?: React.ReactNode;
 }
 
 // Updated hover effect for the sidebar with more responsive behavior
@@ -184,13 +194,18 @@ export function ChatLayout({
   onDeleteSession,
   onSendMessage,
   onInputChange,
+  setInputMessage,
   onRecommendedPrompt,
+  onUsePrompt,
   onAITool,
+  onUseTool,
   onSavePrompt,
   onDeleteSavedPrompt,
   isUsingGemini = false,
   apiSettingsLink,
   onExportPDF,
+  headerAction,
+  modelStatus,
 }: ChatLayoutProps) {
   const {
     isOpen: sidebarOpen,
@@ -249,6 +264,33 @@ export function ChatLayout({
   const handleSendMessage = () => {
     if (!inputMessage?.trim() || !onSendMessage) return;
     onSendMessage(inputMessage);
+  };
+
+  // Handler for recommended prompts that supports both naming conventions
+  const handleRecommendedPrompt = (prompt: string) => {
+    if (onUsePrompt) {
+      onUsePrompt(prompt);
+    } else if (onRecommendedPrompt) {
+      onRecommendedPrompt(prompt);
+    }
+  };
+  
+  // Handler for AI tools that supports both naming conventions
+  const handleAITool = (tool: string) => {
+    if (onUseTool) {
+      onUseTool(tool);
+    } else if (onAITool) {
+      onAITool(tool);
+    }
+  };
+  
+  // Handler for input changes that supports both setInputMessage and onInputChange
+  const handleInputChange = (value: string) => {
+    if (setInputMessage) {
+      setInputMessage(value);
+    } else if (onInputChange) {
+      onInputChange(value);
+    }
   };
 
   // Handle keyboard shortcuts
@@ -693,8 +735,13 @@ export function ChatLayout({
               )}
             </Button>
             
-            {/* API indicator */}
-            {apiSettingsLink && (
+            {/* Custom header action */}
+            {headerAction}
+            
+            {/* API indicator or custom model status */}
+            {modelStatus ? (
+              modelStatus
+            ) : apiSettingsLink ? (
               <Link href={apiSettingsLink} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-200">
                 {isUsingGemini ? (
                   <span className="flex items-center gap-1 text-blue-400">
@@ -708,7 +755,7 @@ export function ChatLayout({
                   </span>
                 )}
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -802,7 +849,7 @@ export function ChatLayout({
                         variant="outline"
                         size="sm"
                         className="text-sm h-9 bg-gray-800/60 border-gray-700 text-gray-200 hover:bg-gray-700 hover:text-white transition-all"
-                        onClick={() => onRecommendedPrompt?.(prompt.text)}
+                        onClick={() => handleRecommendedPrompt(prompt.text)}
                       >
                         {prompt.icon}
                         <span className="ml-2 truncate max-w-[180px]">{prompt.text}</span>
@@ -844,7 +891,7 @@ export function ChatLayout({
                 <Textarea
                   placeholder="Type your message here..."
                   value={inputMessage}
-                  onChange={(e) => onInputChange?.(e.target.value)}
+                  onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={handleKeyDown}
                   className="min-h-[56px] max-h-[250px] resize-none bg-transparent border-0 text-base text-gray-100 focus-visible:ring-0 p-0 shadow-none flex-1 placeholder-gray-400"
                 />
@@ -872,7 +919,7 @@ export function ChatLayout({
                     variant="outline"
                     size="sm"
                     className="text-sm h-8 bg-[#212121] hover:bg-gray-700 border-gray-700 text-gray-300 transition-colors"
-                    onClick={() => onRecommendedPrompt?.(prompt.text)}
+                    onClick={() => handleRecommendedPrompt(prompt.text)}
                   >
                     {prompt.icon && <span className="mr-1.5">{prompt.icon}</span>}
                     <span className="truncate max-w-[200px]">{prompt.text}</span>
@@ -1061,7 +1108,7 @@ export function ChatLayout({
                     key={prompt.id}
                     className="flex items-center text-left py-3 px-4 rounded-lg border border-gray-700 bg-[#212121] hover:bg-gray-800 text-gray-200 transition-all"
                     onClick={() => {
-                      onRecommendedPrompt?.(prompt.text);
+                      handleRecommendedPrompt(prompt.text);
                       setFeaturesOpen(false);
                     }}
                   >
@@ -1096,7 +1143,7 @@ export function ChatLayout({
                           size="default"
                           className="bg-[#3b5bdb] text-white border-none hover:bg-[#364fc7]"
                           onClick={() => {
-                            onAITool?.(tool.prompt);
+                            handleAITool(tool.prompt);
                             setFeaturesOpen(false);
                           }}
                         >
@@ -1125,7 +1172,7 @@ export function ChatLayout({
                           size="sm"
                           className="h-9 px-4 bg-[#3b5bdb]/90 border-none text-white hover:bg-[#3b5bdb] shadow-sm"
                           onClick={() => {
-                            onRecommendedPrompt?.(prompt.text);
+                            handleRecommendedPrompt(prompt.text);
                             setFeaturesOpen(false);
                           }}
                         >
