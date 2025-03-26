@@ -12,7 +12,8 @@ import {
   Gauge, 
   Settings, 
   Users, 
-  Zap 
+  Zap,
+  MessageSquare 
 } from "lucide-react"
 
 const navigation = [
@@ -21,6 +22,7 @@ const navigation = [
   { name: "Schedule", href: "/dashboard/schedule", icon: CalendarClock },
   { name: "Study Sessions", href: "/dashboard/study", icon: BookOpen },
   { name: "AI Assistant", href: "/dashboard/ai", icon: BrainCircuit },
+  { name: "Study Chatbot", href: "/dashboard/chatbot", icon: MessageSquare },
   { name: "Analytics", href: "/dashboard/analytics", icon: Zap },
   { name: "Collaboration", href: "/dashboard/collaborate", icon: Users },
 ]
