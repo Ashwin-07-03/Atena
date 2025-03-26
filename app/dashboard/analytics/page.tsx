@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   BarChart, 
   Clock, 
@@ -15,7 +15,10 @@ import {
   PieChart, 
   Download, 
   Filter,
-  ChevronDown 
+  ChevronDown,
+  FileDown,
+  FileJson,
+  FileText
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,6 +28,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { 
   StudyTimeChart, 
@@ -48,6 +62,11 @@ export default function AnalyticsPage() {
   const [selectedMetrics, setSelectedMetrics] = useState<('studyHours' | 'grade' | 'performance')[]>(['studyHours', 'grade']);
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'semester'>('month');
   const [isClient, setIsClient] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'json'>('pdf');
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  
+  const analyticsContentRef = useRef<HTMLDivElement>(null);
   
   // Make sure we're rendering on the client side
   useEffect(() => {
@@ -74,20 +93,90 @@ export default function AnalyticsPage() {
     setTimeframe(newTimeframe);
   };
   
-  const handleDownloadData = () => {
+  const handleExportData = async () => {
+    setExportLoading(true);
+    setExportError(null);
+    
     try {
-      const dataStr = JSON.stringify(analyticsData, null, 2);
-      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-      
-      const exportName = 'atena_analytics_export.json';
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportName);
-      linkElement.click();
+      if (exportFormat === 'json') {
+        // JSON export
+        const dataStr = JSON.stringify(analyticsData, null, 2);
+        const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+        const exportName = 'atena_analytics_export.json';
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportName);
+        linkElement.click();
+      } else {
+        // PDF export
+        try {
+          // Dynamic import of the required libraries for PDF export
+          const [html2canvas, jsPDFModule] = await Promise.all([
+            import('html2canvas'),
+            import('jspdf')
+          ]);
+          
+          const html2canvasLib = html2canvas.default;
+          const jsPDF = jsPDFModule.default;
+          
+          if (!analyticsContentRef.current) {
+            throw new Error("Could not find analytics content to export");
+          }
+          
+          // Create a clone of the element to modify for PDF export
+          const element = analyticsContentRef.current.cloneNode(true) as HTMLElement;
+          document.body.appendChild(element);
+          
+          // Style the clone for better PDF output
+          element.style.width = '1200px';
+          element.style.padding = '20px';
+          element.style.position = 'absolute';
+          element.style.top = '-9999px';
+          element.style.left = '-9999px';
+          element.style.background = 'white';
+          
+          const canvas = await html2canvasLib(element, {
+            scale: 1.5, // Higher resolution
+            useCORS: true, // Enable CORS for external images
+            logging: false,
+            backgroundColor: '#ffffff',
+          });
+          
+          document.body.removeChild(element);
+          
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+          });
+          
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
+          const imgWidth = canvas.width;
+          const imgHeight = canvas.height;
+          const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+          const imgX = (pdfWidth - imgWidth * ratio) / 2;
+          
+          // Add title
+          pdf.setFontSize(18);
+          pdf.text('Atena Analytics Report', pdfWidth / 2, 15, { align: 'center' });
+          pdf.setFontSize(12);
+          pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pdfWidth / 2, 22, { align: 'center' });
+          pdf.addImage(imgData, 'PNG', imgX, 30, imgWidth * ratio, imgHeight * ratio);
+          
+          pdf.save('atena_analytics_report.pdf');
+        } catch (err) {
+          console.error('Error generating PDF:', err);
+          setExportError('Failed to generate PDF. Please try again.');
+        }
+      }
     } catch (error) {
-      console.error('Error exporting analytics data:', error);
-      alert('Failed to export data. Please try again.');
+      console.error('Error exporting data:', error);
+      setExportError('Failed to export data. Please try again.');
+    } finally {
+      setExportLoading(false);
     }
   };
   
@@ -102,7 +191,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" ref={analyticsContentRef}>
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -112,10 +201,87 @@ export default function AnalyticsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleDownloadData}>
-            <Download className="mr-2 h-4 w-4" />
-            Export Data
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <FileDown className="mr-2 h-4 w-4" />
+                Export Data
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Export Analytics Data</DialogTitle>
+                <DialogDescription>
+                  Download your analytics data in your preferred format.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="export-format" className="text-right">
+                    Format
+                  </Label>
+                  <Select
+                    value={exportFormat}
+                    onValueChange={(val) => setExportFormat(val as 'pdf' | 'json')}
+                  >
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pdf">
+                        <div className="flex items-center">
+                          <FileText className="mr-2 h-4 w-4" />
+                          <span>PDF Document (.pdf)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="json">
+                        <div className="flex items-center">
+                          <FileJson className="mr-2 h-4 w-4" />
+                          <span>JSON Data (.json)</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {exportFormat === 'pdf' && (
+                  <div className="text-sm text-muted-foreground">
+                    <p>PDF export will include visualizations and key metrics from your analytics dashboard.</p>
+                  </div>
+                )}
+                
+                {exportFormat === 'json' && (
+                  <div className="text-sm text-muted-foreground">
+                    <p>JSON export will include the raw data for further analysis or importing into other applications.</p>
+                  </div>
+                )}
+                
+                {exportError && (
+                  <div className="text-sm text-red-500 mt-2">
+                    {exportError}
+                  </div>
+                )}
+              </div>
+              
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button 
+                  type="submit" 
+                  onClick={handleExportData}
+                  disabled={exportLoading}
+                >
+                  {exportLoading && (
+                    <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground"></span>
+                  )}
+                  {exportLoading ? 'Exporting...' : 'Download'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          
           <Button>
             <Calendar className="mr-2 h-4 w-4" />
             View Calendar
