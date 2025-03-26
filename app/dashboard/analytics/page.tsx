@@ -1,83 +1,106 @@
-import { Metadata } from "next";
-import { BarChart, Clock, Calendar, Brain, TrendingUp, Target, Zap, Award, BookOpen, LineChart, PieChart, Download } from "lucide-react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { 
+  BarChart, 
+  Clock, 
+  Calendar, 
+  Brain, 
+  TrendingUp, 
+  Target, 
+  Zap, 
+  Award, 
+  BookOpen, 
+  LineChart, 
+  PieChart, 
+  Download, 
+  Filter,
+  ChevronDown 
+} from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
-export const metadata: Metadata = {
-  title: "Analytics | Atena",
-  description: "Track and analyze your study performance",
-};
+import { 
+  StudyTimeChart, 
+  FocusLineChart, 
+  SubjectPieChart, 
+  ProgressChart, 
+  TaskBreakdownChart, 
+  Recommendations,
+  type SubjectData
+} from "@/components/analytics";
 
-// Sample data for analytics
-const weeklyData = [
-  { day: "Mon", hours: 3.5, focus: 75 },
-  { day: "Tue", hours: 4.2, focus: 82 },
-  { day: "Wed", hours: 2.0, focus: 65 },
-  { day: "Thu", hours: 5.0, focus: 85 },
-  { day: "Fri", hours: 3.8, focus: 80 },
-  { day: "Sat", hours: 1.5, focus: 70 },
-  { day: "Sun", hours: 2.5, focus: 78 },
-];
-
-const subjectData = [
-  { name: "Physics", hours: 8.5, progress: 78, color: "bg-blue-500" },
-  { name: "Computer Science", hours: 7.2, progress: 65, color: "bg-green-500" },
-  { name: "Mathematics", hours: 6.5, progress: 72, color: "bg-amber-500" },
-  { name: "Literature", hours: 4.0, progress: 85, color: "bg-purple-500" },
-  { name: "Biology", hours: 3.8, progress: 60, color: "bg-rose-500" },
-];
-
-const streakData = [
-  { date: "Mar 20", count: 3.5 },
-  { date: "Mar 21", count: 4.2 },
-  { date: "Mar 22", count: 0 },
-  { date: "Mar 23", count: 5.0 },
-  { date: "Mar 24", count: 3.8 },
-  { date: "Mar 25", count: 1.5 },
-  { date: "Mar 26", count: 2.5 },
-  { date: "Mar 27", count: 4.0 },
-  { date: "Mar 28", count: 3.2 },
-  { date: "Mar 29", count: 0 },
-  { date: "Mar 30", count: 0 },
-  { date: "Mar 31", count: 2.8 },
-  { date: "Apr 1", count: 3.5 },
-  { date: "Apr 2", count: 4.2 },
-];
-
-const insightsData = [
-  {
-    id: "1",
-    title: "Best Focus Time",
-    description: "You achieve your highest focus scores between 9am-11am",
-    icon: Clock,
-    action: "Schedule important study sessions in the morning",
-  },
-  {
-    id: "2",
-    title: "Subject Improvement",
-    description: "Your Physics performance has improved by 15% this month",
-    icon: TrendingUp,
-    action: "Continue with your current study approach",
-  },
-  {
-    id: "3",
-    title: "Study Consistency",
-    description: "You've maintained a 5-day study streak",
-    icon: Calendar,
-    action: "Keep up the momentum to improve retention",
-  },
-  {
-    id: "4",
-    title: "Learning Gap",
-    description: "You're behind on Computer Science algorithm topics",
-    icon: Target,
-    action: "Allocate 3 extra hours this week to catch up",
-  },
-];
+import { 
+  getAnalyticsData, 
+  updateAnalyticsData,
+  type AnalyticsData
+} from "@/lib/services/analytics-service";
 
 export default function AnalyticsPage() {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(() => getAnalyticsData());
+  const [showPrevWeek, setShowPrevWeek] = useState(false);
+  const [selectedMetrics, setSelectedMetrics] = useState<('studyHours' | 'grade' | 'performance')[]>(['studyHours', 'grade']);
+  const [timeframe, setTimeframe] = useState<'week' | 'month' | 'semester'>('month');
+  const [isClient, setIsClient] = useState(false);
+  
+  // Make sure we're rendering on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  // Functions to handle data updates
+  const handleCompareToggle = () => {
+    setShowPrevWeek(!showPrevWeek);
+  };
+  
+  const handleMetricToggle = (metric: 'studyHours' | 'grade' | 'performance') => {
+    if (selectedMetrics.includes(metric)) {
+      // Don't remove the last metric
+      if (selectedMetrics.length > 1) {
+        setSelectedMetrics(selectedMetrics.filter(m => m !== metric));
+      }
+    } else {
+      setSelectedMetrics([...selectedMetrics, metric]);
+    }
+  };
+  
+  const handleTimeframeChange = (newTimeframe: 'week' | 'month' | 'semester') => {
+    setTimeframe(newTimeframe);
+  };
+  
+  const handleDownloadData = () => {
+    try {
+      const dataStr = JSON.stringify(analyticsData, null, 2);
+      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+      
+      const exportName = 'atena_analytics_export.json';
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportName);
+      linkElement.click();
+    } catch (error) {
+      console.error('Error exporting analytics data:', error);
+      alert('Failed to export data. Please try again.');
+    }
+  };
+  
+  if (!isClient) {
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-center h-96">
+          <p className="text-muted-foreground">Loading analytics data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {/* Page header */}
@@ -89,7 +112,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleDownloadData}>
             <Download className="mr-2 h-4 w-4" />
             Export Data
           </Button>
@@ -111,7 +134,7 @@ export default function AnalyticsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Study Time</p>
                 <div className="flex items-baseline gap-1">
-                  <h3 className="text-2xl font-bold">22.5</h3>
+                  <h3 className="text-2xl font-bold">{analyticsData.studyStats.totalHours.toFixed(1)}</h3>
                   <p className="text-sm text-muted-foreground">hours</p>
                 </div>
                 <p className="text-xs text-green-500">↑ 15% from last week</p>
@@ -129,7 +152,7 @@ export default function AnalyticsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Average Focus</p>
                 <div className="flex items-baseline gap-1">
-                  <h3 className="text-2xl font-bold">76%</h3>
+                  <h3 className="text-2xl font-bold">{analyticsData.studyStats.averageFocus}%</h3>
                   <p className="text-sm text-muted-foreground">score</p>
                 </div>
                 <p className="text-xs text-green-500">↑ 5% from last week</p>
@@ -147,10 +170,10 @@ export default function AnalyticsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Current Streak</p>
                 <div className="flex items-baseline gap-1">
-                  <h3 className="text-2xl font-bold">5</h3>
+                  <h3 className="text-2xl font-bold">{analyticsData.studyStats.currentStreak}</h3>
                   <p className="text-sm text-muted-foreground">days</p>
                 </div>
-                <p className="text-xs text-green-500">Your best: 8 days</p>
+                <p className="text-xs text-green-500">Your best: {analyticsData.studyStats.bestStreak} days</p>
               </div>
             </div>
           </CardContent>
@@ -165,7 +188,7 @@ export default function AnalyticsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Sessions Completed</p>
                 <div className="flex items-baseline gap-1">
-                  <h3 className="text-2xl font-bold">18</h3>
+                  <h3 className="text-2xl font-bold">{analyticsData.studyStats.completedSessions}</h3>
                   <p className="text-sm text-muted-foreground">this month</p>
                 </div>
                 <p className="text-xs text-amber-500">→ On track with your goal</p>
@@ -177,12 +200,27 @@ export default function AnalyticsPage() {
 
       {/* Main charts */}
       <Tabs defaultValue="time" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="time">Study Time</TabsTrigger>
-          <TabsTrigger value="focus">Focus Score</TabsTrigger>
-          <TabsTrigger value="subjects">Subjects</TabsTrigger>
-          <TabsTrigger value="streak">Study Streak</TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <TabsList>
+            <TabsTrigger value="time">Study Time</TabsTrigger>
+            <TabsTrigger value="focus">Focus Score</TabsTrigger>
+            <TabsTrigger value="subjects">Subjects</TabsTrigger>
+            <TabsTrigger value="progress">Progress</TabsTrigger>
+            <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          </TabsList>
+          
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleCompareToggle}
+              className={showPrevWeek ? "bg-muted" : ""}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              {showPrevWeek ? "Hide Comparison" : "Compare with Previous"}
+            </Button>
+          </div>
+        </div>
         
         <TabsContent value="time" className="space-y-4">
           <Card>
@@ -191,34 +229,26 @@ export default function AnalyticsPage() {
               <CardDescription>Hours spent studying each day</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80 w-full">
-                {/* This would be a real chart in production */}
-                <div className="flex items-end h-64 gap-2 pt-8">
-                  {weeklyData.map((day) => (
-                    <div key={day.day} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-blue-500 rounded-t-sm"
-                        style={{ height: `${(day.hours / 6) * 100}%` }}
-                      ></div>
-                      <div className="text-xs mt-2">{day.day}</div>
-                      <div className="text-xs text-muted-foreground">{day.hours}h</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <StudyTimeChart 
+                data={analyticsData.weeklyData} 
+                showPreviousWeek={showPrevWeek}
+                previousWeekData={analyticsData.prevWeeklyData}
+              />
             </CardContent>
             <CardFooter className="border-t pt-4">
               <div className="flex items-center justify-between w-full text-sm">
                 <div className="text-muted-foreground">
-                  Weekly total: <span className="font-medium">22.5 hours</span>
+                  Weekly total: <span className="font-medium">{analyticsData.studyStats.totalHours.toFixed(1)} hours</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-blue-500/10 text-blue-500">
                     This Week
                   </Badge>
-                  <Badge variant="outline">
-                    Previous Week
-                  </Badge>
+                  {showPrevWeek && (
+                    <Badge variant="outline" className="bg-slate-500/10 text-slate-500">
+                      Previous Week
+                    </Badge>
+                  )}
                 </div>
               </div>
             </CardFooter>
@@ -354,54 +384,26 @@ export default function AnalyticsPage() {
               <CardDescription>How your concentration changes over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-80 w-full">
-                {/* This would be a line chart in production */}
-                <div className="flex flex-col h-64 w-full relative pt-8">
-                  <div className="absolute inset-0 flex flex-col justify-between py-5">
-                    {[100, 80, 60, 40, 20, 0].map((tick) => (
-                      <div key={tick} className="w-full h-px bg-border flex items-center">
-                        <span className="text-xs text-muted-foreground pr-2">{tick}%</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <svg className="h-full w-full" viewBox="0 0 700 300" preserveAspectRatio="none">
-                    <polyline
-                      points="0,75 100,54 200,105 300,45 400,60 500,70 600,45 700,66"
-                      fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="3"
-                    />
-                    <circle cx="0" cy="75" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="100" cy="54" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="200" cy="105" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="300" cy="45" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="400" cy="60" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="500" cy="70" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="600" cy="45" r="4" fill="hsl(var(--primary))" />
-                    <circle cx="700" cy="66" r="4" fill="hsl(var(--primary))" />
-                  </svg>
-                  
-                  <div className="flex justify-between text-xs text-muted-foreground px-2 mt-2">
-                    {weeklyData.map((day) => (
-                      <div key={day.day}>{day.day}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <FocusLineChart 
+                data={analyticsData.weeklyData} 
+                showPreviousWeek={showPrevWeek}
+                previousWeekData={analyticsData.prevWeeklyData}
+              />
             </CardContent>
             <CardFooter className="border-t pt-4">
               <div className="flex items-center justify-between w-full text-sm">
                 <div className="text-muted-foreground">
-                  Average focus: <span className="font-medium">76%</span>
+                  Average focus: <span className="font-medium">{analyticsData.studyStats.averageFocus}%</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-primary/10 text-primary">
                     This Week
                   </Badge>
-                  <Badge variant="outline">
-                    Previous Week
-                  </Badge>
+                  {showPrevWeek && (
+                    <Badge variant="outline">
+                      Previous Week
+                    </Badge>
+                  )}
                 </div>
               </div>
             </CardFooter>
@@ -492,7 +494,7 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-5">
-                  {subjectData.map((subject) => (
+                  {analyticsData.subjectData.map((subject: SubjectData) => (
                     <div key={subject.name} className="space-y-1">
                       <div className="flex justify-between text-sm">
                         <span>{subject.name}</span>
@@ -531,80 +533,16 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="w-64 h-64 relative flex items-center justify-center">
-                  {/* This would be a pie chart in production */}
-                  <svg viewBox="0 0 100 100" className="w-full h-full">
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="hsl(var(--muted))" strokeWidth="20" />
-                    
-                    {/* Physics slice */}
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="transparent" 
-                      stroke="#3b82f6" 
-                      strokeWidth="20"
-                      strokeDasharray="251.2 251.2"
-                      strokeDashoffset="0"
-                    />
-                    
-                    {/* CS slice */}
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="transparent" 
-                      stroke="#22c55e" 
-                      strokeWidth="20"
-                      strokeDasharray="251.2 251.2"
-                      strokeDashoffset="188.4"
-                    />
-                    
-                    {/* Math slice */}
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="transparent" 
-                      stroke="#f59e0b" 
-                      strokeWidth="20"
-                      strokeDasharray="251.2 251.2"
-                      strokeDashoffset="125.6"
-                    />
-                    
-                    {/* Literature slice */}
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="transparent" 
-                      stroke="#a855f7" 
-                      strokeWidth="20"
-                      strokeDasharray="251.2 251.2"
-                      strokeDashoffset="75.4"
-                    />
-                    
-                    {/* Biology slice */}
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="transparent" 
-                      stroke="#f43f5e" 
-                      strokeWidth="20"
-                      strokeDasharray="251.2 251.2"
-                      strokeDashoffset="37.7"
-                    />
-                  </svg>
-                  
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <h3 className="text-2xl font-bold">22.5</h3>
-                    <p className="text-sm text-muted-foreground">Total Hours</p>
-                  </div>
-                </div>
+                <SubjectPieChart 
+                  data={analyticsData.subjectData} 
+                  centerText={{
+                    primary: analyticsData.studyStats.totalHours.toFixed(1),
+                    secondary: "Total Hours"
+                  }}
+                />
                 
                 <div className="flex-1 grid gap-4">
-                  {subjectData.map((subject) => (
+                  {analyticsData.subjectData.map((subject: SubjectData) => (
                     <div key={subject.name} className="flex items-center gap-3">
                       <div className={`w-3 h-10 ${subject.color} rounded-sm`}></div>
                       <div className="flex-1">
@@ -614,7 +552,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>Progress: {subject.progress}%</span>
-                          <span>{Math.round((subject.hours / 30) * 100)}% of total</span>
+                          <span>{Math.round((subject.hours / analyticsData.studyStats.totalHours) * 100)}% of total</span>
                         </div>
                       </div>
                     </div>
@@ -631,144 +569,128 @@ export default function AnalyticsPage() {
           </Card>
         </TabsContent>
         
-        <TabsContent value="streak">
+        <TabsContent value="progress" className="space-y-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>Study Streak Calendar</CardTitle>
-              <CardDescription>
-                Your consistency in studying over the past two weeks
-              </CardDescription>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <CardTitle>Progress Over Time</CardTitle>
+                  <CardDescription>Track your performance trends</CardDescription>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8">
+                        <Filter className="h-3.5 w-3.5 mr-2" />
+                        Metrics
+                        <ChevronDown className="h-3.5 w-3.5 ml-2" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-3">
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium">Select metrics to display</h4>
+                        <Separator />
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="study-hours" 
+                              checked={selectedMetrics.includes("studyHours")} 
+                              onCheckedChange={() => handleMetricToggle("studyHours")}
+                            />
+                            <Label htmlFor="study-hours">Study Hours</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="grades" 
+                              checked={selectedMetrics.includes("grade")} 
+                              onCheckedChange={() => handleMetricToggle("grade")}
+                            />
+                            <Label htmlFor="grades">Grades</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="performance" 
+                              checked={selectedMetrics.includes("performance")} 
+                              onCheckedChange={() => handleMetricToggle("performance")}
+                            />
+                            <Label htmlFor="performance">Performance</Label>
+                          </div>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8">
+                        <Calendar className="h-3.5 w-3.5 mr-2" />
+                        {timeframe === 'week' ? 'Weekly' : timeframe === 'month' ? 'Monthly' : 'Semester'}
+                        <ChevronDown className="h-3.5 w-3.5 ml-2" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-3">
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium">Select timeframe</h4>
+                        <Separator />
+                        
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant={timeframe === 'week' ? 'default' : 'ghost'} 
+                            size="sm" 
+                            onClick={() => handleTimeframeChange('week')}
+                          >
+                            Weekly
+                          </Button>
+                          <Button 
+                            variant={timeframe === 'month' ? 'default' : 'ghost'} 
+                            size="sm" 
+                            onClick={() => handleTimeframeChange('month')}
+                          >
+                            Monthly
+                          </Button>
+                          <Button 
+                            variant={timeframe === 'semester' ? 'default' : 'ghost'} 
+                            size="sm" 
+                            onClick={() => handleTimeframeChange('semester')}
+                          >
+                            Semester
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="h-80 w-full">
-                {/* This would be a calendar heatmap in production */}
-                <div className="flex flex-col gap-2">
-                  <div className="grid grid-cols-7 gap-2">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="text-center text-xs text-muted-foreground">
-                        {day}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="grid grid-cols-7 gap-2">
-                    {/* First week */}
-                    {streakData.slice(0, 7).map((day, i) => (
-                      <div 
-                        key={i} 
-                        className={`h-16 rounded-md flex items-center justify-center ${
-                          day.count === 0 ? 'bg-muted' : 
-                          day.count < 2 ? 'bg-green-500/20' : 
-                          day.count < 4 ? 'bg-green-500/50' : 
-                          'bg-green-500'
-                        }`}
-                      >
-                        <div className="text-center">
-                          <div className="text-xs font-medium">{day.date.split(' ')[1]}</div>
-                          <div className={`text-xs ${day.count === 0 ? 'text-muted-foreground' : 'text-green-900'}`}>
-                            {day.count > 0 ? `${day.count}h` : '-'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {/* Second week */}
-                    {streakData.slice(7).map((day, i) => (
-                      <div 
-                        key={i + 7} 
-                        className={`h-16 rounded-md flex items-center justify-center ${
-                          day.count === 0 ? 'bg-muted' : 
-                          day.count < 2 ? 'bg-green-500/20' : 
-                          day.count < 4 ? 'bg-green-500/50' : 
-                          'bg-green-500'
-                        }`}
-                      >
-                        <div className="text-center">
-                          <div className="text-xs font-medium">{day.date.split(' ')[1]}</div>
-                          <div className={`text-xs ${day.count === 0 ? 'text-muted-foreground' : 'text-green-900'}`}>
-                            {day.count > 0 ? `${day.count}h` : '-'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center mt-6">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-muted rounded-sm"></div>
-                    <span className="text-xs text-muted-foreground">No Study</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-green-500/20 rounded-sm"></div>
-                    <span className="text-xs text-muted-foreground">{"<2 hours"}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-green-500/50 rounded-sm"></div>
-                    <span className="text-xs text-muted-foreground">{"2-4 hours"}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
-                    <span className="text-xs text-muted-foreground">{">4 hours"}</span>
-                  </div>
-                </div>
-              </div>
+              <ProgressChart 
+                data={analyticsData.progressData}
+                metrics={selectedMetrics}
+                timeframe={timeframe}
+              />
             </CardContent>
-            <CardFooter className="border-t pt-4 flex justify-between">
+            <CardFooter className="border-t pt-4">
               <div className="text-sm text-muted-foreground">
-                Current streak: <span className="font-medium">5 days</span>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Total days studied: <span className="font-medium">11 of 14</span>
+                This visualization helps you track your progress and identify trends in your performance over time.
               </div>
             </CardFooter>
           </Card>
+          
+          <div className="grid gap-4 md:grid-cols-2">
+            <Recommendations
+              studyData={analyticsData.weeklyData}
+              subjectData={analyticsData.subjectData}
+              customRecommendations={analyticsData.recommendations}
+            />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="tasks">
+          <TaskBreakdownChart data={analyticsData.taskCategories} />
         </TabsContent>
       </Tabs>
-
-      {/* AI Insights */}
-      <Card className="bg-primary/5 border-primary/20">
-        <CardHeader className="pb-2">
-          <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
-            <CardTitle>AI-Powered Insights</CardTitle>
-          </div>
-          <CardDescription>
-            Personalized recommendations based on your study patterns
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {insightsData.map((insight) => (
-              <div key={insight.id} className="bg-card border rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <insight.icon className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-1">{insight.title}</h4>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {insight.description}
-                    </p>
-                    <div className="inline-flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                      <Zap className="h-3 w-3" />
-                      {insight.action}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-        <CardFooter className="border-t border-primary/10 pt-4">
-          <Button size="sm" className="ml-auto">
-            <Brain className="mr-2 h-4 w-4" />
-            Generate Custom Study Plan
-          </Button>
-        </CardFooter>
-      </Card>
     </div>
   );
 } 

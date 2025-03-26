@@ -1,7 +1,7 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
-import { generateChatResponse, isGeminiInitialized, initializeFromStoredKey } from "@/lib/services/gemini-service";
+import { generateChatResponse, isGeminiInitialized, initializeFromStoredKey, resetGeminiAPI } from "@/lib/services/gemini-service";
 
 export interface Message {
   id: string;
@@ -545,5 +545,8 @@ export const AIAssistantService = {
     localStorage.removeItem(ACTIVE_CHAT_SESSION_KEY);
     localStorage.removeItem(STUDY_PLANS_STORAGE_KEY);
     localStorage.removeItem(SAVED_PROMPTS_STORAGE_KEY);
+    
+    // Reset Gemini API state
+    resetGeminiAPI();
   }
 }; 

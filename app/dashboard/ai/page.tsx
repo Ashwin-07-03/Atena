@@ -7,7 +7,7 @@ import {
   AITool 
 } from "@/components/ui/chat-layout";
 import { AIAssistantService, ChatSession, SavedPrompt } from "@/lib/services/ai-assistant-service";
-import { isGeminiInitialized, initializeFromStoredKey } from "@/lib/services/gemini-service";
+import { isGeminiInitialized, initializeFromStoredKey, resetGeminiAPI } from "@/lib/services/gemini-service";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { 
@@ -152,9 +152,22 @@ export default function AIAssistantPage() {
 
   // Check Gemini status periodically
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsUsingGemini(isGeminiInitialized());
-    }, 5000);
+    const checkGeminiStatus = () => {
+      const initialized = isGeminiInitialized();
+      setIsUsingGemini(initialized);
+      
+      // If localStorage key is gone but state shows initialized, reset state
+      if (typeof window !== 'undefined' && !localStorage.getItem('gemini-api-key') && initialized) {
+        resetGeminiAPI();
+        setIsUsingGemini(false);
+      }
+    };
+    
+    // Check immediately
+    checkGeminiStatus();
+    
+    // Then check periodically
+    const interval = setInterval(checkGeminiStatus, 5000);
     
     return () => clearInterval(interval);
   }, []);

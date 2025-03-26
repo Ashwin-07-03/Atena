@@ -133,4 +133,19 @@ export async function generateChatResponse(messages: { role: string; content: st
 // Get API key
 export function getApiKey(): string {
   return apiKey;
+}
+
+/**
+ * Reset Gemini API by clearing all in-memory state and local storage
+ */
+export function resetGeminiAPI(): void {
+  // Reset in-memory variables
+  apiKey = '';
+  genAI = null;
+  geminiModel = null;
+  
+  // Remove from localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('gemini-api-key');
+  }
 } 

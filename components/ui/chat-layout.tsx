@@ -505,15 +505,15 @@ export function ChatLayout({
           <h2 className="text-xl font-semibold tracking-tight text-gray-100">Atena</h2>
         </div>
 
-        {/* Fixed new chat button - IMPROVED UI */}
-        <div className="py-4 px-4">
+        {/* Simplified new chat button */}
+        <div className="p-4">
           <Button 
             variant="default" 
-            className="flex w-full items-center justify-start gap-3 bg-[#3b5bdb] text-white hover:bg-[#364fc7] border-0 shadow-md py-6 px-4 rounded-xl"
+            className="w-full bg-[#3b5bdb] hover:bg-[#364fc7] text-white flex items-center justify-center gap-2 h-10 px-4"
             onClick={onNewSession}
           >
-            <MessageSquarePlus size={18} className="flex-shrink-0" />
-            <span className="text-sm font-semibold">New Chat</span>
+            <MessageSquarePlus size={16} />
+            <span>New Chat</span>
           </Button>
         </div>
         

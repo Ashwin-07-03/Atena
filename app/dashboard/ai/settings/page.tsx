@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, CheckCircle, Key, Save, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { initializeGeminiAPI, isGeminiInitialized, getApiKey } from "@/lib/services/gemini-service";
+import { initializeGeminiAPI, isGeminiInitialized, getApiKey, resetGeminiAPI } from "@/lib/services/gemini-service";
 import { AIAssistantService } from "@/lib/services/ai-assistant-service";
 import Link from "next/link";
 
@@ -59,8 +59,13 @@ export default function AISettingsPage() {
   // Clear all stored data
   const handleClearData = () => {
     if (window.confirm("Are you sure you want to clear all AI assistant data? This will remove all chat history and settings.")) {
+      // Clear all data from AI Assistant Service
       AIAssistantService.clearAllData();
-      localStorage.removeItem('gemini-api-key');
+      
+      // Reset Gemini API (clears both localStorage and in-memory state)
+      resetGeminiAPI();
+      
+      // Update UI state
       setApiKey("");
       setIsInitialized(false);
       setSaveStatus("success");
