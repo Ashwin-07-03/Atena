@@ -1,7 +1,15 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
-import { generateChatResponse, isGeminiInitialized, initializeFromStoredKey, resetGeminiAPI } from "@/lib/services/gemini-service";
+import { 
+  generateResponse, 
+  isProviderInitialized, 
+  getCurrentProvider, 
+  initializeProviderAPI, 
+  getCurrentModel, 
+  ModelProvider,
+  resetProviderAPI
+} from "@/lib/services/model-service";
 
 export interface Message {
   id: string;
@@ -121,38 +129,32 @@ const generateMockAIResponse = async (prompt: string): Promise<string> => {
   return "I don't have specific information about that topic. Could you provide more details or ask another question? I can help with explanations across many academic subjects, create study plans, generate practice questions, analyze learning styles, or create flashcards for better retention.";
 };
 
-// Actual AI response generator that uses Gemini if available, falls back to mock responses
+// Updated generateAIResponse function that uses the model service
 const generateAIResponse = async (prompt: string, messages: Message[] = []): Promise<string> => {
-  // Try to initialize Gemini from stored key if not already initialized
-  if (!isGeminiInitialized()) {
-    initializeFromStoredKey();
+  // Try to initialize from stored keys if needed
+  if (!isProviderInitialized(getCurrentProvider())) {
+    // This will be handled by the model service which will try to find another initialized provider
   }
-  
-  // If Gemini is initialized, use it for responses
-  if (isGeminiInitialized()) {
-    try {
-      // Convert messages to format expected by Gemini
-      const chatHistory = [...messages].map(msg => ({
-        role: msg.role,
-        content: msg.content
-      }));
-      
-      // Add the current prompt as a user message
-      chatHistory.push({
-        role: "user",
-        content: prompt
-      });
-      
-      // Generate response using Gemini
-      const response = await generateChatResponse(chatHistory);
-      return response;
-    } catch (error) {
-      console.error("Error generating response with Gemini:", error);
-      // Fall back to mock responses if Gemini fails
-      return generateMockAIResponse(prompt);
-    }
-  } else {
-    // Fall back to mock responses if Gemini is not initialized
+
+  try {
+    // Convert messages to format expected by model service
+    const chatHistory = [...messages].map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    // Add the current prompt as a user message
+    chatHistory.push({
+      role: "user",
+      content: prompt
+    });
+    
+    // Generate response using current provider
+    const response = await generateResponse(chatHistory);
+    return response;
+  } catch (error) {
+    console.error("Error generating response:", error);
+    // Fall back to mock responses if model service fails
     return generateMockAIResponse(prompt);
   }
 };
@@ -375,20 +377,93 @@ export const AIAssistantService = {
     }
   },
   
-  // AI Response (updated to use messages history)
-  getAIResponse: async (prompt: string): Promise<Message> => {
+  // Get AI response for a message
+  getAIResponse: async (message: string): Promise<void> => {
+    if (typeof window === "undefined") return;
+    
+    const activeSessionId = AIAssistantService.getActiveSessionId();
+    if (!activeSessionId) return;
+    
+    const activeSession = AIAssistantService.getSession(activeSessionId);
+    if (!activeSession) return;
+    
     // Add user message
-    AIAssistantService.addMessage("user", prompt);
+    const userMessageId = uuidv4();
+    const userMessage: Message = {
+      id: userMessageId,
+      role: "user",
+      content: message,
+      timestamp: new Date().toISOString()
+    };
     
-    // Get active session and its messages
-    const activeSession = AIAssistantService.getActiveSession();
-    const messages = activeSession ? activeSession.messages : AIAssistantService.getMessages();
+    const updatedMessages = [...activeSession.messages, userMessage];
+    let updatedSession: ChatSession = {
+      ...activeSession,
+      messages: updatedMessages,
+      updatedAt: new Date().toISOString()
+    };
     
-    // Get AI response using all previous messages for context
-    const response = await generateAIResponse(prompt, messages);
+    // Update session title if it's the first message
+    if (activeSession.messages.length === 0) {
+      updatedSession = {
+        ...updatedSession,
+        title: message.slice(0, 30) + (message.length > 30 ? "..." : "")
+      };
+    }
     
-    // Add AI response to chat
-    return AIAssistantService.addMessage("assistant", response);
+    // Update session in storage
+    AIAssistantService.updateSession(updatedSession);
+    
+    // Generate AI response
+    try {
+      // Use the model service to generate AI response
+      const formattedMessages = updatedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      const aiResponse = await generateResponse(formattedMessages);
+      
+      // Add AI response
+      const aiMessageId = uuidv4();
+      const aiMessage: Message = {
+        id: aiMessageId,
+        role: "assistant",
+        content: aiResponse,
+        timestamp: new Date().toISOString()
+      };
+      
+      const newMessages = [...updatedMessages, aiMessage];
+      const finalSession: ChatSession = {
+        ...updatedSession,
+        messages: newMessages,
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Update session in storage
+      AIAssistantService.updateSession(finalSession);
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      
+      // Add error message
+      const errorMessageId = uuidv4();
+      const errorMessage: Message = {
+        id: errorMessageId,
+        role: "assistant",
+        content: "I'm sorry, but I encountered an error while processing your request. Please try again later.",
+        timestamp: new Date().toISOString()
+      };
+      
+      const newMessages = [...updatedMessages, errorMessage];
+      const finalSession: ChatSession = {
+        ...updatedSession,
+        messages: newMessages,
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Update session in storage
+      AIAssistantService.updateSession(finalSession);
+    }
   },
   
   // Migration from old format to new format (if needed)
@@ -547,6 +622,27 @@ export const AIAssistantService = {
     localStorage.removeItem(SAVED_PROMPTS_STORAGE_KEY);
     
     // Reset Gemini API state
-    resetGeminiAPI();
+    resetProviderAPI('gemini');
+  },
+  
+  // Update a session
+  updateSession: (session: ChatSession): void => {
+    if (typeof window === "undefined") return;
+    
+    const sessions = AIAssistantService.getChatSessions();
+    const sessionIndex = sessions.findIndex(s => s.id === session.id);
+    
+    if (sessionIndex !== -1) {
+      sessions[sessionIndex] = session;
+      localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    }
+  },
+  
+  // Reset API keys
+  resetAPI: (): void => {
+    // Reset all provider APIs
+    resetProviderAPI('gemini');
+    resetProviderAPI('openai');
+    resetProviderAPI('anthropic');
   }
 }; 
