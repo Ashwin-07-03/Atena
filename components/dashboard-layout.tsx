@@ -15,6 +15,7 @@ import {
   Users, 
   BarChart 
 } from 'lucide-react';
+import { Logo } from './ui/logo';
 
 interface NavItemProps {
   href: string;
@@ -47,8 +48,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full md:w-64 border-r border-border bg-background md:min-h-screen">
-        <div className="p-4 border-b border-border">
-          <h1 className="text-xl font-bold">Atena</h1>
+        <div className="p-4 border-b border-border flex flex-col items-center md:items-start">
+          <Logo size="md" className="mb-1" />
           <p className="text-sm text-muted-foreground">Intelligent Study Assistant</p>
         </div>
         

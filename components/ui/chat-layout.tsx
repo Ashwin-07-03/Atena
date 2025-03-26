@@ -63,6 +63,7 @@ import { useTheme } from "next-themes";
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { Checkbox } from "@/components/ui/checkbox";
+import { Logo } from "@/components/ui/logo";
 
 export interface RecommendedPrompt {
   id: string;
@@ -502,7 +503,7 @@ export function ChatLayout({
       >
         {/* App branding */}
         <div className="flex h-16 items-center px-5 border-b border-gray-800 bg-[#151515]">
-          <h2 className="text-xl font-semibold tracking-tight text-gray-100">Atena</h2>
+          <Logo size="md" textClassName="text-gray-100" />
         </div>
 
         {/* Simplified new chat button */}
@@ -726,8 +727,8 @@ export function ChatLayout({
                   <div className="flex items-start gap-4 max-w-[90%] md:max-w-[85%]">
                     {message.role === "assistant" && (
                       <div className="flex-shrink-0 mt-1">
-                        <div className="h-9 w-9 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                          A
+                        <div className="h-9 w-9 rounded-full bg-blue-600 flex items-center justify-center text-white overflow-hidden">
+                          <Logo showText={false} size="sm" />
                         </div>
                       </div>
                     )}
@@ -785,7 +786,7 @@ export function ChatLayout({
             ) : (
               <div className="flex h-full flex-col items-center justify-center space-y-6 text-center max-w-xl mx-auto">
                 <div className="rounded-full bg-[#3b5bdb]/20 p-5">
-                  <MessageSquare className="h-8 w-8 text-[#3b5bdb]" />
+                  <Logo size="lg" textClassName="text-[#3b5bdb]" />
                 </div>
                 <div className="space-y-3">
                   <h3 className="text-2xl font-semibold text-gray-100">How can I assist you today?</h3>
