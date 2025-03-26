@@ -24,7 +24,9 @@ import {
   ThumbsDown,
   Copy,
   FileDown,
-  Circle
+  Circle,
+  CheckCircle,
+  Filter
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -60,6 +62,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
+import { Checkbox } from "@/components/ui/checkbox";
 
 export interface RecommendedPrompt {
   id: string;
@@ -208,10 +211,27 @@ export function ChatLayout({
 
   // Added for client-side only rendering
   const [isMounted, setIsMounted] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportableSessions, setExportableSessions] = useState<{[key: string]: boolean}>({});
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'text'>('pdf');
+  const [exportLoading, setExportLoading] = useState(false);
   
   useEffect(() => {
     setIsMounted(true);
   }, []);
+  
+  // Prepare exportable sessions when dialog opens
+  useEffect(() => {
+    if (exportDialogOpen && sessions.length > 0) {
+      const sessionsMap = sessions.reduce((acc, session) => {
+        // Only include active session by default
+        acc[session.id] = session.id === activeSession?.id;
+        return acc;
+      }, {} as {[key: string]: boolean});
+      
+      setExportableSessions(sessionsMap);
+    }
+  }, [exportDialogOpen, sessions, activeSession]);
 
   // Filter sessions based on search query
   const filteredSessions = searchQuery 
@@ -262,7 +282,7 @@ export function ChatLayout({
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // Updated PDF export function with improved error handling and client-side only execution
+  // Enhanced PDF export function with improved formatting and multi-session support
   const handleExportPDF = async () => {
     if (!isMounted) return;
     
@@ -271,47 +291,174 @@ export function ChatLayout({
       return;
     }
 
-    if (!chatContainerRef.current || !activeSession) return;
+    // Open export dialog
+    setExportDialogOpen(true);
+  };
+  
+  // Actual export function
+  const executeExport = async () => {
+    setExportLoading(true);
     
     try {
-      // Create a clone of the chat container to avoid modifying the original
-      const element = chatContainerRef.current.cloneNode(true) as HTMLElement;
+      const selectedSessionIds = Object.entries(exportableSessions)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([id]) => id);
       
-      // Set background to white for better print quality
-      element.style.backgroundColor = "white";
-      element.style.color = "black";
-      element.style.padding = "20px";
+      if (selectedSessionIds.length === 0) {
+        alert("Please select at least one chat to export");
+        setExportLoading(false);
+        return;
+      }
       
-      // Make sure all SVG elements are properly set for export
-      const svgElements = element.querySelectorAll('svg');
-      svgElements.forEach(svg => {
-        if (!svg.hasAttribute('xmlns')) {
-          svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      const selectedSessions = sessions.filter(session => 
+        selectedSessionIds.includes(session.id)
+      );
+      
+      if (exportFormat === 'pdf') {
+        // Create PDF
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "pt",
+          format: "a4",
+        });
+        
+        let yOffset = 40;
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 40;
+        const contentWidth = pageWidth - (margin * 2);
+        
+        // PDF styles
+        const headerFontSize = 18;
+        const subheaderFontSize = 14;
+        const normalFontSize = 12;
+        const smallFontSize = 10;
+        const lineHeight = 5;
+        
+        // Add title
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(22);
+        pdf.text("Atena Chat Export", pageWidth / 2, yOffset, { align: "center" });
+        yOffset += 30;
+        
+        // Add date
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(smallFontSize);
+        pdf.text(`Generated on ${new Date().toLocaleString()}`, pageWidth / 2, yOffset, { align: "center" });
+        yOffset += 30;
+        
+        // Process each selected session
+        for (let sessionIndex = 0; sessionIndex < selectedSessions.length; sessionIndex++) {
+          const session = selectedSessions[sessionIndex];
+          
+          // Check if we need a new page
+          if (sessionIndex > 0) {
+            pdf.addPage();
+            yOffset = 40;
+          }
+          
+          // Add session title
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(headerFontSize);
+          pdf.text(session.title, margin, yOffset);
+          yOffset += headerFontSize + lineHeight;
+          
+          // Add creation date
+          pdf.setFont("helvetica", "italic");
+          pdf.setFontSize(smallFontSize);
+          pdf.text(`Created: ${new Date(session.createdAt).toLocaleString()}`, margin, yOffset);
+          yOffset += smallFontSize + 20;
+          
+          // Process each message
+          for (const message of session.messages) {
+            const isUser = message.role === "user";
+            
+            // Add role indicator
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(subheaderFontSize);
+            pdf.text(isUser ? "You:" : "AI Assistant:", margin, yOffset);
+            yOffset += subheaderFontSize + lineHeight;
+            
+            // Add message content with word wrapping
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(normalFontSize);
+            
+            const textLines = pdf.splitTextToSize(message.content, contentWidth);
+            
+            // Check if we need to add a new page
+            if (yOffset + (textLines.length * (normalFontSize + lineHeight)) > pageHeight - margin) {
+              pdf.addPage();
+              yOffset = 40;
+            }
+            
+            // Add text lines
+            for (const line of textLines) {
+              pdf.text(line, margin, yOffset);
+              yOffset += normalFontSize + lineHeight;
+              
+              // Check if we need a new page
+              if (yOffset > pageHeight - margin) {
+                pdf.addPage();
+                yOffset = 40;
+              }
+            }
+            
+            // Add spacer between messages
+            yOffset += 20;
+            
+            // Check if we need a new page
+            if (yOffset > pageHeight - 100) {
+              pdf.addPage();
+              yOffset = 40;
+            }
+          }
         }
-      });
+        
+        // Save the PDF with custom filename
+        const filename = selectedSessions.length === 1 
+          ? `${selectedSessions[0].title}_chat.pdf` 
+          : `Atena_Chats_${new Date().toISOString().split('T')[0]}.pdf`;
+        
+        pdf.save(filename);
+      } else {
+        // Plain text export
+        let textContent = "ATENA CHAT EXPORT\n";
+        textContent += `Generated on ${new Date().toLocaleString()}\n\n`;
+        
+        selectedSessions.forEach(session => {
+          textContent += `CHAT: ${session.title}\n`;
+          textContent += `Created: ${new Date(session.createdAt).toLocaleString()}\n\n`;
+          
+          session.messages.forEach(message => {
+            textContent += `${message.role === "user" ? "You" : "AI Assistant"}: ${message.content}\n\n`;
+          });
+          
+          textContent += "\n---\n\n";
+        });
+        
+        // Create and download text file
+        const blob = new Blob([textContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        
+        const filename = selectedSessions.length === 1 
+          ? `${selectedSessions[0].title}_chat.txt` 
+          : `Atena_Chats_${new Date().toISOString().split('T')[0]}.txt`;
+        
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
       
-      // Convert node to PNG
-      const dataUrl = await toPng(element, {
-        backgroundColor: "white",
-        quality: 0.95,
-        skipAutoScale: true,
-        pixelRatio: 2
-      });
-      
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [element.offsetWidth, element.offsetHeight]
-      });
-      
-      // Add image to PDF (with slight margin)
-      pdf.addImage(dataUrl, "PNG", 10, 10, element.offsetWidth - 20, element.offsetHeight - 20);
-      
-      // Download PDF with chat title as filename
-      pdf.save(`${activeSession.title || 'Chat'}_summary.pdf`);
+      setExportDialogOpen(false);
     } catch (error) {
-      console.error("Error exporting PDF:", error);
+      console.error("Error exporting:", error);
+      alert("An error occurred while exporting your chats. Please try again.");
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -358,16 +505,38 @@ export function ChatLayout({
           <h2 className="text-xl font-semibold tracking-tight text-gray-100">Atena</h2>
         </div>
 
-        {/* Fixed new chat button */}
-        <div className="flex flex-col p-3 border-b border-gray-800">
+        {/* Fixed new chat button - FIXED UI */}
+        <div className="py-3 px-3 border-b border-gray-800">
           <Button 
             variant="default" 
-            className="flex w-full items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#364fc7] border-0 shadow-md h-10"
+            className="flex w-full items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#364fc7] border-0 shadow-md h-10 overflow-hidden whitespace-nowrap"
             onClick={onNewSession}
           >
             <MessageSquarePlus size={16} />
             <span className="text-sm font-medium">New Chat</span>
           </Button>
+        </div>
+        
+        {/* Search box */}
+        <div className="p-3 border-b border-gray-800">
+          <div className="relative w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Search chats..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-gray-800 border-gray-700 pl-9 h-9 text-gray-100"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-300"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
         
         {/* Chat sections */}
@@ -417,6 +586,19 @@ export function ChatLayout({
                               <span>Rename</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem 
+                              className="hover:bg-gray-700"
+                              onClick={() => {
+                                // Set up export dialog with just this session
+                                const singleSessionExport = { [session.id]: true };
+                                setExportableSessions(singleSessionExport);
+                                setExportDialogOpen(true);
+                              }}
+                            >
+                              <FileDown className="mr-2 h-4 w-4" />
+                              <span>Export</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
                               className="text-red-400 hover:bg-gray-700 focus:text-red-400"
                               onClick={() => onDeleteSession?.(session.id)}
                             >
@@ -452,7 +634,7 @@ export function ChatLayout({
         {/* Chat header - simplified for more screen space */}
         <div className="flex h-14 items-center justify-between border-b border-gray-800 px-4 lg:px-6 bg-[#111111] sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-medium text-gray-100">
+            <h2 className="text-lg font-medium text-gray-100 truncate max-w-[200px] sm:max-w-xs">
               {activeSession ? activeSession.title : "New Chat"}
             </h2>
           </div>
@@ -706,6 +888,112 @@ export function ChatLayout({
           </div>
         </div>
       </div>
+      
+      {/* Export Dialog */}
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent className="sm:max-w-[550px] p-0 gap-0 overflow-hidden rounded-xl bg-[#1a1a1a] border border-gray-800 shadow-lg">
+          <DialogHeader className="px-6 pt-6 pb-2 border-b border-gray-800">
+            <DialogTitle className="text-xl text-gray-100">Export Chats</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Select the chats you want to export and choose your preferred format.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="px-6 py-4 max-h-[60vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-sm font-medium text-gray-200">Select Chats</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs text-gray-300"
+                onClick={() => {
+                  // Toggle all sessions
+                  const allSelected = Object.values(exportableSessions).every(Boolean);
+                  const updatedSessions = Object.keys(exportableSessions).reduce((acc, key) => {
+                    acc[key] = !allSelected;
+                    return acc;
+                  }, {} as {[key: string]: boolean});
+                  
+                  setExportableSessions(updatedSessions);
+                }}
+              >
+                {Object.values(exportableSessions).every(Boolean) ? "Deselect All" : "Select All"}
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {sessions.map(session => (
+                <div key={session.id} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/40 hover:bg-gray-800/80 transition-colors">
+                  <Checkbox
+                    id={`export-${session.id}`}
+                    checked={exportableSessions[session.id] || false}
+                    onCheckedChange={(checked) => {
+                      setExportableSessions({
+                        ...exportableSessions,
+                        [session.id]: !!checked
+                      });
+                    }}
+                    className="border-gray-500 data-[state=checked]:bg-blue-600"
+                  />
+                  <label
+                    htmlFor={`export-${session.id}`}
+                    className="flex-1 text-sm font-medium text-gray-200 cursor-pointer"
+                  >
+                    <div className="flex flex-col">
+                      <span className="truncate">{session.title}</span>
+                      <span className="text-xs text-gray-400">
+                        {session.messages.length} messages • {new Date(session.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6">
+              <h3 className="text-sm font-medium text-gray-200 mb-3">Export Format</h3>
+              <div className="flex gap-4">
+                <div
+                  className={cn(
+                    "flex flex-col items-center justify-center p-4 rounded-lg border border-gray-700 cursor-pointer transition-all",
+                    exportFormat === 'pdf' ? "bg-blue-600/20 border-blue-500" : "bg-gray-800/40 hover:bg-gray-800/80"
+                  )}
+                  onClick={() => setExportFormat('pdf')}
+                >
+                  <FileDown className="h-6 w-6 mb-2 text-gray-200" />
+                  <span className="text-sm font-medium text-gray-200">PDF Document</span>
+                  <span className="text-xs text-gray-400 mt-1">Formatted layout</span>
+                </div>
+                
+                <div
+                  className={cn(
+                    "flex flex-col items-center justify-center p-4 rounded-lg border border-gray-700 cursor-pointer transition-all",
+                    exportFormat === 'text' ? "bg-blue-600/20 border-blue-500" : "bg-gray-800/40 hover:bg-gray-800/80"
+                  )}
+                  onClick={() => setExportFormat('text')}
+                >
+                  <FileDown className="h-6 w-6 mb-2 text-gray-200" />
+                  <span className="text-sm font-medium text-gray-200">Text File</span>
+                  <span className="text-xs text-gray-400 mt-1">Plain text format</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="p-6 pt-4 border-t border-gray-800 bg-gray-800/30">
+            <Button variant="outline" onClick={() => setExportDialogOpen(false)} className="border-gray-700 text-gray-200 hover:bg-gray-700 hover:text-white">
+              Cancel
+            </Button>
+            <Button 
+              onClick={executeExport} 
+              disabled={exportLoading || Object.values(exportableSessions).every(v => !v)}
+              className="bg-[#3b5bdb] text-white border-none hover:bg-[#364fc7]"
+            >
+              {exportLoading ? "Exporting..." : "Export"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       {/* AI Features Dialog */}
       <Dialog open={featuresOpen} onOpenChange={setFeaturesOpen}>
