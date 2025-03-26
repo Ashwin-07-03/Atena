@@ -23,7 +23,8 @@ import {
   ThumbsUp,
   ThumbsDown,
   Copy,
-  FileDown
+  FileDown,
+  Circle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -205,6 +206,13 @@ export function ChatLayout({
   const { theme, setTheme } = useTheme();
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+  // Added for client-side only rendering
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Filter sessions based on search query
   const filteredSessions = searchQuery 
     ? sessions.filter(session => 
@@ -254,8 +262,10 @@ export function ChatLayout({
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // Function to export chat as PDF
+  // Updated PDF export function with improved error handling and client-side only execution
   const handleExportPDF = async () => {
+    if (!isMounted) return;
+    
     if (onExportPDF) {
       onExportPDF();
       return;
@@ -272,10 +282,20 @@ export function ChatLayout({
       element.style.color = "black";
       element.style.padding = "20px";
       
+      // Make sure all SVG elements are properly set for export
+      const svgElements = element.querySelectorAll('svg');
+      svgElements.forEach(svg => {
+        if (!svg.hasAttribute('xmlns')) {
+          svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        }
+      });
+      
       // Convert node to PNG
       const dataUrl = await toPng(element, {
         backgroundColor: "white",
-        quality: 0.95
+        quality: 0.95,
+        skipAutoScale: true,
+        pixelRatio: 2
       });
       
       // Create PDF
@@ -294,6 +314,17 @@ export function ChatLayout({
       console.error("Error exporting PDF:", error);
     }
   };
+
+  // Don't render anything on server or during hydration
+  if (!isMounted) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-[#111111] text-gray-100 shadow-lg transition-all duration-300 ease-in-out">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-[#111111] text-gray-100 shadow-lg transition-all duration-300 ease-in-out">
