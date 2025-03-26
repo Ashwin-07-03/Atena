@@ -4,53 +4,31 @@ import {
   generateChatResponse as generateGeminiResponse,
   isGeminiInitialized,
   initializeGeminiAPI,
-  resetGeminiAPI 
+  resetGeminiAPI,
+  getGeminiApiKey
 } from './gemini-service';
 
 import { 
   generateChatResponse as generateOpenAIResponse,
   isOpenAIInitialized,
   initializeOpenAIAPI,
-  resetOpenAIAPI 
+  resetOpenAIAPI,
+  getOpenAIApiKey
 } from './openai-service';
 
 import { 
   generateChatResponse as generateAnthropicResponse,
   isAnthropicInitialized,
   initializeAnthropicAPI,
-  resetAnthropicAPI 
+  resetAnthropicAPI,
+  getAnthropicApiKey
 } from './anthropic-service';
 
 // Supported AI model providers
 export type ModelProvider = 'gemini' | 'openai' | 'anthropic';
 
-// Models available for each provider
-export const availableModels = {
-  gemini: [
-    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: 'Advanced model for complex tasks' },
-    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Fast and efficient' }
-  ],
-  openai: [
-    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Most advanced OpenAI model' },
-    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Efficient and cost-effective' }
-  ],
-  anthropic: [
-    { id: 'claude-3-opus', name: 'Claude 3 Opus', description: 'Most powerful Claude model' },
-    { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: 'Balance of intelligence and speed' },
-    { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: 'Fast and efficient' }
-  ]
-};
-
-// Default model for each provider
-export const defaultModels: Record<ModelProvider, string> = {
-  gemini: 'gemini-1.5-pro',
-  openai: 'gpt-4-turbo',
-  anthropic: 'claude-3-opus'
-};
-
 // Storage keys
 const PROVIDER_STORAGE_KEY = 'atena-ai-model-provider';
-const MODEL_STORAGE_KEY = 'atena-ai-model-selection';
 
 /**
  * Get the current model provider
@@ -72,49 +50,6 @@ export function setCurrentProvider(provider: ModelProvider): void {
 }
 
 /**
- * Get the current model ID for a provider
- */
-export function getCurrentModel(provider: ModelProvider): string {
-  if (typeof window === 'undefined') return defaultModels[provider];
-  
-  const storedModels = localStorage.getItem(MODEL_STORAGE_KEY);
-  if (!storedModels) return defaultModels[provider];
-  
-  try {
-    const models = JSON.parse(storedModels);
-    return models[provider] || defaultModels[provider];
-  } catch (error) {
-    console.error('Error parsing stored models:', error);
-    return defaultModels[provider];
-  }
-}
-
-/**
- * Set the current model ID for a provider
- */
-export function setCurrentModel(provider: ModelProvider, modelId: string): void {
-  if (typeof window === 'undefined') return;
-  
-  const storedModels = localStorage.getItem(MODEL_STORAGE_KEY);
-  let models: Record<ModelProvider, string> = {
-    gemini: defaultModels.gemini,
-    openai: defaultModels.openai,
-    anthropic: defaultModels.anthropic
-  };
-  
-  if (storedModels) {
-    try {
-      models = { ...models, ...JSON.parse(storedModels) };
-    } catch (error) {
-      console.error('Error parsing stored models:', error);
-    }
-  }
-  
-  models[provider] = modelId;
-  localStorage.setItem(MODEL_STORAGE_KEY, JSON.stringify(models));
-}
-
-/**
  * Check if a provider's API is initialized
  */
 export function isProviderInitialized(provider: ModelProvider): boolean {
@@ -131,9 +66,29 @@ export function isProviderInitialized(provider: ModelProvider): boolean {
 }
 
 /**
+ * Get the stored API key for a provider
+ */
+export function getStoredApiKey(provider: ModelProvider): string | null {
+  switch (provider) {
+    case 'gemini':
+      return getGeminiApiKey();
+    case 'openai':
+      return getOpenAIApiKey();
+    case 'anthropic':
+      return getAnthropicApiKey();
+    default:
+      return null;
+  }
+}
+
+/**
  * Initialize a provider's API
  */
 export function initializeProviderAPI(provider: ModelProvider, key: string): boolean {
+  // First try to set the current provider
+  setCurrentProvider(provider);
+  
+  // Then initialize the API
   switch (provider) {
     case 'gemini':
       return initializeGeminiAPI(key);

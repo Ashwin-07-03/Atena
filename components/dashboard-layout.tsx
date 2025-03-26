@@ -47,13 +47,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 border-r border-border bg-background md:min-h-screen">
+      <aside className="w-full md:w-64 border-r border-border bg-background md:min-h-screen flex flex-col">
         <div className="p-4 border-b border-border flex flex-col items-center md:items-start">
           <Logo size="md" className="mb-1" />
           <p className="text-sm text-muted-foreground">Intelligent Study Assistant</p>
         </div>
         
-        <nav className="p-4 space-y-1">
+        <nav className="p-4 space-y-1 flex-1">
           <NavItem href="/dashboard" icon={<Home size={18} />} label="Dashboard" />
           <NavItem href="/dashboard/study" icon={<Clock size={18} />} label="Study Sessions" />
           <NavItem href="/dashboard/resources" icon={<BookOpen size={18} />} label="Resources" />
@@ -65,7 +65,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" />
         </nav>
         
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border md:block hidden">
+        <div className="p-4 border-t border-border md:block hidden">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-full bg-gray-300"></div>
             <div>

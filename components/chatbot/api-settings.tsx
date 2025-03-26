@@ -9,7 +9,8 @@ import {
   getCurrentProvider,
   isProviderInitialized,
   initializeProviderAPI,
-  resetProviderAPI
+  resetProviderAPI,
+  getStoredApiKey
 } from "@/lib/services/model-service";
 import { BrainCircuit, Sparkles, Zap } from "lucide-react";
 
@@ -20,18 +21,30 @@ interface ApiSettingsProps {
 
 export default function ApiSettings({ isOpen, onClose }: ApiSettingsProps) {
   const [apiKey, setApiKey] = useState<string>('');
+  const [connectedKey, setConnectedKey] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [keyError, setKeyError] = useState<string>('');
   const [currentProvider, setCurrentProvider] = useState<'gemini' | 'openai' | 'anthropic'>('gemini');
 
   useEffect(() => {
-    // Get current provider and check if initialized
-    const provider = getCurrentProvider();
-    setCurrentProvider(provider);
-    
-    // Check if this provider is initialized
-    const initialized = isProviderInitialized(provider);
-    setIsInitialized(initialized);
+    if (isOpen) {
+      // Get current provider and check if initialized
+      const provider = getCurrentProvider();
+      setCurrentProvider(provider);
+      
+      // Check if this provider is initialized
+      const initialized = isProviderInitialized(provider);
+      setIsInitialized(initialized);
+      
+      // Get stored API key if available
+      const storedKey = getStoredApiKey(provider);
+      if (storedKey) {
+        const maskedKey = storedKey.substring(0, 4) + '...' + storedKey.substring(storedKey.length - 4);
+        setConnectedKey(maskedKey);
+      } else {
+        setConnectedKey('');
+      }
+    }
   }, [isOpen]);
 
   // Handle API key submission
@@ -44,6 +57,9 @@ export default function ApiSettings({ isOpen, onClose }: ApiSettingsProps) {
     const success = initializeProviderAPI(currentProvider, apiKey);
     if (success) {
       setIsInitialized(true);
+      // Store masked version of API key for display
+      const maskedKey = apiKey.substring(0, 4) + '...' + apiKey.substring(apiKey.length - 4);
+      setConnectedKey(maskedKey);
       setApiKey('');
       setKeyError('');
       onClose();
@@ -57,6 +73,7 @@ export default function ApiSettings({ isOpen, onClose }: ApiSettingsProps) {
     resetProviderAPI(currentProvider);
     setIsInitialized(false);
     setApiKey('');
+    setConnectedKey('');
     setKeyError('');
   };
 
@@ -121,13 +138,24 @@ export default function ApiSettings({ isOpen, onClose }: ApiSettingsProps) {
             </div>
             
             <div className="grid gap-2">
+              {isInitialized && connectedKey && (
+                <div className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-800 rounded border text-sm">
+                  <span>Connected key: {connectedKey}</span>
+                </div>
+              )}
+              
               <Input
                 type="password"
                 placeholder={`Enter your ${providerInfo.name} API key`}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
               />
+              
               {keyError && <p className="text-sm text-red-500">{keyError}</p>}
+              
+              <p className="text-xs text-muted-foreground mt-1">
+                Your API key is stored locally in your browser and never sent to our servers.
+              </p>
             </div>
           </div>
         </div>

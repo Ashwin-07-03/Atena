@@ -30,18 +30,47 @@ const generationConfig = {
   maxOutputTokens: 1024,
 };
 
-// Initialize with API key or use environment variable
-let apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+// Storage key
+const API_KEY_STORAGE_KEY = 'atena-gemini-api-key';
+
+let isInitialized = false;
+let apiKey: string | null = null;
 let genAI: GoogleGenerativeAI | null = null;
 let geminiModel: any = null;
 
+// Initialize the API on client-side mount
+if (typeof window !== 'undefined') {
+  // Try to load from localStorage
+  const storedKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+  if (storedKey) {
+    apiKey = storedKey;
+    isInitialized = true;
+  }
+}
+
 /**
- * Initialize the Gemini API with the provided API key
- * @param key Gemini API key
+ * Check if the API is initialized
  */
-export function initializeGeminiAPI(key: string) {
+export function isGeminiInitialized(): boolean {
+  return isInitialized;
+}
+
+/**
+ * Get the stored API key
+ */
+export function getGeminiApiKey(): string | null {
+  return apiKey;
+}
+
+/**
+ * Initialize the API with an API key
+ */
+export function initializeGeminiAPI(key: string): boolean {
+  if (!key) return false;
+  
   try {
     apiKey = key;
+    isInitialized = true;
     genAI = new GoogleGenerativeAI(apiKey);
     geminiModel = genAI.getGenerativeModel({ 
       model: "gemini-1.5-pro",
@@ -49,103 +78,109 @@ export function initializeGeminiAPI(key: string) {
       generationConfig,
     });
     
-    // Store API key in localStorage for persistence
+    // Store in localStorage for persistence
     if (typeof window !== 'undefined') {
-      localStorage.setItem('gemini-api-key', key);
+      localStorage.setItem(API_KEY_STORAGE_KEY, key);
     }
     
     return true;
   } catch (error) {
-    console.error("Failed to initialize Gemini API:", error);
+    console.error('Error initializing Gemini API:', error);
     return false;
   }
 }
 
 /**
- * Check if Gemini API is initialized
- */
-export function isGeminiInitialized(): boolean {
-  return !!genAI && !!geminiModel;
-}
-
-/**
- * Try to initialize Gemini API from stored key
- */
-export function initializeFromStoredKey(): boolean {
-  if (typeof window !== 'undefined') {
-    const storedKey = localStorage.getItem('gemini-api-key');
-    if (storedKey) {
-      return initializeGeminiAPI(storedKey);
-    }
-  }
-  return false;
-}
-
-/**
- * Generate a chat response from Gemini
- * @param messages Array of conversation messages
- * @returns Generated response text
- */
-export async function generateChatResponse(messages: { role: string; content: string }[]): Promise<string> {
-  try {
-    if (!isGeminiInitialized()) {
-      throw new Error("Gemini API not initialized. Please provide an API key.");
-    }
-
-    // Convert to Gemini chat format
-    const chatHistory = messages.map(msg => ({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
-    }));
-
-    // Start a chat session
-    const chat = geminiModel.startChat({
-      history: chatHistory.slice(0, -1), // All except the latest message
-      generationConfig,
-      safetySettings,
-    });
-
-    // Send the latest message
-    const lastMessage = messages[messages.length - 1];
-    const result = await chat.sendMessage(lastMessage.content);
-    const response = await result.response;
-    const text = response.text();
-    
-    return text;
-  } catch (error) {
-    console.error("Error generating chat response:", error);
-    
-    // Return friendly error message based on the error
-    if (error instanceof Error) {
-      if (error.message.includes("API key")) {
-        return "I need a valid API key to function. Please set up your Gemini API key in the settings.";
-      } else if (error.message.includes("quota")) {
-        return "Your Gemini API quota has been exceeded. Please check your usage limits or try again later.";
-      } else if (error.message.includes("safety")) {
-        return "I couldn't process that request due to safety concerns. Please try a different question.";
-      }
-    }
-    
-    return "I encountered an error while processing your request. Please try again or check your API key.";
-  }
-}
-
-// Get API key
-export function getApiKey(): string {
-  return apiKey;
-}
-
-/**
- * Reset Gemini API by clearing all in-memory state and local storage
+ * Reset the API
  */
 export function resetGeminiAPI(): void {
-  // Reset in-memory variables
-  apiKey = '';
+  apiKey = null;
+  isInitialized = false;
   genAI = null;
   geminiModel = null;
   
   // Remove from localStorage
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('gemini-api-key');
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+  }
+}
+
+/**
+ * Generate a response using the Gemini API
+ */
+export async function generateChatResponse(
+  messages: { role: string; content: string }[]
+): Promise<string> {
+  if (!isInitialized || !apiKey) {
+    throw new Error('Gemini API not initialized');
+  }
+  
+  try {
+    // Format messages for Gemini API
+    const formattedMessages = messages.map(msg => {
+      // Convert 'user' to 'user' and anything else to 'model'
+      const role = msg.role === 'user' ? 'user' : 'model';
+      return {
+        role,
+        parts: [{ text: msg.content }]
+      };
+    });
+    
+    // Remove system messages which Gemini doesn't support
+    const filteredMessages = formattedMessages.filter(msg => 
+      !messages.find((original, index) => index === formattedMessages.indexOf(msg) && original.role === 'system')
+    );
+    
+    // Take system message content and prepend to first non-user message if present
+    const systemMessage = messages.find(msg => msg.role === 'system');
+    if (systemMessage && filteredMessages.length > 0) {
+      const firstModelMessage = filteredMessages.find(msg => msg.role === 'model');
+      if (firstModelMessage) {
+        firstModelMessage.parts[0].text = `${systemMessage.content}\n\n${firstModelMessage.parts[0].text}`;
+      }
+    }
+    
+    console.log('Calling Gemini API with formatted messages:', filteredMessages);
+    
+    // Call Google Gemini API
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=' + apiKey, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: filteredMessages,
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
+        },
+        safetySettings: [
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+        ]
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Gemini API error:', errorData);
+      throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Extract the response text
+    if (data.candidates && data.candidates[0]?.content?.parts && data.candidates[0].content.parts[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
+    } else {
+      throw new Error('No valid response from Gemini API');
+    }
+  } catch (error) {
+    console.error('Error generating Gemini response:', error);
+    throw error;
   }
 } 
