@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 
 // Import our custom components
-import { Chat } from "@/components/collaborate/chat";
+import Chat from "@/components/collaborate/chat";
 import { ConversationList } from "@/components/collaborate/conversation-list";
 import { SharedResources } from "@/components/collaborate/shared-resources";
 
@@ -22,7 +22,9 @@ import {
   createStudyGroup, 
   joinStudyGroup, 
   getUserStudyGroups, 
-  getSharedCalendarEvents, 
+  getSharedCalendarEvents,
+  getSharedResources,
+  addSharedResource,
   createCalendarEvent, 
   getCurrentUser,
   getConversations,
@@ -224,6 +226,36 @@ const getUserByIdFallback = (userId: string) => {
   } : undefined;
 };
 
+// Wrapper component for SharedResources to handle data fetching and state
+function ResourcesSection({ groupId }: { groupId?: string }) {
+  const resources = getSharedResources(groupId);
+  const currentUser = getCurrentUser();
+
+  const handleAddResource = (resource: { name: string; url: string; type: string; tags: string[] }) => {
+    addSharedResource({
+      ...resource,
+      type: resource.type as "document" | "image" | "link",
+      thumbnailUrl: resource.type === "image" ? resource.url : undefined,
+    });
+    // If we had local state, we would update it here
+  };
+
+  const handleDeleteResource = (id: string) => {
+    // Implementation for deleting resources would go here
+    console.log(`Delete resource: ${id}`);
+  };
+
+  return (
+    <SharedResources 
+      resources={resources}
+      groupId={groupId}
+      onAddResource={handleAddResource}
+      onDeleteResource={handleDeleteResource}
+      currentUserId={currentUser.id}
+    />
+  );
+}
+
 export default function CollaboratePage() {
   const [activeTab, setActiveTab] = useState<"messages" | "groups" | "resources" | "calendar">("messages");
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -300,43 +332,33 @@ export default function CollaboratePage() {
   const renderContent = () => {
     switch (activeTab) {
       case "messages":
-        if (conversationView === "list" || !selectedConversationId) {
+        if (conversationView === "list") {
           return (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-220px)]">
-              <div className="md:col-span-1 h-full">
-                <ConversationList 
-                  onSelectConversation={handleSelectConversation}
-                  selectedConversationId={selectedConversationId || undefined}
-                />
-              </div>
-              <div className="md:col-span-2 h-full flex items-center justify-center bg-muted/20 rounded-lg p-8">
-                <div className="text-center">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                  <h3 className="text-xl font-medium mb-2">Select a conversation</h3>
-                  <p className="text-muted-foreground">
-                    Choose a conversation from the list to start chatting
-                  </p>
-                </div>
-              </div>
+            <div className="border rounded-lg overflow-hidden">
+              <ConversationList 
+                conversations={getConversations()}
+                activeConversationId={selectedConversationId || undefined}
+                onSelectConversation={handleSelectConversation}
+                onCreateConversation={(participants, title) => {
+                  // Implementation would go here
+                  console.log(`Create conversation with ${participants.length} users`);
+                }}
+                availableUsers={getFriends()}
+                currentUserId={getCurrentUser().id}
+              />
             </div>
           );
-        } else {
+        } else if (selectedConversationId) {
           return (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100vh-220px)]">
-              <div className="md:col-span-1 h-full">
-                <ConversationList 
-                  onSelectConversation={handleSelectConversation}
-                  selectedConversationId={selectedConversationId}
-                />
-              </div>
-              <div className="md:col-span-2 h-full">
-                {selectedConversationId && (
-                  <Chat conversationId={selectedConversationId} />
-                )}
-              </div>
+            <div className="border rounded-lg overflow-hidden">
+              <Chat 
+                conversationId={selectedConversationId}
+                onBack={() => setConversationView("list")}
+              />
             </div>
           );
         }
+        return null;
         
       case "groups":
         return (
@@ -533,7 +555,7 @@ export default function CollaboratePage() {
         );
         
       case "resources":
-        return <SharedResources groupId={selectedGroupId || undefined} />;
+        return <ResourcesSection groupId={selectedGroupId || undefined} />;
         
       case "calendar":
         return (
