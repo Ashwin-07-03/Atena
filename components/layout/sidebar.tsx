@@ -21,7 +21,6 @@ const navigation = [
   { name: "Flashcards", href: "/dashboard/flashcards", icon: FileText },
   { name: "Schedule", href: "/dashboard/schedule", icon: CalendarClock },
   { name: "Study Sessions", href: "/dashboard/study", icon: BookOpen },
-  { name: "AI Assistant", href: "/dashboard/ai", icon: BrainCircuit },
   { name: "Study Chatbot", href: "/dashboard/chatbot", icon: MessageSquare },
   { name: "Analytics", href: "/dashboard/analytics", icon: Zap },
   { name: "Collaboration", href: "/dashboard/collaborate", icon: Users },

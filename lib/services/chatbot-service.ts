@@ -39,6 +39,11 @@ export const studySubjects = [
   { id: "other", name: "Other Subjects", icon: "📝" }
 ];
 
+// Helper function to ensure consistent date format for server/client rendering
+const formatDate = (): string => {
+  return new Date().toISOString();
+};
+
 /**
  * Generate a default system prompt for the chatbot based on the subject
  */
@@ -108,8 +113,8 @@ export const createConversation = (subject: string, title?: string): ChatbotConv
     title: defaultTitle,
     subject: subject,
     messages: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: formatDate(),
+    updatedAt: formatDate()
   };
   
   const conversations = getConversations();
@@ -128,7 +133,7 @@ export const updateConversationTitle = (conversationId: string, title: string): 
   
   if (index !== -1) {
     conversations[index].title = title;
-    conversations[index].updatedAt = new Date().toISOString();
+    conversations[index].updatedAt = formatDate();
     saveConversations(conversations);
   }
 };
@@ -189,12 +194,12 @@ export const sendMessage = async (conversationId: string, messageText: string): 
     id: uuidv4(),
     role: "user",
     content: messageText,
-    timestamp: new Date().toISOString()
+    timestamp: formatDate()
   };
   
   // Add to conversation
   conversation.messages.push(userMessage);
-  conversation.updatedAt = new Date().toISOString();
+  conversation.updatedAt = formatDate();
   
   // Generate title from first message if it doesn't have a custom title
   if (conversation.messages.length === 1 && conversation.title === `${studySubjects.find(s => s.id === conversation.subject)?.name} Chat`) {
@@ -239,12 +244,12 @@ export const sendMessage = async (conversationId: string, messageText: string): 
       id: uuidv4(),
       role: "assistant",
       content: response,
-      timestamp: new Date().toISOString()
+      timestamp: formatDate()
     };
     
     // Add to conversation
     conversation.messages.push(assistantMessage);
-    conversation.updatedAt = new Date().toISOString();
+    conversation.updatedAt = formatDate();
     
     // Save updated conversation
     const updatedConversations = getConversations();
@@ -264,12 +269,12 @@ export const sendMessage = async (conversationId: string, messageText: string): 
       id: uuidv4(),
       role: "assistant",
       content: "I'm sorry, I encountered an error while processing your request. Please ensure your API settings are configured correctly in Settings.",
-      timestamp: new Date().toISOString()
+      timestamp: formatDate()
     };
     
     // Add to conversation
     conversation.messages.push(errorMessage);
-    conversation.updatedAt = new Date().toISOString();
+    conversation.updatedAt = formatDate();
     
     // Save updated conversation
     const updatedConversations = getConversations();

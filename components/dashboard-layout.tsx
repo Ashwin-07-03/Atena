@@ -11,7 +11,6 @@ import {
   Home, 
   Settings, 
   FileText, 
-  Zap, 
   Users, 
   BarChart,
   MessageSquare 
@@ -62,7 +61,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NavItem href="/dashboard/schedule" icon={<Calendar size={18} />} label="Schedule" />
           <NavItem href="/dashboard/analytics" icon={<BarChart size={18} />} label="Analytics" />
           <NavItem href="/dashboard/collaborate" icon={<Users size={18} />} label="Collaboration" />
-          <NavItem href="/dashboard/ai" icon={<Zap size={18} />} label="AI Assistant" />
           <NavItem href="/dashboard/chatbot" icon={<MessageSquare size={18} />} label="Study Chatbot" />
           <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" />
         </nav>

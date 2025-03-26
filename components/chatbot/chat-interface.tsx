@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Edit, MoreHorizontal, Settings } from 'lucide-react';
+import { Send, Edit, MoreHorizontal, Settings, KeyRound } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,13 +21,17 @@ interface ChatInterfaceProps {
   isLoading?: boolean;
   onSendMessage: (message: string) => void;
   onEditTitle: (conversationId: string, title: string) => void;
+  onOpenApiSettings?: () => void;
+  isModelInitialized?: boolean;
 }
 
 export default function ChatInterface({ 
   conversation, 
   isLoading = false, 
   onSendMessage, 
-  onEditTitle 
+  onEditTitle,
+  onOpenApiSettings,
+  isModelInitialized = false
 }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState("");
   const [editingTitle, setEditingTitle] = useState(false);
@@ -153,11 +157,9 @@ export default function ChatInterface({
               <Edit className="h-4 w-4 mr-2" />
               <span>Rename</span>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <a href="/dashboard/settings" className="flex items-center">
-                <Settings className="h-4 w-4 mr-2" />
-                <span>API Settings</span>
-              </a>
+            <DropdownMenuItem onClick={onOpenApiSettings}>
+              <KeyRound className="h-4 w-4 mr-2" />
+              <span>API Settings</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -266,17 +268,30 @@ export default function ChatInterface({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Ask about ${studySubjects.find(s => s.id === conversation.subject)?.name}...`}
+            placeholder={isModelInitialized ? 
+              `Ask about ${studySubjects.find(s => s.id === conversation.subject)?.name}...` : 
+              "Configure API key to start chatting..."
+            }
             className="flex-1 bg-background"
-            disabled={isLoading}
+            disabled={isLoading || !isModelInitialized}
           />
-          <Button 
-            onClick={handleSendMessage} 
-            disabled={!inputValue.trim() || isLoading}
-            size="icon"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
+          {!isModelInitialized ? (
+            <Button 
+              onClick={onOpenApiSettings}
+              size="icon"
+              variant="outline"
+            >
+              <KeyRound className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleSendMessage} 
+              disabled={!inputValue.trim() || isLoading}
+              size="icon"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

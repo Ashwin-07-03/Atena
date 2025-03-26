@@ -14,9 +14,9 @@ import {
 } from '@/lib/services/chatbot-service';
 import { isProviderInitialized, getCurrentProvider } from '@/lib/services/model-service';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { PlusCircle, Settings, MessageSquare, Info } from 'lucide-react';
+import { PlusCircle, Settings, MessageSquare, KeyRound } from 'lucide-react';
 import SubjectSelect from '@/components/chatbot/subject-select';
+import ApiSettings from '@/components/chatbot/api-settings';
 import ChatInterface from '@/components/chatbot/chat-interface';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -28,6 +28,7 @@ export default function ChatbotPage() {
   const [activeConversation, setActiveConversation] = useState<ChatbotConversation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubjectSelectOpen, setIsSubjectSelectOpen] = useState(false);
+  const [isApiSettingsOpen, setIsApiSettingsOpen] = useState(false);
   const [isModelInitialized, setIsModelInitialized] = useState(false);
   const [currentProvider, setCurrentProvider] = useState('');
   
@@ -125,7 +126,32 @@ export default function ChatbotPage() {
       setIsLoading(false);
     }
   };
+
+  // Handle opening API settings
+  const handleOpenApiSettings = () => {
+    setIsApiSettingsOpen(true);
+  };
+
+  // Handle closing API settings
+  const handleCloseApiSettings = () => {
+    setIsApiSettingsOpen(false);
+    checkModelStatus(); // Re-check API status after closing settings
+  };
   
+  // Get provider icon
+  const getProviderIcon = () => {
+    switch (currentProvider) {
+      case 'gemini':
+        return <span className="text-blue-500">G</span>;
+      case 'openai':
+        return <span className="text-green-500">O</span>;
+      case 'anthropic':
+        return <span className="text-purple-500">C</span>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="h-full flex-1 flex flex-col space-y-8 p-8">
       <div className="flex items-center justify-between">
@@ -137,14 +163,23 @@ export default function ChatbotPage() {
         </div>
         
         <div className="flex items-center gap-2">
-          {!isModelInitialized && (
-            <Link href="/dashboard/settings">
-              <Button variant="outline" size="sm" className="gap-1">
-                <Settings className="h-4 w-4" />
-                <span>Configure AI</span>
-              </Button>
-            </Link>
-          )}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1"
+            onClick={handleOpenApiSettings}
+          >
+            <KeyRound className="h-4 w-4" />
+            <span>
+              {isModelInitialized ? (
+                <span className="flex items-center">
+                  Connected {getProviderIcon()}
+                </span>
+              ) : (
+                "Configure API"
+              )}
+            </span>
+          </Button>
           
           <Button onClick={handleNewConversation} className="gap-1">
             <PlusCircle className="h-4 w-4" />
@@ -155,11 +190,16 @@ export default function ChatbotPage() {
       
       {!isModelInitialized && (
         <Alert className="mb-4">
-          <Info className="h-4 w-4" />
+          <KeyRound className="h-4 w-4" />
           <AlertDescription>
-            Please configure your AI provider in 
-            <Link href="/dashboard/settings" className="font-medium underline mx-1">Settings</Link>
-            to use the chatbot.
+            Please configure your AI API key to use the chatbot.
+            <Button 
+              variant="link" 
+              className="h-auto p-0 px-1"
+              onClick={handleOpenApiSettings}
+            >
+              Configure now
+            </Button>
           </AlertDescription>
         </Alert>
       )}
@@ -222,6 +262,8 @@ export default function ChatbotPage() {
                 isLoading={isLoading}
                 onSendMessage={handleSendMessage}
                 onEditTitle={handleUpdateTitle}
+                onOpenApiSettings={handleOpenApiSettings}
+                isModelInitialized={isModelInitialized}
               />
             </div>
           ) : (
@@ -248,6 +290,12 @@ export default function ChatbotPage() {
         isOpen={isSubjectSelectOpen}
         onClose={() => setIsSubjectSelectOpen(false)}
         onSelectSubject={handleSelectSubject}
+      />
+
+      {/* API settings dialog */}
+      <ApiSettings
+        isOpen={isApiSettingsOpen}
+        onClose={handleCloseApiSettings}
       />
     </div>
   );
