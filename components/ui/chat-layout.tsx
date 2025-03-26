@@ -494,44 +494,44 @@ export function ChatLayout({
       <div 
         ref={sidebarRef}
         className={cn(
-          "w-full max-w-xs flex-col border-r border-gray-800 bg-[#1a1a1a] transition-all duration-300 ease-in-out z-10",
-          sidebarOpen ? "flex lg:w-64 translate-x-0" : "hidden lg:flex lg:w-0 lg:-translate-x-full"
+          "w-full max-w-[280px] flex-col border-r border-gray-800 bg-[#1a1a1a] transition-all duration-300 ease-in-out z-10",
+          sidebarOpen ? "flex lg:w-72 translate-x-0" : "hidden lg:flex lg:w-0 lg:-translate-x-full"
         )}
         onMouseEnter={handleSidebarMouseEnter}
         onMouseLeave={handleSidebarMouseLeave}
       >
         {/* App branding */}
-        <div className="flex h-14 items-center px-5 border-b border-gray-800">
+        <div className="flex h-16 items-center px-5 border-b border-gray-800 bg-[#151515]">
           <h2 className="text-xl font-semibold tracking-tight text-gray-100">Atena</h2>
         </div>
 
-        {/* Fixed new chat button - FIXED UI */}
-        <div className="py-3 px-3 border-b border-gray-800">
+        {/* Fixed new chat button - IMPROVED UI */}
+        <div className="py-4 px-4">
           <Button 
             variant="default" 
-            className="flex w-full items-center justify-center gap-2 bg-[#3b5bdb] text-white hover:bg-[#364fc7] border-0 shadow-md h-10 overflow-hidden whitespace-nowrap"
+            className="flex w-full items-center justify-start gap-3 bg-[#3b5bdb] text-white hover:bg-[#364fc7] border-0 shadow-md py-6 px-4 rounded-xl"
             onClick={onNewSession}
           >
-            <MessageSquarePlus size={16} />
-            <span className="text-sm font-medium">New Chat</span>
+            <MessageSquarePlus size={18} className="flex-shrink-0" />
+            <span className="text-sm font-semibold">New Chat</span>
           </Button>
         </div>
         
         {/* Search box */}
-        <div className="p-3 border-b border-gray-800">
+        <div className="px-4 pb-3">
           <div className="relative w-full">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="search"
               placeholder="Search chats..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-800 border-gray-700 pl-9 h-9 text-gray-100"
+              className="w-full bg-gray-800 border-gray-700 pl-10 py-5 h-10 text-gray-100 rounded-xl"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-300"
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-300"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -540,15 +540,18 @@ export function ChatLayout({
         </div>
         
         {/* Chat sections */}
-        <ScrollArea className="flex-1">
-          <div className="p-2">
-            <h3 className="px-3 py-2 text-xs font-medium text-gray-400">Conversations</h3>
-            <div className="space-y-1">
+        <ScrollArea className="flex-1 px-2">
+          <div className="pt-2 pb-4">
+            <div className="px-4 pb-2 pt-3 flex items-center justify-between">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Conversations</h3>
+              <span className="text-xs text-gray-500">{filteredSessions.length}</span>
+            </div>
+            <div className="space-y-1.5 px-2">
               {filteredSessions.length > 0 ? (
                 filteredSessions.map((session) => (
                   <div key={session.id} className="relative">
                     {editingSession === session.id ? (
-                      <div className="flex items-center px-2 py-1 gap-1">
+                      <div className="flex items-center p-2 gap-1 bg-gray-800/60 rounded-lg">
                         <Input 
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
@@ -558,25 +561,34 @@ export function ChatLayout({
                           }}
                           onBlur={saveSessionTitle}
                           autoFocus
-                          className="h-8 text-sm bg-gray-800 border-gray-700 text-gray-100"
+                          className="h-9 text-sm bg-gray-800 border-gray-700 text-gray-100"
                         />
                       </div>
                     ) : (
                       <button
                         className={cn(
-                          "flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors",
-                          activeSession?.id === session.id ? "bg-gray-800 text-gray-100" : "text-gray-300 hover:bg-gray-800/60"
+                          "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+                          activeSession?.id === session.id 
+                            ? "bg-gradient-to-r from-blue-900/50 to-blue-800/30 text-gray-100 border border-blue-800/50" 
+                            : "text-gray-300 hover:bg-gray-800/60"
                         )}
                         onClick={() => onSelectSession?.(session.id)}
                       >
-                        <div className="flex items-center gap-2 truncate">
-                          <MessageSquare size={16} className="text-gray-400" />
-                          <span className="truncate">{session.title}</span>
+                        <div className="flex items-center gap-3 max-w-[82%]">
+                          <div className="flex-shrink-0 rounded-full bg-gray-700 h-8 w-8 flex items-center justify-center">
+                            <MessageSquare size={15} className="text-gray-300" />
+                          </div>
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="truncate font-medium">{session.title}</span>
+                            <span className="text-xs text-gray-500 truncate">
+                              {session.messages.length} messages • {new Date(session.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                         
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-gray-300 hover:bg-gray-700">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300 hover:bg-gray-700 rounded-full">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -612,8 +624,18 @@ export function ChatLayout({
                   </div>
                 ))
               ) : (
-                <div className="px-2 py-4 text-center text-sm text-gray-400">
-                  {searchQuery ? "No chats found" : "No chat history"}
+                <div className="px-2 py-8 text-center">
+                  <div className="mb-3 flex justify-center">
+                    <div className="rounded-full bg-gray-800 p-3">
+                      <MessageSquare size={20} className="text-gray-400" />
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-400">
+                    {searchQuery ? "No chats found" : "No chat history"}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {searchQuery ? "Try a different search" : "Start a new conversation"}
+                  </p>
                 </div>
               )}
             </div>
@@ -621,10 +643,13 @@ export function ChatLayout({
         </ScrollArea>
 
         {/* Settings area */}
-        <div className="mt-auto border-t border-gray-800 p-3">
-          <Button variant="ghost" className="w-full justify-start gap-2 text-gray-300 hover:bg-gray-800 hover:text-gray-100">
+        <div className="mt-auto border-t border-gray-800 p-4 bg-[#151515]">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-2 text-gray-300 hover:bg-gray-800 hover:text-gray-100 py-5 rounded-lg"
+          >
             <Settings className="h-4 w-4" />
-            <span>Settings</span>
+            <span className="font-medium">Settings</span>
           </Button>
         </div>
       </div>
