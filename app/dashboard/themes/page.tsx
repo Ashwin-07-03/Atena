@@ -4,57 +4,51 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { Check } from "lucide-react";
+import { Check, Grape, Cherry, FlameKindling, Leaf } from "lucide-react";
 import DashboardLayout from '@/components/dashboard-layout';
 
 const themeOptions = [
   {
-    value: "ethereal",
-    label: "Ethereal Japanese",
-    description: "Wabi-sabi cream, matcha green and cherry blossom accents",
-    colors: ["#60A77B", "#E3ACAC", "#A5C4D1", "#D4C4A8", "#F5EFE0"],
+    value: "blackberry",
+    label: "Blackberry",
+    description: "Deep purple with lavender accents",
+    colors: ["#5D3FD3", "#C1A7F7", "#DCD6ED", "#DBD0F5", "#180A4A"],
+    icon: Grape,
   },
   {
-    value: "vibrant",
-    label: "Vibrant",
-    description: "Bold Japanese colors with bright blues and pinks",
-    colors: ["#1C6DD0", "#F86E8B", "#C9EED3", "#F8C651", "#1340B6"],
+    value: "blueberry",
+    label: "Blueberry",
+    description: "Deep blue with sky blue highlights",
+    colors: ["#3D70D3", "#A7C1F7", "#D6E0ED", "#D0DBF5", "#0A1A4A"],
+    icon: Grape,
   },
   {
-    value: "traditional",
-    label: "Traditional",
-    description: "Classic Japanese colors with Indigo blue and warm accents",
-    colors: ["#226A9F", "#F7A8AC", "#A9E0B8", "#F9D675", "#1B4080"],
+    value: "pomegranate",
+    label: "Pomegranate",
+    description: "Rich crimson with soft pink accents",
+    colors: ["#D33D4E", "#F7A7B3", "#EDD6DA", "#F5D0D8", "#4A0A15"],
+    icon: FlameKindling,
   },
   {
-    value: "sakura",
-    label: "Cherry Blossom",
-    description: "Soft pink hues celebrating the beauty of sakura",
-    colors: ["#D51E62", "#F992CC", "#F0CAB9", "#F5937D", "#A02654"],
+    value: "cherry",
+    label: "Cherry",
+    description: "Vibrant pink with soft magenta tones",
+    colors: ["#D33D9E", "#F7A7E0", "#EDD6E5", "#F5D0ED", "#4A0A3A"],
+    icon: Cherry,
   },
   {
-    value: "kyoto",
-    label: "Kyoto Garden",
-    description: "Fresh green palette inspired by moss gardens",
-    colors: ["#0D9B63", "#F2D04B", "#C2E8E4", "#ECA23E", "#0F6647"],
+    value: "tangerine",
+    label: "Tangerine",
+    description: "Warm orange with golden highlights",
+    colors: ["#F5AD3D", "#F9D6A7", "#EDE2D6", "#F5E2D0", "#4A290A"],
+    icon: FlameKindling,
   },
   {
-    value: "sometsuke",
-    label: "Porcelain",
-    description: "Blue and white inspired by traditional porcelain",
-    colors: ["#0A43A6", "#8C9FE6", "#A7D6EB", "#48C7E6", "#0A2A61"],
-  },
-  {
-    value: "sado",
-    label: "Tea Ceremony",
-    description: "Warm earth tones inspired by the art of tea ceremony",
-    colors: ["#8F471C", "#F9B186", "#E5CA89", "#E9B939", "#AD6E51"],
-  },
-  {
-    value: "zen",
-    label: "Zen Garden",
-    description: "Minimalist monochrome palette inspired by rock gardens",
-    colors: ["#404040", "#CFBFB1", "#E6E6E6", "#B39B87", "#262626"],
+    value: "lime",
+    label: "Lime",
+    description: "Fresh green with bright highlights",
+    colors: ["#8DD33D", "#D3F7A7", "#E1EDD6", "#E8F5D0", "#0B4A0A"],
+    icon: Leaf,
   },
 ];
 
@@ -63,72 +57,89 @@ export default function ThemesPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-light tracking-wide">Japanese Color Themes</h1>
-          <p className="text-muted-foreground mt-2">
-            Choose from a variety of traditional Japanese color palettes for your study experience
+      <div className="space-y-8">
+        <div className="text-center mb-12 relative">
+          <h1 className="text-4xl font-light tracking-wide mb-3 relative inline-block">
+            Fruit-Inspired Color Themes
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 animate-pulse-juice"></div>
+          </h1>
+          <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+            Choose from a variety of delicious fruit-inspired palettes to customize your experience
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {themeOptions.map((option) => (
-            <Card key={option.value} className={`overflow-hidden ${theme === option.value ? 'ring-2 ring-primary' : ''}`}>
-              <CardHeader className="pb-2">
-                <CardTitle>{option.label}</CardTitle>
-                <CardDescription>{option.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex space-x-2 mb-4">
-                  {option.colors.map((color, i) => (
-                    <div 
-                      key={i}
-                      className="w-8 h-8 rounded-sm shadow-zen transition-all hover:scale-110"
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-                <div className="p-4 border rounded-sm bg-background/50 aspect-video flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-4 right-4 w-32 h-32">
-                      <svg viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="40" fill={option.colors[0]} />
-                      </svg>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {themeOptions.map((option) => {
+            const OptionIcon = option.icon || Grape;
+            const isActive = theme === option.value;
+            
+            return (
+              <Card 
+                key={option.value} 
+                className={`overflow-hidden transition-all duration-500 hover:scale-105 ${isActive ? 'ring-2 ring-primary shadow-juice' : 'hover:shadow-juice'}`}
+              >
+                <CardHeader className="pb-3 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 -mt-10 -mr-10 opacity-10">
+                    <OptionIcon size={128} className="text-primary animate-float-bubble" />
+                  </div>
+                  <CardTitle className="flex items-center gap-3">
+                    <OptionIcon className="h-6 w-6 text-primary" />
+                    {option.label}
+                  </CardTitle>
+                  <CardDescription>{option.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex space-x-2 mb-6">
+                    {option.colors.map((color, i) => (
+                      <div 
+                        key={i}
+                        className="w-10 h-10 rounded-xl shadow-juice transition-all hover:scale-125 hover:rotate-12"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                  <div className="p-5 border rounded-xl bg-card/50 aspect-video flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute top-4 right-4 w-32 h-32 animate-gentle-rotate" style={{animationDuration: '30s'}}>
+                        <svg viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="40" fill={option.colors[0]} />
+                        </svg>
+                      </div>
+                      <div className="absolute bottom-4 left-4 w-24 h-24 animate-gentle-rotate" style={{animationDuration: '40s', animationDirection: 'reverse'}}>
+                        <svg viewBox="0 0 100 100">
+                          <rect x="20" y="20" width="60" height="60" fill={option.colors[1]} rx="8" ry="8" />
+                        </svg>
+                      </div>
                     </div>
-                    <div className="absolute bottom-4 left-4 w-24 h-24">
-                      <svg viewBox="0 0 100 100">
-                        <rect x="20" y="20" width="60" height="60" fill={option.colors[2]} />
-                      </svg>
+                    <div className="z-10 text-center">
+                      <span className="font-medium tracking-wide text-lg" style={{ color: option.colors[0] }}>
+                        {option.label} Theme
+                      </span>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        Juicy & Refreshing
+                      </div>
                     </div>
                   </div>
-                  <div className="z-10 text-center">
-                    <span className="font-medium tracking-wide" style={{ color: option.colors[0] }}>
-                      {option.label} Theme
-                    </span>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      和の美しさ
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  onClick={() => setTheme(option.value)} 
-                  variant={theme === option.value ? "default" : "outline"}
-                  className="w-full"
-                >
-                  {theme === option.value ? (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Current Theme
-                    </>
-                  ) : (
-                    "Apply Theme"
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    onClick={() => setTheme(option.value)} 
+                    variant={isActive ? "default" : "outline"}
+                    className={`w-full rounded-xl transition-all duration-500 ${isActive ? 'bg-primary hover:scale-105' : 'hover:bg-primary/10'}`}
+                  >
+                    {isActive ? (
+                      <>
+                        <Check className="mr-2 h-4 w-4 animate-wiggle" />
+                        Current Theme
+                      </>
+                    ) : (
+                      "Apply Theme"
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </DashboardLayout>

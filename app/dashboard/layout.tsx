@@ -1,10 +1,12 @@
-import { ReactNode } from 'react';
-import { Shell } from '@/components/layout/shell';
+"use client";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  return <Shell>{children}</Shell>;
+import React, { useState } from "react";
+import DashboardLayout from "@/components/dashboard-layout";
+
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function Layout({ children }: DashboardLayoutProps) {
+  return <DashboardLayout>{children}</DashboardLayout>;
 } 

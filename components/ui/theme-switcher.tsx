@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Grape, Cherry, FlameKindling, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,44 +14,40 @@ import { cn } from "@/lib/utils";
 
 const themeOptions = [
   {
-    value: "ethereal",
-    label: "Ethereal Japanese",
-    description: "Wabi-sabi cream, matcha green and cherry blossom accents",
+    value: "blackberry",
+    label: "Blackberry",
+    description: "Deep purple with lavender accents",
+    icon: Grape,
   },
   {
-    value: "vibrant",
-    label: "Vibrant",
-    description: "Bold Japanese colors with bright blues and pinks",
+    value: "blueberry",
+    label: "Blueberry",
+    description: "Deep blue with sky blue highlights",
+    icon: Grape,
   },
   {
-    value: "traditional",
-    label: "Traditional",
-    description: "Classic Japanese colors with Indigo blue and warm accents",
+    value: "pomegranate",
+    label: "Pomegranate",
+    description: "Rich crimson with soft pink accents",
+    icon: FlameKindling,
   },
   {
-    value: "sakura",
-    label: "Cherry Blossom",
-    description: "Soft pink hues celebrating the beauty of sakura",
+    value: "cherry",
+    label: "Cherry",
+    description: "Vibrant pink with soft magenta tones",
+    icon: Cherry,
   },
   {
-    value: "kyoto",
-    label: "Kyoto Garden",
-    description: "Fresh green palette inspired by moss gardens",
+    value: "tangerine",
+    label: "Tangerine",
+    description: "Warm orange with golden highlights",
+    icon: FlameKindling,
   },
   {
-    value: "sometsuke",
-    label: "Porcelain",
-    description: "Blue and white inspired by traditional porcelain",
-  },
-  {
-    value: "sado",
-    label: "Tea Ceremony",
-    description: "Warm earth tones inspired by the art of tea ceremony",
-  },
-  {
-    value: "zen",
-    label: "Zen Garden",
-    description: "Minimalist monochrome palette inspired by rock gardens",
+    value: "lime",
+    label: "Lime",
+    description: "Fresh green with bright highlights",
+    icon: Leaf,
   },
 ];
 
@@ -62,35 +58,42 @@ export function ThemeSwitcher() {
   const currentTheme = themeOptions.find(
     (option) => option.value === theme
   ) || themeOptions[0];
+
+  const Icon = currentTheme.icon || Grape;
   
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="flex items-center gap-1 px-3 py-2 rounded-sm border border-accent/10 shadow-zen"
+          className="flex items-center gap-2 px-3 py-2 rounded-xl border border-primary/20 shadow-juice transition-all duration-300 hover:scale-105"
         >
+          <Icon className="h-4 w-4 text-primary animate-wiggle" />
           <span className="hidden md:inline-block">{currentTheme.label}</span>
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px] rounded-sm">
-        {themeOptions.map((option) => (
-          <DropdownMenuItem
-            key={option.value}
-            onClick={() => setTheme(option.value)}
-            className={cn(
-              "flex items-center gap-2 cursor-pointer rounded-sm py-2",
-              theme === option.value && "bg-accent/10"
-            )}
-          >
-            <div className="flex flex-col flex-1">
-              <span className="text-sm font-medium">{option.label}</span>
-              <span className="text-xs text-muted-foreground">{option.description}</span>
-            </div>
-            {theme === option.value && <Check className="h-4 w-4" />}
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuContent align="end" className="w-[220px] rounded-xl p-2 bg-card/95 backdrop-blur-md border border-primary/20 shadow-juice">
+        {themeOptions.map((option) => {
+          const OptionIcon = option.icon || Grape;
+          return (
+            <DropdownMenuItem
+              key={option.value}
+              onClick={() => setTheme(option.value)}
+              className={cn(
+                "flex items-center gap-3 cursor-pointer rounded-lg py-3 px-2 mb-1 transition-all duration-300 hover:scale-105",
+                theme === option.value ? "bg-primary/15 text-primary font-medium" : "hover:bg-primary/5"
+              )}
+            >
+              <OptionIcon className="h-5 w-5 text-primary" />
+              <div className="flex flex-col flex-1">
+                <span className="text-sm font-medium">{option.label}</span>
+                <span className="text-xs text-muted-foreground">{option.description}</span>
+              </div>
+              {theme === option.value && <Check className="h-4 w-4" />}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

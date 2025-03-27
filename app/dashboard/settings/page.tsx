@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ModelSettings } from "@/components/ui/model-settings";
 
 // Settings Service
 import { 
@@ -816,6 +817,18 @@ export default function SettingsPage() {
               
               <Card>
                 <CardHeader>
+                  <CardTitle>AI Model Settings</CardTitle>
+                  <CardDescription>
+                    Configure which AI models power your assistant
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ModelSettings />
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
                   <CardTitle>AI Behavior Settings</CardTitle>
                   <CardDescription>
                     Customize how the AI assistant interacts with you
@@ -940,278 +953,6 @@ export default function SettingsPage() {
                         onCheckedChange={(checked) => handleAIAssistantChange('saveHistory', checked)}
                       />
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-          
-          {/* Notifications Settings */}
-          {activeTab === "notifications" && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-semibold">Notifications</h1>
-                <Button onClick={handleSaveChanges} disabled={!hasUnsavedChanges}>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save
-                </Button>
-              </div>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Notification Preferences</CardTitle>
-                  <CardDescription>
-                    Manage what notifications you receive
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Notification Level</h3>
-                    <RadioGroup 
-                      value={settings.notifications.notificationLevel} 
-                      onValueChange={(value: string) => handleNotificationsChange('notificationLevel', value as NotificationLevel)}
-                      className="flex flex-col space-y-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="all" id="level-all" />
-                        <Label htmlFor="level-all">All Notifications</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="important" id="level-important" />
-                        <Label htmlFor="level-important">Important Only</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="none" id="level-none" />
-                        <Label htmlFor="level-none">None</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Study Reminders</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Scheduled study session notifications
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.notifications.studyReminders}
-                        onCheckedChange={(checked) => handleNotificationsChange('studyReminders', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Session Summaries</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Receive study session reports
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.notifications.sessionSummaries}
-                        onCheckedChange={(checked) => handleNotificationsChange('sessionSummaries', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Friend Requests</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Notifications for new friend requests
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.notifications.friendRequests}
-                        onCheckedChange={(checked) => handleNotificationsChange('friendRequests', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Group Messages</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Notifications for study group chats
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.notifications.groupMessages}
-                        onCheckedChange={(checked) => handleNotificationsChange('groupMessages', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Resource Sharing</h3>
-                        <p className="text-sm text-muted-foreground">
-                          When someone shares study materials with you
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.notifications.resourceSharing}
-                        onCheckedChange={(checked) => handleNotificationsChange('resourceSharing', checked)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium">Email Notifications</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Receive notifications via email
-                      </p>
-                    </div>
-                    <Switch 
-                      checked={settings.notifications.emailNotifications}
-                      onCheckedChange={(checked) => handleNotificationsChange('emailNotifications', checked)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-          
-          {/* Privacy Settings */}
-          {activeTab === "privacy" && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-semibold">Privacy Settings</h1>
-                <Button onClick={handleSaveChanges} disabled={!hasUnsavedChanges}>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save
-                </Button>
-              </div>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Privacy</CardTitle>
-                  <CardDescription>
-                    Control who can see your profile and activity
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Profile Visibility</h3>
-                    <RadioGroup 
-                      value={settings.privacy.profileVisibility} 
-                      onValueChange={(value: string) => handlePrivacyChange('profileVisibility', value as typeof settings.privacy.profileVisibility)}
-                      className="flex flex-col space-y-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="public" id="visibility-public" />
-                        <Label htmlFor="visibility-public">Public - Anyone can view your profile</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="friends" id="visibility-friends" />
-                        <Label htmlFor="visibility-friends">Friends Only - Only your connections can view your profile</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="private" id="visibility-private" />
-                        <Label htmlFor="visibility-private">Private - Your profile is not visible to others</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Show Activity Status</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Show when you're online or studying
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.privacy.activityStatus}
-                        onCheckedChange={(checked) => handlePrivacyChange('activityStatus', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Share Study Statistics</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Allow others to see your study progress
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.privacy.shareStudyStats}
-                        onCheckedChange={(checked) => handlePrivacyChange('shareStudyStats', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Allow Friend Requests</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Receive connection requests from other users
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.privacy.allowFriendRequests}
-                        onCheckedChange={(checked) => handlePrivacyChange('allowFriendRequests', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Allow Group Invites</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Receive invitations to join study groups
-                        </p>
-                      </div>
-                      <Switch 
-                        checked={settings.privacy.allowGroupInvites}
-                        onCheckedChange={(checked) => handlePrivacyChange('allowGroupInvites', checked)}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Data Settings</CardTitle>
-                  <CardDescription>
-                    Manage your data and privacy preferences
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium">Data Collection</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Allow anonymous usage data collection to improve our services
-                      </p>
-                    </div>
-                    <Switch 
-                      checked={settings.privacy.dataCollection}
-                      onCheckedChange={(checked) => handlePrivacyChange('dataCollection', checked)}
-                    />
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Data Management</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Button variant="outline">
-                        <PenLine className="mr-2 h-4 w-4" />
-                        Request My Data
-                      </Button>
-                      <Button variant="outline" className="text-destructive border-destructive/20 hover:bg-destructive/10">
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete Account
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Account deletion will permanently remove all your data and cannot be undone.
-                    </p>
                   </div>
                 </CardContent>
               </Card>

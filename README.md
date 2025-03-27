@@ -1,219 +1,228 @@
-# Atena - Intelligent Study Management System
+# Atena - AI-Powered Learning Assistant Platform
 
-Atena is an AI-driven study management platform that helps students optimize their academic performance through personalized scheduling, intelligent resource management, and data-driven insights.
+<div align="center">
+  <img src="/public/logo.png" alt="Atena Logo" width="200">
+  <p><em>Your personalized study companion</em></p>
+</div>
 
-## Tech Stack
+## Overview
 
-- **Frontend**: Next.js 14, React, TypeScript, TailwindCSS
-- **Backend**: Express.js, Node.js, Python (ML services)
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: NextAuth.js with Supabase integration
-- **ML/AI**: OpenAI API, Python custom models, TensorFlow.js
-- **Real-time Features**: Supabase Realtime, WebSockets
-- **State Management**: React Context API, SWR for data fetching
+Atena is a comprehensive learning platform designed to help students optimize their study sessions, collaborate with peers, and leverage AI-assisted learning tools. The application combines modern educational methodologies with cutting-edge AI technology to provide a personalized learning experience.
 
-## Architecture Overview
+## Features
 
-The application follows a modern, scalable architecture:
+### 📚 Study Dashboard
 
-1. **Next.js App Router**: Leveraging Server Components for improved performance
-2. **API Routes**: Combination of Next.js API routes and Express.js microservices
-3. **Serverless Functions**: For ML processing and background tasks
-4. **Database Layer**: Supabase for structured data, vector embeddings for AI features
-5. **Authentication Flow**: JWT-based auth with secure refresh token rotation
-6. **Caching Strategy**: SWR for client-side, Redis for server-side
+- **Study Sessions Management**: Create, schedule, and track study sessions with customizable focus timers
+- **Analytics & Progress Tracking**: Visualize your study habits and progress with detailed charts and statistics
+- **Note Taking**: Create and organize structured notes with support for markdown, code snippets, and file attachments
+- **Spaced Repetition**: Automatically schedule review sessions based on proven learning science
 
-## Core Features Implementation Plan
+### 🤖 AI Assistant
 
-### Phase 1: Foundation & User Experience
+- **Contextual Learning Support**: Ask questions about your study materials and get instant, relevant answers
+- **Personalized Explanations**: Receive explanations tailored to your knowledge level and learning style
+- **Study Material Generation**: Generate practice problems, flashcards, and study guides based on your notes
+- **Multiple AI Models**: Choose between different AI models including Claude, GPT, Gemini, and more
 
-- [x] User authentication & profile management
-- [x] Dashboard UI with customizable widgets
-- [x] Dark/light mode implementation
-- [x] Responsive design for all device sizes
-- [x] Basic Pomodoro timer & task tracker
+### 👥 Collaboration
 
-### Phase 2: AI-Powered Features
+- **Real-time Collaboration**: Work together on study materials, notes, and problem-solving
+- **Group Study Sessions**: Create or join virtual study rooms with integrated chat and file sharing
+- **Resource Sharing**: Share notes, documents, and learning resources with peers
+- **Discussion Threads**: Create topic-specific discussions to deepen understanding
 
-- [x] AI-Powered Pomodoro Timer
-  - Smart scheduling based on workload
-  - Performance tracking and adaptation
-  - ML-based session duration recommendations
+### 📅 Schedule & Calendar
 
-- [ ] Resource Library
-  - Document upload & organization
-  - Automatic tagging system
-  - AI-generated document summaries
+- **Smart Scheduling**: AI-powered recommendations for optimal study times
+- **Calendar Integration**: Sync your study schedule with external calendars (Google, Outlook)
+- **Deadline Tracking**: Never miss an assignment or exam with reminder notifications
+- **Pomodoro Timer**: Built-in focus timer with customizable work/break periods
 
-- [ ] Flashcard Generator
-  - Note parsing & conversion to flashcards
-  - Anki export compatibility
-  - Spaced repetition algorithm
+### ⚙️ Customization & Accessibility
 
-- [ ] Collaborative Whiteboard
-  - Excalidraw integration
-  - Real-time collaboration
-  - Auto-save & version history
+- **Themes**: Light, dark, and high-contrast themes
+- **Accessibility Features**: Screen reader support, keyboard navigation, reduced motion, and large text options
+- **Personalized Settings**: Tailor the interface to your preferences and workflow
 
-### Phase 3: Insights & Analysis
+## Technology Stack
 
-- [ ] Smart Task Prioritizer
-  - ML-based assignment ranking
-  - Deadline & difficulty analysis
-  - Auto-scheduling suggestions
+### Frontend
 
-- [ ] Weakness Analysis
-  - Performance tracking across subjects
-  - Topic-based strength/weakness identification
-  - Targeted resource recommendations
+- **Framework**: Next.js 14 (App Router) with Server Components
+- **Language**: TypeScript
+- **UI Components**: Custom components built with Tailwind CSS and Radix UI
+- **State Management**: React Context API and SWR for data fetching and caching
+- **Animations**: Framer Motion for smooth, accessible animations
 
-- [ ] Study Note Automation
-  - Audio lecture transcription (Whisper API)
-  - Note summarization & organization (GPT)
-  - Key concept extraction
+### Backend
 
-- [ ] Exam Predictions
-  - Syllabus analysis & question generation
-  - Personalized practice tests
-  - Performance prediction
+- **API Routes**: Next.js API routes for serverless function handling
+- **Authentication**: NextAuth.js for secure authentication with multiple providers
+- **Database Access**: Prisma ORM for type-safe database queries
+- **AI Integration**: OpenAI, Anthropic, and Google API clients
 
-### Phase 4: Engagement & Wellness
+### Database & Storage
 
-- [ ] Gamification System
-  - Achievement badges & milestones
-  - Streak tracking & rewards
-  - Weekly leaderboards (anonymous)
+- **Database**: PostgreSQL for relational data storage
+- **File Storage**: Vercel Blob Storage for user-uploaded files
+- **Caching**: Redis for performance optimization
 
-- [ ] Wellness Integration
-  - Study/break balance monitoring
-  - Mindfulness exercises integration
-  - Sleep & hydration tracking
+### Deployment & Infrastructure
 
-- [ ] Community Features
-  - Study group formation & management
-  - Peer note sharing marketplace
-  - Course-specific Q&A forums
+- **Hosting**: Vercel for frontend and serverless functions
+- **CI/CD**: GitHub Actions for continuous integration and deployment
+- **Monitoring**: Vercel Analytics and custom logging
 
-### Phase 5: Advanced Features & Monetization
+## Project Structure
 
-- [ ] Premium Analytics
-  - Advanced performance insights
-  - Long-term trend analysis
-  - Personalized improvement plans
+```
+atena/
+├── app/                  # Next.js App Router
+│   ├── api/              # API routes
+│   ├── auth/             # Authentication pages
+│   ├── dashboard/        # Main application pages
+│   │   ├── ai-assistant/ # AI assistant feature
+│   │   ├── calendar/     # Calendar and scheduling
+│   │   ├── collaborate/  # Collaboration features
+│   │   ├── notes/        # Note-taking functionality
+│   │   ├── settings/     # User settings
+│   │   └── study/        # Study session management
+│   └── providers.tsx     # Global context providers
+├── components/           # Reusable UI components
+│   ├── ai/               # AI-related components
+│   ├── auth/             # Authentication components
+│   ├── calendar/         # Calendar components
+│   ├── collaborate/      # Collaboration components
+│   ├── dashboard-layout/ # Layout components for dashboard
+│   ├── notes/            # Note-taking components
+│   ├── study/            # Study session components
+│   └── ui/               # Base UI components
+├── lib/                  # Utility functions & services
+│   ├── actions/          # Server actions
+│   ├── hooks/            # Custom React hooks
+│   ├── services/         # Service integrations
+│   ├── stores/           # Client-side stores
+│   └── utils/            # Helper functions
+├── prisma/               # Database schema and migrations
+├── public/               # Static assets
+└── styles/               # Global styles
+```
 
-- [ ] Tutor Matchmaking
-  - Peer tutor discovery
-  - Scheduling & payment processing
-  - Rating & review system
+## Data Storage & Persistence
 
-- [ ] Resource Marketplace
-  - Premium study material access
-  - Educational partner integrations
-  - User-generated content marketplace
+### User Data
 
-## Machine Learning Services
+- **User Profiles**: PostgreSQL (users table)
+- **Preferences**: PostgreSQL (user_preferences table)
+- **Authentication**: JWT stored in HTTP-only cookies
 
-Atena uses custom machine learning microservices to power its intelligent features:
+### Application Data
 
-### Pomodoro Session Optimizer
+- **Study Sessions**: PostgreSQL (study_sessions table)
+- **Notes**: PostgreSQL (notes, note_blocks tables)
+- **Calendar Events**: PostgreSQL (calendar_events table)
+- **Collaboration**: PostgreSQL (conversations, messages, shared_resources tables)
 
-The Pomodoro Session Optimizer is a machine learning model that:
-- Analyzes past study sessions and their effectiveness
-- Considers factors like subject, time of day, and energy level
-- Recommends optimal study and break durations
-- Continuously improves based on user feedback
+### AI Conversations
 
-### ML Microservice Setup
+- **Chat History**: PostgreSQL (ai_conversations, ai_messages tables)
+- **Prompt Templates**: PostgreSQL (ai_prompt_templates table)
 
-1. Navigate to the ML services directory:
-   ```bash
-   cd ml-services
-   ```
+### Files & Media
 
-2. Run the setup script:
-   ```bash
-   ./start.sh
-   ```
+- **Uploaded Files**: Vercel Blob Storage with metadata in PostgreSQL
+- **Images**: Vercel Blob Storage with optimized delivery
 
-   This will:
-   - Create a virtual environment (if needed)
-   - Install required dependencies
-   - Create necessary data directories
-   - Start the ML microservice on port 5050
-
-3. Verify the service is running:
-   ```bash
-   curl http://localhost:5050/health
-   ```
-
-### API Integration
-
-The frontend integrates with the ML services via:
-- Next.js API routes as proxy endpoints
-- React Query for client-side data fetching and mutations
-- Custom React hooks that abstract the ML service interaction
-
-## Development Principles
-
-- **Component Architecture**: Server Components by default, Client Components only when necessary
-- **Error Handling**: Comprehensive error boundaries and fallback UI
-- **Accessibility**: WCAG 2.1 AA compliance throughout
-- **Performance**: Core Web Vitals optimization, code splitting, lazy loading
-- **Security**: OWASP best practices, regular security audits
-- **Testing**: Jest for unit tests, Cypress for E2E
-
-## Getting Started
+## Setup & Installation
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
-- Python 3.9+ (for ML services)
-- Supabase account
-- OpenAI API key (for AI features)
+- Node.js 18.x or higher
+- npm or yarn
+- PostgreSQL database
+- API keys for AI services (OpenAI, Anthropic, etc.)
 
-### Installation
+### Installation Steps
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/your-username/atena.git
-   cd atena
-   ```
+1. **Clone the repository**
 
-2. Install dependencies
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/yourusername/atena.git
+cd atena
+```
 
-3. Set up environment variables
-   ```bash
-   cp .env.example .env.local
-   # Fill in your API keys and configuration
-   ```
+2. **Install dependencies**
 
-4. Start the development server
-   ```bash
-   npm run dev
-   ```
+```bash
+npm install
+# or
+yarn install
+```
 
-5. For ML services (optional)
-   ```bash
-   cd ml-services
-   pip install -r requirements.txt
-   python server.py
-   ```
+3. **Set up environment variables**
 
-## Contribution Guidelines
+Create a `.env.local` file in the root directory with the following variables:
 
-- Follow kebab-case for component and file naming
-- Use TypeScript for all new code
-- Implement proper loading states and error handling
-- Write tests for critical functionality
-- Follow the provided ESLint and Prettier configurations
+```
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/atena"
+
+# Authentication
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# AI Services
+OPENAI_API_KEY="your-openai-api-key"
+ANTHROPIC_API_KEY="your-anthropic-api-key"
+GOOGLE_AI_API_KEY="your-google-ai-api-key"
+
+# Storage
+BLOB_READ_WRITE_TOKEN="your-vercel-blob-token"
+```
+
+4. **Set up the database**
+
+```bash
+npx prisma migrate dev
+```
+
+5. **Start the development server**
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+6. **Open your browser**
+
+Navigate to `http://localhost:3000` to see the application running.
+
+## Accessibility
+
+Atena is committed to accessibility for all users. The application includes:
+
+- Semantic HTML structure
+- Keyboard navigation support
+- ARIA labels for interactive elements
+- Screen reader compatibility
+- Customizable text size and contrast
+- Reduced motion option
+- Color schemes that meet WCAG 2.1 AA contrast requirements
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Contact
 
-For questions or collaboration opportunities, reach out to [contact@atena-study.com](mailto:contact@atena-study.com) 
+For any questions or suggestions, please open an issue on GitHub or contact the development team at [support@atena.app](mailto:support@atena.app).
+
+---
+
+<div align="center">
+  <p>Made with ❤️ for better learning experiences</p>
+</div> 

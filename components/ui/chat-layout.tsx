@@ -53,17 +53,35 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  ChatSession, 
-  Message,
-  SavedPrompt
-} from "@/lib/services/ai-assistant-service";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/ui/logo";
+
+// Define interfaces that were previously imported
+export interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant' | 'system';
+  timestamp: number;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface SavedPrompt {
+  id: string;
+  text: string;
+  createdAt: number;
+  savedAt: number;
+}
 
 export interface RecommendedPrompt {
   id: string;

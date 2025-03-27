@@ -21,6 +21,12 @@ module.exports = {
   			ring: "hsl(var(--ring))",
   			background: "hsl(var(--background))",
   			foreground: "hsl(var(--foreground))",
+        /* Japanese-inspired zen garden colors */
+        sakura: "hsl(var(--sakura))",
+        bamboo: "hsl(var(--bamboo))",
+        indigo: "hsl(var(--indigo))",
+        terracotta: "hsl(var(--terracotta))",
+        sky: "hsl(var(--sky))",
   			primary: {
   				'50': '#f0f9ff',
   				'100': '#e0f2fe',
@@ -88,15 +94,15 @@ module.exports = {
   			}
   		},
   		fontFamily: {
-  			sans: ['Montserrat', 'Inter', 'sans-serif'],
+  			sans: ['Noto Sans JP', 'Inter', 'sans-serif'],
   		},
   		boxShadow: {
-  			soft: '0 4px 14px 0 rgba(0, 0, 0, 0.05)',
-  			medium: '0 6px 24px 0 rgba(0, 0, 0, 0.08)',
+  			soft: '0 4px 14px 0 rgba(0, 0, 0, 0.03)',
+  			medium: '0 6px 24px 0 rgba(0, 0, 0, 0.05)',
         inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
-        'fluffy': '0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 3px 10px -5px rgba(0, 0, 0, 0.04)',
-        'fluffy-lg': '0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -5px rgba(0, 0, 0, 0.05)',
-        'fluffy-inner': 'inset 0 2px 10px 0 rgba(0, 0, 0, 0.08)',
+        'zen': '0 1px 3px rgba(0, 0, 0, 0.1)',
+        'zen-xl': '0 8px 20px rgba(0, 0, 0, 0.08), 0 1px 5px rgba(0, 0, 0, 0.02)',
+        'washi': '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
   		},
   		borderRadius: {
   			lg: "var(--radius)",
@@ -124,14 +130,47 @@ module.exports = {
   				from: { transform: "scale(0.95)", opacity: 0 },
   				to: { transform: "scale(1)", opacity: 1 },
   			},
+        /* Japanese-inspired animations */
+        "gentle-reveal": {
+          "0%": { opacity: 0, transform: "translateY(5px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+        "brush-stroke": {
+          "0%": { width: "0%", opacity: 0 },
+          "100%": { width: "100%", opacity: 1 },
+        },
   		},
   		animation: {
   			"accordion-down": "accordion-down 0.2s ease-out",
   			"accordion-up": "accordion-up 0.2s ease-out",
-  			"fade-in": "fade-in 0.3s ease-out",
-  			"slide-in": "slide-in-from-bottom 0.3s ease-out",
+  			"fade-in": "fade-in 0.7s ease-out",
+  			"slide-in": "slide-in-from-bottom 0.5s ease-out",
   			"zoom-in": "zoom-in-50 0.3s ease-out",
+        "gentle-reveal": "gentle-reveal 0.5s ease-out forwards",
+        "brush-stroke": "brush-stroke 1.2s ease-in-out forwards",
   		},
+      /* Japanese-inspired spacing */
+      spacing: {
+        '7.5': '1.875rem',
+        '15': '3.75rem',
+        '18': '4.5rem',
+        '42': '10.5rem',
+        '68': '17rem',
+        '84': '21rem',
+        '128': '32rem',
+        '144': '36rem',
+      },
+      /* Japanese-inspired line heights */
+      lineHeight: {
+        'relaxed': '1.75',
+        'loose': '2',
+        'zen': '1.9',
+      },
+      /* Japanese-inspired letter spacing */
+      letterSpacing: {
+        'zen': '0.04em',
+        'wide': '0.08em',
+      },
   	}
   },
   plugins: [require("tailwindcss-animate")],

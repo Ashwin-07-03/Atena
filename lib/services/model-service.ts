@@ -167,4 +167,69 @@ export async function generateResponse(
     }
     return 'An unknown error occurred while generating a response.';
   }
+}
+
+// Model-specific structures and types
+export interface ModelInfo {
+  id: string;
+  name: string;
+  description: string;
+}
+
+// Available models per provider
+export const availableModels: Record<ModelProvider, ModelInfo[]> = {
+  'gemini': [
+    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: 'Advanced model' },
+    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Fast model' }
+  ],
+  'openai': [
+    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'High performance' },
+    { id: 'gpt-4o', name: 'GPT-4o', description: 'Optimized for chat' },
+    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Balanced' }
+  ],
+  'anthropic': [
+    { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Most capable' },
+    { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet', description: 'Balanced' },
+    { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast' }
+  ]
+};
+
+// Storage key for selected models
+const MODEL_STORAGE_KEY_PREFIX = 'atena-ai-model-';
+
+/**
+ * Get the current model for a provider
+ */
+export function getCurrentModel(provider: ModelProvider): string {
+  if (typeof window === 'undefined') {
+    // Default models for each provider
+    switch (provider) {
+      case 'gemini': return 'gemini-1.5-pro';
+      case 'openai': return 'gpt-4-turbo';
+      case 'anthropic': return 'claude-3-opus-20240229';
+    }
+  }
+  
+  const storageKey = `${MODEL_STORAGE_KEY_PREFIX}${provider}`;
+  const storedModel = localStorage.getItem(storageKey);
+  
+  if (storedModel) return storedModel;
+  
+  // Default models if nothing stored
+  switch (provider) {
+    case 'gemini': return 'gemini-1.5-pro';
+    case 'openai': return 'gpt-4-turbo';
+    case 'anthropic': return 'claude-3-opus-20240229';
+    default: return availableModels[provider][0].id;
+  }
+}
+
+/**
+ * Set the current model for a provider
+ */
+export function setCurrentModel(provider: ModelProvider, modelId: string): void {
+  if (typeof window === 'undefined') return;
+  
+  const storageKey = `${MODEL_STORAGE_KEY_PREFIX}${provider}`;
+  localStorage.setItem(storageKey, modelId);
 } 

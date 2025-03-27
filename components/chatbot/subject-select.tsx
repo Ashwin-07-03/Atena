@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface SubjectSelectProps {
   isOpen: boolean;
@@ -62,14 +64,12 @@ export default function SubjectSelect({ isOpen, onClose, onSelectSubject }: Subj
 
           <div className="mt-2">
             <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="custom-title"
-                className="rounded border-gray-300"
+              <Checkbox 
+                id="custom-title" 
                 checked={isCustomTitle}
-                onChange={(e) => setIsCustomTitle(e.target.checked)}
+                onCheckedChange={(checked) => setIsCustomTitle(!!checked)}
               />
-              <label htmlFor="custom-title" className="text-sm">Use custom conversation title</label>
+              <Label htmlFor="custom-title" className="text-sm">Use custom conversation title</Label>
             </div>
             
             {isCustomTitle && (
