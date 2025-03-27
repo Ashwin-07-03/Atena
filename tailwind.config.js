@@ -88,11 +88,15 @@ module.exports = {
   			}
   		},
   		fontFamily: {
-  			sans: ['Inter var', 'Inter', 'sans-serif'],
+  			sans: ['Montserrat', 'Inter', 'sans-serif'],
   		},
   		boxShadow: {
-  			soft: '0 2px 15px 0 rgba(0, 0, 0, 0.05)',
-  			medium: '0 4px 20px 0 rgba(0, 0, 0, 0.1)'
+  			soft: '0 4px 14px 0 rgba(0, 0, 0, 0.05)',
+  			medium: '0 6px 24px 0 rgba(0, 0, 0, 0.08)',
+        inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+        'fluffy': '0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 3px 10px -5px rgba(0, 0, 0, 0.04)',
+        'fluffy-lg': '0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px -5px rgba(0, 0, 0, 0.05)',
+        'fluffy-inner': 'inset 0 2px 10px 0 rgba(0, 0, 0, 0.08)',
   		},
   		borderRadius: {
   			lg: "var(--radius)",

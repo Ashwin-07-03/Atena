@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Edit, MoreHorizontal, Settings, KeyRound } from 'lucide-react';
+import { Send, Edit, MoreHorizontal, Settings, KeyRound, Sparkles } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -104,11 +104,11 @@ export default function ChatInterface({
   const showWelcomeMessage = conversation.messages.length === 0;
   
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gradient-to-b from-background to-background/90">
       {/* Chat Header */}
-      <div className="p-4 border-b flex items-center justify-between bg-muted/50">
+      <div className="p-4 border-b border-primary/20 backdrop-blur-md flex items-center justify-between bg-background/90 rounded-b-xl shadow-sm">
         <div className="flex items-center">
-          <div className="flex-shrink-0 rounded-full bg-primary/10 h-10 w-10 flex items-center justify-center text-xl">
+          <div className="flex-shrink-0 rounded-full bg-primary/30 h-11 w-11 flex items-center justify-center text-xl shadow-inner animate-soft-bounce">
             {subjectIcon}
           </div>
           <div className="ml-3">
@@ -120,16 +120,16 @@ export default function ChatInterface({
                   onChange={(e) => setTitleInput(e.target.value)}
                   onBlur={handleSaveTitle}
                   onKeyDown={handleTitleKeyDown}
-                  className="h-8 text-base font-medium"
+                  className="h-9 text-base font-medium rounded-full shadow-inner focus-ring"
                 />
               </div>
             ) : (
               <div className="flex items-center">
-                <h2 className="text-base font-medium mr-2">{conversation.title}</h2>
+                <h2 className="text-base font-medium mr-2 text-foreground">{conversation.title}</h2>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7" 
+                  className="h-7 w-7 rounded-full hover:bg-primary/20 hover:text-primary-foreground transition-colors" 
                   onClick={handleStartEditingTitle}
                 >
                   <Edit className="h-3.5 w-3.5" />
@@ -148,16 +148,16 @@ export default function ChatInterface({
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/20">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleStartEditingTitle}>
+          <DropdownMenuContent align="end" className="rounded-xl border border-primary/20 shadow-lg backdrop-blur-md">
+            <DropdownMenuItem onClick={handleStartEditingTitle} className="rounded-lg focus:bg-primary/20">
               <Edit className="h-4 w-4 mr-2" />
               <span>Rename</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onOpenApiSettings}>
+            <DropdownMenuItem onClick={onOpenApiSettings} className="rounded-lg focus:bg-primary/20">
               <KeyRound className="h-4 w-4 mr-2" />
               <span>API Settings</span>
             </DropdownMenuItem>
@@ -166,35 +166,36 @@ export default function ChatInterface({
       </div>
       
       {/* Messages Area */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-6 overflow-auto">
         <div className="space-y-6 max-w-3xl mx-auto">
           {showWelcomeMessage ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="bg-primary/10 rounded-full p-4 mb-4">
+            <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
+              <div className="fluffy-bubble p-5 mb-6 animate-soft-bounce">
                 <Logo showText={false} size="lg" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-3 text-foreground">
                 Welcome to your {studySubjects.find(s => s.id === conversation.subject)?.name} Study Session
               </h3>
-              <p className="text-muted-foreground max-w-md">
+              <p className="text-muted-foreground max-w-md px-4 py-3 rounded-xl bg-muted/30 backdrop-blur-sm border border-primary/10 shadow-sm">
                 Ask any {studySubjects.find(s => s.id === conversation.subject)?.name.toLowerCase()} questions, 
                 request explanations, or get help with specific problems. I'm here to assist your learning!
               </p>
             </div>
           ) : (
-            conversation.messages.map((message) => (
+            conversation.messages.map((message, index) => (
               <div
                 key={message.id}
                 className={cn(
-                  "flex",
+                  "flex animate-fade-in",
                   message.role === "user" ? "justify-end" : "justify-start"
                 )}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-start gap-4 max-w-[85%]">
                   {message.role === "assistant" && (
-                    <Avatar className="h-8 w-8 mt-1">
-                      <div className="h-full w-full rounded-full bg-primary flex items-center justify-center">
-                        <Logo showText={false} size="sm" className="text-white" />
+                    <Avatar className="h-9 w-9 mt-1 border-2 border-accent/30 p-0.5 shadow-md">
+                      <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <Sparkles className="h-4 w-4 text-primary-foreground" />
                       </div>
                     </Avatar>
                   )}
@@ -202,17 +203,17 @@ export default function ChatInterface({
                   <div className="flex flex-col">
                     <div
                       className={cn(
-                        "rounded-lg px-4 py-3 shadow-sm",
+                        "shadow-md",
                         message.role === "user" 
-                          ? "bg-primary text-primary-foreground ml-auto" 
-                          : "bg-muted"
+                          ? "message-bubble-user text-primary-foreground" 
+                          : "message-bubble-assistant text-accent-foreground"
                       )}
                     >
                       <div className="whitespace-pre-wrap">{message.content}</div>
                     </div>
                     <div
                       className={cn(
-                        "text-xs text-muted-foreground mt-1",
+                        "text-xs text-muted-foreground mt-1.5 px-2",
                         message.role === "user" ? "text-right" : "text-left"
                       )}
                     >
@@ -221,8 +222,8 @@ export default function ChatInterface({
                   </div>
                   
                   {message.role === "user" && (
-                    <Avatar className="h-8 w-8 mt-1">
-                      <div className="h-full w-full rounded-full bg-muted flex items-center justify-center text-primary-foreground">
+                    <Avatar className="h-9 w-9 mt-1 border-2 border-primary/30 p-0.5 shadow-md">
+                      <div className="h-full w-full rounded-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-primary-foreground font-medium">
                         U
                       </div>
                     </Avatar>
@@ -234,20 +235,20 @@ export default function ChatInterface({
           
           {/* Loading indicator */}
           {isLoading && (
-            <div className="flex justify-start">
+            <div className="flex justify-start animate-fade-in">
               <div className="flex items-start gap-4">
-                <Avatar className="h-8 w-8">
-                  <div className="h-full w-full rounded-full bg-primary flex items-center justify-center">
-                    <Logo showText={false} size="sm" className="text-white" />
+                <Avatar className="h-9 w-9 border-2 border-accent/30 p-0.5 shadow-md">
+                  <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <Sparkles className="h-4 w-4 text-primary-foreground" />
                   </div>
                 </Avatar>
-                <div className="bg-muted rounded-lg px-4 py-3 flex items-center">
-                  <div className="flex space-x-1">
-                    <div className="h-2 w-2 rounded-full bg-current animate-bounce" 
+                <div className="message-bubble-assistant flex items-center">
+                  <div className="flex space-x-2">
+                    <div className="h-2.5 w-2.5 rounded-full bg-current animate-bounce opacity-75" 
                       style={{ animationDelay: "0ms" }}></div>
-                    <div className="h-2 w-2 rounded-full bg-current animate-bounce" 
+                    <div className="h-2.5 w-2.5 rounded-full bg-current animate-bounce opacity-75" 
                       style={{ animationDelay: "150ms" }}></div>
-                    <div className="h-2 w-2 rounded-full bg-current animate-bounce" 
+                    <div className="h-2.5 w-2.5 rounded-full bg-current animate-bounce opacity-75" 
                       style={{ animationDelay: "300ms" }}></div>
                   </div>
                 </div>
@@ -255,42 +256,38 @@ export default function ChatInterface({
             </div>
           )}
           
-          {/* Scroll anchor */}
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
       
       {/* Input Area */}
-      <div className="p-4 border-t bg-muted/50">
-        <div className="flex items-center gap-2 max-w-3xl mx-auto">
-          <Input
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isModelInitialized ? 
-              `Ask about ${studySubjects.find(s => s.id === conversation.subject)?.name}...` : 
-              "Configure API key to start chatting..."
-            }
-            className="flex-1 bg-background"
-            disabled={isLoading || !isModelInitialized}
-          />
-          {!isModelInitialized ? (
-            <Button 
-              onClick={onOpenApiSettings}
-              size="icon"
-              variant="outline"
-            >
-              <KeyRound className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleSendMessage} 
-              disabled={!inputValue.trim() || isLoading}
-              size="icon"
+      <div className="p-4 border-t border-primary/20 bg-background/80 backdrop-blur-md">
+        <div className="max-w-3xl mx-auto relative">
+          <div className="relative flex items-center">
+            <Input
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type your message..."
+              className="pr-12 rounded-full shadow-inner border-primary/30 focus-ring"
+              disabled={!isModelInitialized}
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || isLoading || !isModelInitialized}
+              className="absolute right-1 h-9 w-9 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md hover:shadow-lg transition-all"
+              aria-label="Send message"
             >
               <Send className="h-4 w-4" />
             </Button>
+          </div>
+          
+          {!isModelInitialized && (
+            <div className="mt-2 text-center text-sm text-muted-foreground bg-accent/30 rounded-lg p-2 shadow-sm border border-accent/20">
+              <KeyRound className="h-4 w-4 inline mr-1" />
+              <span>Please set up your API key in settings to start chatting</span>
+            </div>
           )}
         </div>
       </div>
