@@ -5,7 +5,8 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+.theme-blackberry {
   /* Fruit-inspired default color palette (Blackberry) */
   --background: 250 30% 97%; /* Light lavender: #F3F1FA */
   --foreground: 250 90% 15%; /* Deep blackberry: #180A4A */
@@ -45,43 +46,6 @@
 
   /* Default theme */
   --theme: "blackberry";
-}
-
-/* Blackberry Theme */
-.theme-blackberry {
-  --background: 250 30% 97%; /* Light lavender: #F3F1FA */
-  --foreground: 250 90% 15%; /* Deep blackberry: #180A4A */
-
-  --card: 250 30% 99%;
-  --card-foreground: 250 90% 15%;
-
-  --popover: 250 30% 99%;
-  --popover-foreground: 250 90% 15%;
-
-  --primary: 250 70% 50%; /* Blackberry: #5D3FD3 */
-  --primary-foreground: 250 30% 98%;
-
-  --secondary: 270 70% 75%; /* Lavender: #C1A7F7 */
-  --secondary-foreground: 270 90% 20%;
-
-  --muted: 250 20% 85%; /* Soft lilac: #DCD6ED */
-  --muted-foreground: 250 30% 30%;
-
-  --accent: 270 50% 85%; /* Pale violet: #DBD0F5 */
-  --accent-foreground: 270 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 250 90% 25%; /* Deep blackberry: #261168 */
-  --berry-medium: 250 70% 60%; /* Medium blackberry: #7153E0 */
-  --berry-light: 250 70% 85%; /* Light blackberry: #D4CAF7 */
-  --berry-pale: 250 40% 95%; /* Pale blackberry: #EBE7F7 */
-
-  --border: 250 30% 90%;
-  --input: 250 30% 90%;
-  --ring: 250 70% 50%;
 }
 
 /* Blueberry Theme */

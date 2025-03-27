@@ -11,6 +11,16 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       defaultTheme="blackberry"
       themes={["blackberry", "blueberry", "pomegranate", "cherry", "tangerine", "lime"]}
       enableSystem={false}
+      value={{
+        blackberry: "theme-blackberry",
+        blueberry: "theme-blueberry",
+        pomegranate: "theme-pomegranate", 
+        cherry: "theme-cherry",
+        tangerine: "theme-tangerine",
+        lime: "theme-lime",
+        dark: "dark",
+        light: "light",
+      }}
       disableTransitionOnChange
       {...props}
     >
