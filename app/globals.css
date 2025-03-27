@@ -6,233 +6,347 @@
 @tailwind utilities;
 
 :root {
-  /* Japanese-inspired traditional color palette */
+  /* Ethereal Japanese-Inspired Aesthetic Color Palette */
+  --background: 40 30% 95%; /* Wabi-Sabi Cream: #F5EFE0 */
+  --foreground: 210 30% 25%; /* Deep Indigo/Navy: #2E4756 */
+
+  --card: 40 30% 97%;
+  --card-foreground: 210 30% 25%;
+
+  --popover: 40 30% 97%;
+  --popover-foreground: 210 30% 25%;
+
+  --primary: 155 30% 50%; /* Matcha Green: #60A77B */
+  --primary-foreground: 40 30% 98%;
+
+  --secondary: 355 30% 70%; /* Cherry Blossom Blush: #E3ACAC */
+  --secondary-foreground: 355 50% 25%;
+
+  --muted: 210 15% 65%; /* Misty Mountain Gray: #9DA4AB */
+  --muted-foreground: 210 30% 25%;
+
+  --accent: 35 30% 65%; /* River Stone Beige: #D4C4A8 */
+  --accent-foreground: 35 40% 25%;
+
+  --destructive: 15 60% 45%; /* Soft Terracotta: #B05F3C */
+  --destructive-foreground: 40 30% 98%;
+
+  /* Japanese pastel accent colors */
+  --indigo: 200 30% 45%; /* Deep Indigo/Navy: #2E4756 */
+  --terracotta: 15 50% 50%; /* Enhanced Terracotta: #C26545 */
+  --sky: 200 35% 70%; /* Pale Sky Blue: #A5C4D1 */
+  --bamboo: 155 35% 60%; /* Matcha Green: #60A77B */
+  --plum: 335 40% 65%; /* Plum Blossom: #D281A3 */
+
+  --border: 40 30% 85%;
+  --input: 40 30% 85%;
+  --ring: 155 30% 50%;
+
+  --radius: 0.5rem;
+
+  /* Default theme */
+  --theme: "ethereal";
+}
+
+/* Ethereal theme class - add near the theme declarations */
+.theme-ethereal {
+  --background: 40 30% 95%; /* Wabi-Sabi Cream: #F5EFE0 */
+  --foreground: 210 30% 25%; /* Deep Indigo/Navy: #2E4756 */
+
+  --card: 40 30% 97%;
+  --card-foreground: 210 30% 25%;
+
+  --popover: 40 30% 97%;
+  --popover-foreground: 210 30% 25%;
+
+  --primary: 155 30% 50%; /* Matcha Green: #60A77B */
+  --primary-foreground: 40 30% 98%;
+
+  --secondary: 355 30% 70%; /* Cherry Blossom Blush: #E3ACAC */
+  --secondary-foreground: 355 50% 25%;
+
+  --muted: 210 15% 65%; /* Misty Mountain Gray: #9DA4AB */
+  --muted-foreground: 210 30% 25%;
+
+  --accent: 35 30% 65%; /* River Stone Beige: #D4C4A8 */
+  --accent-foreground: 35 40% 25%;
+
+  --destructive: 15 60% 45%; /* Soft Terracotta: #B05F3C */
+  --destructive-foreground: 40 30% 98%;
+
+  /* Japanese pastel accent colors */
+  --indigo: 200 30% 45%; /* Deep Indigo/Navy: #2E4756 */
+  --terracotta: 15 50% 50%; /* Enhanced Terracotta: #C26545 */
+  --sky: 200 35% 70%; /* Pale Sky Blue: #A5C4D1 */
+  --bamboo: 155 35% 60%; /* Matcha Green: #60A77B */
+  --plum: 335 40% 65%; /* Plum Blossom: #D281A3 */
+
+  --border: 40 30% 85%;
+  --input: 40 30% 85%;
+  --ring: 155 30% 50%;
+}
+
+/* Vibrant Traditional Theme - Enhanced version of Traditional */
+.theme-traditional {
   --background: 35 36% 95%; /* Shiro (White): #F4F0E6 */
-  --foreground: 200 15% 30%; /* Kon (Deep Blue): #3D5366 */
+  --foreground: 200 50% 30%; /* Enhanced Kon (Deep Blue): #2E5F85 */
 
   --card: 0 0% 100%;
-  --card-foreground: 200 15% 25%;
+  --card-foreground: 200 50% 25%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 200 15% 25%;
+  --popover-foreground: 200 50% 25%;
 
-  --primary: 200 25% 40%; /* Ai (Indigo Blue): #3B5D7A */
+  --primary: 200 60% 40%; /* Enhanced Ai (Indigo Blue): #226A9F */
   --primary-foreground: 35 36% 98%;
 
-  --secondary: 0 40% 80%; /* Sakura (Cherry Blossom): #EBBFC4 */
-  --secondary-foreground: 0 60% 30%;
+  --secondary: 0 70% 80%; /* Enhanced Sakura (Cherry Blossom): #F7A8AC */
+  --secondary-foreground: 0 80% 30%;
 
-  --muted: 140 20% 80%; /* Moegi (Fresh Onion): #C6DACA */
-  --muted-foreground: 140 30% 25%;
+  --muted: 140 40% 80%; /* Enhanced Moegi (Fresh Onion): #A9E0B8 */
+  --muted-foreground: 140 50% 25%;
 
-  --accent: 40 40% 85%; /* Yamabuki (Mountain Rose): #EBDBB8 */
-  --accent-foreground: 40 40% 25%;
+  --accent: 40 70% 85%; /* Enhanced Yamabuki (Mountain Rose): #F9D675 */
+  --accent-foreground: 40 80% 25%;
 
   --destructive: 0 70% 55%;
   --destructive-foreground: 210 40% 98%;
 
-  /* Japanese traditional accent colors */
-  --indigo: 220 40% 30%; /* Ai-iro (Indigo): #24426A */
-  --terracotta: 25 60% 50%; /* Akane (Madder): #CF6A3C */
-  --sky: 195 45% 75%; /* Mizuiro (Water Blue): #9DCBD6 */
-  --bamboo: 80 30% 60%; /* Take (Bamboo): #A0BB89 */
-  --plum: 330 30% 60%; /* Ume (Plum): #BA7B96 */
+  /* Enhanced Japanese traditional accent colors */
+  --indigo: 220 70% 30%; /* Enhanced Ai-iro (Indigo): #1B4080 */
+  --terracotta: 25 80% 50%; /* Enhanced Akane (Madder): #E35E2B */
+  --sky: 195 70% 75%; /* Enhanced Mizuiro (Water Blue): #6ECCE8 */
+  --bamboo: 80 60% 60%; /* Enhanced Take (Bamboo): #95CB68 */
+  --plum: 330 60% 60%; /* Enhanced Ume (Plum): #D45A97 */
 
   --border: 40 40% 90%;
   --input: 40 40% 90%;
-  --ring: 195 45% 75%; /* Mizuiro (Water Blue) */
-
-  --radius: 0.25rem;
-
-  /* Default to traditional theme and add theme variable */
-  --theme: "traditional";
+  --ring: 195 70% 75%;
 }
 
-/* Tea Ceremony Theme (Sado) */
+/* Tea Ceremony Theme (Sado) - Enhanced */
 .theme-sado {
-  --background: 30 20% 95%; /* Washi (Rice Paper): #F4F1EC */
-  --foreground: 25 30% 25%; /* Cha (Tea): #52402F */
+  --background: 30 40% 95%; /* Enhanced Washi (Rice Paper): #F7EFE2 */
+  --foreground: 25 70% 25%; /* Enhanced Cha (Tea): #6B3A18 */
 
-  --card: 30 15% 98%;
-  --card-foreground: 25 30% 25%;
+  --card: 30 30% 98%;
+  --card-foreground: 25 70% 25%;
 
-  --popover: 30 15% 98%;
-  --popover-foreground: 25 30% 25%;
+  --popover: 30 30% 98%;
+  --popover-foreground: 25 70% 25%;
 
-  --primary: 25 30% 35%; /* Chairo (Tea Color): #73573F */
-  --primary-foreground: 30 20% 98%;
+  --primary: 25 70% 35%; /* Enhanced Chairo (Tea Color): #8F471C */
+  --primary-foreground: 30 40% 98%;
 
-  --secondary: 20 40% 80%; /* Usuki (Pale Red): #EBC4AF */
-  --secondary-foreground: 20 60% 30%;
+  --secondary: 20 80% 80%; /* Enhanced Usuki (Pale Red): #F9B186 */
+  --secondary-foreground: 20 90% 30%;
 
-  --muted: 40 20% 80%; /* Kinari (Unbleached Silk): #DDD4BE */
-  --muted-foreground: 40 30% 25%;
+  --muted: 40 50% 80%; /* Enhanced Kinari (Unbleached Silk): #E5CA89 */
+  --muted-foreground: 40 60% 25%;
 
-  --accent: 45 30% 65%; /* Karashi (Mustard): #CCB173 */
-  --accent-foreground: 45 40% 25%;
+  --accent: 45 70% 65%; /* Enhanced Karashi (Mustard): #E9B939 */
+  --accent-foreground: 45 80% 25%;
 
-  --destructive: 0 60% 50%;
+  --destructive: 0 80% 50%;
   --destructive-foreground: 0 0% 98%;
   
-  /* Accent colors */
-  --indigo: 220 30% 30%;
-  --terracotta: 25 50% 45%;
-  --sky: 180 20% 65%;
-  --bamboo: 80 25% 55%;
-  --plum: 330 25% 55%;
+  /* Enhanced Accent colors */
+  --indigo: 220 60% 30%;
+  --terracotta: 25 80% 45%;
+  --sky: 180 50% 65%;
+  --bamboo: 80 55% 55%;
+  --plum: 330 55% 55%;
 
-  --border: 30 20% 85%;
-  --input: 30 20% 85%;
-  --ring: 25 30% 55%;
+  --border: 30 40% 85%;
+  --input: 30 40% 85%;
+  --ring: 25 70% 55%;
 }
 
-/* Zen Garden Theme (Karesansui) */
-.theme-zen {
-  --background: 0 0% 95%; /* Shiro (Pure White): #F2F2F2 */
-  --foreground: 0 0% 20%; /* Sumi (Ink): #333333 */
-
-  --card: 0 0% 98%;
-  --card-foreground: 0 0% 20%;
-
-  --popover: 0 0% 98%;
-  --popover-foreground: 0 0% 20%;
-
-  --primary: 0 0% 30%; /* Kuro (Black): #4D4D4D */
-  --primary-foreground: 0 0% 98%;
-
-  --secondary: 25 20% 75%; /* Ishabai (Stone Ash): #CDC0B5 */
-  --secondary-foreground: 25 30% 30%;
-
-  --muted: 0 0% 85%; /* Nezumi (Mouse): #D9D9D9 */
-  --muted-foreground: 0 0% 30%;
-
-  --accent: 40 10% 60%; /* Suna (Sand): #A99E91 */
-  --accent-foreground: 40 20% 25%;
-
-  --destructive: 0 40% 45%;
-  --destructive-foreground: 0 0% 98%;
-  
-  /* Accent colors */
-  --indigo: 240 10% 40%;
-  --terracotta: 15 20% 50%;
-  --sky: 200 10% 70%;
-  --bamboo: 90 10% 55%;
-  --plum: 320 10% 50%;
-
-  --border: 0 0% 85%;
-  --input: 0 0% 85%;
-  --ring: 0 0% 50%;
-}
-
-/* Cherry Blossom Theme (Sakura) */
+/* Cherry Blossom Theme (Sakura) - Enhanced */
 .theme-sakura {
-  --background: 350 30% 95%; /* Sakura-iro (Cherry Blossom): #FCF0F2 */
-  --foreground: 340 30% 30%; /* Ebi-cha (Burgundy): #7B4857 */
+  --background: 350 40% 95%; /* Enhanced Sakura-iro (Cherry Blossom): #FCE9EE */
+  --foreground: 340 60% 30%; /* Enhanced Ebi-cha (Burgundy): #A02654 */
 
-  --card: 350 20% 98%;
-  --card-foreground: 340 30% 30%;
+  --card: 350 30% 98%;
+  --card-foreground: 340 60% 30%;
 
-  --popover: 350 20% 98%;
-  --popover-foreground: 340 30% 30%;
+  --popover: 350 30% 98%;
+  --popover-foreground: 340 60% 30%;
 
-  --primary: 340 40% 45%; /* Beni (Crimson): #A24057 */
-  --primary-foreground: 350 30% 98%;
+  --primary: 340 80% 45%; /* Enhanced Beni (Crimson): #D51E62 */
+  --primary-foreground: 350 40% 98%;
 
-  --secondary: 330 40% 80%; /* Momo (Peach): #EAAFC3 */
-  --secondary-foreground: 330 60% 30%;
+  --secondary: 330 80% 80%; /* Enhanced Momo (Peach): #F992CC */
+  --secondary-foreground: 330 90% 30%;
 
-  --muted: 15 20% 85%; /* Haizakura (Ash Pink): #E5D2CA */
-  --muted-foreground: 15 40% 30%;
+  --muted: 15 40% 85%; /* Enhanced Haizakura (Ash Pink): #F0CAB9 */
+  --muted-foreground: 15 50% 30%;
 
-  --accent: 10 30% 75%; /* Usubeni (Pale Pink): #E4B9AE */
-  --accent-foreground: 10 50% 25%;
+  --accent: 10 60% 75%; /* Enhanced Usubeni (Pale Pink): #F5937D */
+  --accent-foreground: 10 70% 25%;
+
+  --destructive: 0 90% 50%;
+  --destructive-foreground: 0 0% 98%;
+  
+  /* Enhanced Accent colors */
+  --indigo: 300 55% 40%;
+  --terracotta: 15 70% 55%;
+  --sky: 200 55% 75%;
+  --bamboo: 100 50% 60%;
+  --plum: 340 70% 60%;
+
+  --border: 350 40% 85%;
+  --input: 350 40% 85%;
+  --ring: 340 80% 65%;
+}
+
+/* Blue and White Porcelain Theme (Sometsuke) - Enhanced */
+.theme-sometsuke {
+  --background: 210 60% 95%; /* Enhanced Gofun (White Clay): #E1F0FF */
+  --foreground: 215 90% 25%; /* Enhanced Kon (Navy): #0A2A61 */
+
+  --card: 210 50% 98%;
+  --card-foreground: 215 90% 25%;
+
+  --popover: 210 50% 98%;
+  --popover-foreground: 215 90% 25%;
+
+  --primary: 215 90% 35%; /* Enhanced Rurikon (Lapis): #0A43A6 */
+  --primary-foreground: 210 60% 98%;
+
+  --secondary: 225 60% 70%; /* Enhanced Fujinezumi (Wisteria): #8C9FE6 */
+  --secondary-foreground: 225 70% 30%;
+
+  --muted: 200 40% 80%; /* Enhanced Usukon (Pale Navy): #A7D6EB */
+  --muted-foreground: 200 50% 30%;
+
+  --accent: 195 70% 65%; /* Enhanced Mizu (Water): #48C7E6 */
+  --accent-foreground: 195 80% 25%;
+
+  --destructive: 350 90% 50%;
+  --destructive-foreground: 0 0% 98%;
+  
+  /* Enhanced Accent colors */
+  --indigo: 230 80% 40%;
+  --terracotta: 15 60% 50%;
+  --sky: 195 80% 75%;
+  --bamboo: 170 60% 60%;
+  --plum: 280 60% 50%;
+
+  --border: 210 60% 80%;
+  --input: 210 60% 80%;
+  --ring: 215 90% 55%;
+}
+
+/* Kyoto Garden Theme (NEW) */
+.theme-kyoto {
+  --background: 120 30% 95%; /* Pale Moss: #EBF4EC */
+  --foreground: 150 60% 20%; /* Deep Moss: #0F6647 */
+
+  --card: 120 20% 98%;
+  --card-foreground: 150 60% 20%;
+
+  --popover: 120 20% 98%;
+  --popover-foreground: 150 60% 20%;
+
+  --primary: 150 70% 35%; /* Moss Green: #0D9B63 */
+  --primary-foreground: 120 30% 98%;
+
+  --secondary: 50 80% 70%; /* Mustard Yellow: #F2D04B */
+  --secondary-foreground: 50 90% 20%;
+
+  --muted: 170 40% 85%; /* Pale Teal: #C2E8E4 */
+  --muted-foreground: 170 50% 25%;
+
+  --accent: 30 70% 65%; /* Orange: #ECA23E */
+  --accent-foreground: 30 80% 20%;
 
   --destructive: 0 80% 50%;
   --destructive-foreground: 0 0% 98%;
   
   /* Accent colors */
-  --indigo: 300 25% 40%;
-  --terracotta: 15 40% 55%;
-  --sky: 200 25% 75%;
-  --bamboo: 100 20% 60%;
-  --plum: 340 40% 60%;
+  --indigo: 200 70% 40%;
+  --terracotta: 25 70% 50%;
+  --sky: 180 60% 70%;
+  --bamboo: 90 80% 50%;
+  --plum: 320 60% 50%;
 
-  --border: 350 30% 85%;
-  --input: 350 30% 85%;
-  --ring: 340 40% 65%;
+  --border: 120 30% 85%;
+  --input: 120 30% 85%;
+  --ring: 150 70% 35%;
 }
 
-/* Blue and White Porcelain Theme (Sometsuke) */
-.theme-sometsuke {
-  --background: 210 40% 95%; /* Gofun (White Clay): #EBF2FA */
-  --foreground: 215 60% 25%; /* Kon (Navy): #172F52 */
+/* Zen Garden Theme (Karesansui) - More contrast but still minimalist */
+.theme-zen {
+  --background: 0 0% 98%; /* Shiro (Pure White): #FAFAFA */
+  --foreground: 0 0% 15%; /* Sumi (Ink): #262626 */
 
-  --card: 210 30% 98%;
-  --card-foreground: 215 60% 25%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 15%;
 
-  --popover: 210 30% 98%;
-  --popover-foreground: 215 60% 25%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 15%;
 
-  --primary: 215 60% 35%; /* Rurikon (Lapis): #234173 */
-  --primary-foreground: 210 40% 98%;
+  --primary: 0 0% 25%; /* Kuro (Black): #404040 */
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 225 30% 70%; /* Fujinezumi (Wisteria): #A9B4D6 */
-  --secondary-foreground: 225 50% 30%;
+  --secondary: 25 30% 75%; /* Ishabai (Stone Ash): #CFBFB1 */
+  --secondary-foreground: 25 40% 30%;
 
-  --muted: 200 20% 80%; /* Usukon (Pale Navy): #C7D4DE */
-  --muted-foreground: 200 40% 30%;
+  --muted: 0 0% 90%; /* Nezumi (Mouse): #E6E6E6 */
+  --muted-foreground: 0 0% 30%;
 
-  --accent: 195 40% 65%; /* Mizu (Water): #8FC6D9 */
-  --accent-foreground: 195 60% 25%;
+  --accent: 40 20% 60%; /* Suna (Sand): #B39B87 */
+  --accent-foreground: 40 30% 25%;
 
-  --destructive: 350 70% 50%;
+  --destructive: 0 60% 45%;
   --destructive-foreground: 0 0% 98%;
   
   /* Accent colors */
-  --indigo: 230 50% 40%;
+  --indigo: 240 20% 40%;
   --terracotta: 15 30% 50%;
-  --sky: 195 50% 75%;
-  --bamboo: 170 30% 60%;
-  --plum: 280 30% 50%;
+  --sky: 200 20% 70%;
+  --bamboo: 90 20% 55%;
+  --plum: 320 20% 50%;
 
-  --border: 210 40% 80%;
-  --input: 210 40% 80%;
-  --ring: 215 60% 55%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 0 0% 50%;
 }
 
 .dark {
-  --background: 200 15% 10%; /* Sumi Night: #141A1E */
-  --foreground: 40 30% 90%; /* Washi Light: #EBE5D9 */
+  --background: 200 50% 10%; /* Enhanced Sumi Night: #0E1D2B */
+  --foreground: 40 60% 90%; /* Enhanced Washi Light: #F2E6C8 */
 
-  --card: 200 15% 12%;
-  --card-foreground: 40 30% 90%;
+  --card: 200 50% 12%;
+  --card-foreground: 40 60% 90%;
 
-  --popover: 200 15% 12%;
-  --popover-foreground: 40 30% 90%;
+  --popover: 200 50% 12%;
+  --popover-foreground: 40 60% 90%;
 
-  --primary: 200 15% 45%;
-  --primary-foreground: 40 30% 98%;
+  --primary: 200 60% 45%; /* Enhanced Blue: #1E80C2 */
+  --primary-foreground: 40 60% 98%;
 
-  --secondary: 355 25% 30%;
-  --secondary-foreground: 355 30% 90%;
+  --secondary: 355 60% 30%;
+  --secondary-foreground: 355 70% 90%;
 
-  --muted: 150 15% 20%;
-  --muted-foreground: 150 20% 90%;
+  --muted: 150 40% 20%;
+  --muted-foreground: 150 50% 90%;
 
-  --accent: 30 25% 30%;
-  --accent-foreground: 30 30% 95%;
+  --accent: 30 60% 30%;
+  --accent-foreground: 30 70% 95%;
 
-  /* Japanese zen garden dark mode accent colors */
-  --indigo: 210 35% 20%;
-  --terracotta: 20 45% 35%;
-  --sky: 190 40% 35%;
+  /* Enhanced Japanese zen garden dark mode accent colors */
+  --indigo: 210 70% 20%;
+  --terracotta: 20 70% 35%;
+  --sky: 190 70% 35%;
 
-  --destructive: 0 62.8% 30.6%;
+  --destructive: 0 80% 30.6%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 200 15% 25%;
-  --input: 200 15% 25%;
-  --ring: 190 40% 40%;
+  --border: 200 50% 25%;
+  --input: 200 50% 25%;
+  --ring: 190 70% 40%;
 }
 
 @layer base {
@@ -250,8 +364,10 @@
     line-height: 1.8;
     letter-spacing: 0.02em;
     
-    /* Subtle paper texture */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    /* Enhanced paper texture with color overlay */
+    background-image: 
+      linear-gradient(to right, rgba(165, 196, 209, 0.03), rgba(225, 212, 212, 0.05)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 200px;
   }
@@ -304,58 +420,129 @@
 /* Japanese inspired UI Components */
 @layer components {
   .card {
-    @apply bg-card/90 rounded-sm p-6 border border-accent/10 shadow-sm backdrop-blur-sm transition-all duration-500;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.01);
+    @apply bg-card/90 rounded-md p-6 border border-accent/20 backdrop-blur-sm transition-all duration-500;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.03), 0 4px 10px rgba(0, 0, 0, 0.02);
+    transform: translateY(0);
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   }
   
-  /* Japanese shadow style */
+  .card:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 6px 15px rgba(0, 0, 0, 0.03);
+    transform: translateY(-3px);
+  }
+  
+  /* Enhanced Japanese shadow style */
   .shadow-zen {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05), 0 2px 5px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.3s ease-out;
   }
   
-  /* Japanese paper shadow */
+  .shadow-zen:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07), 0 3px 8px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Japanese paper shadow with animation */
   .shadow-washi {
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03), 0 1px 5px rgba(0, 0, 0, 0.01);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out;
+  }
+  
+  .shadow-washi:hover {
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06), 0 3px 10px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
   }
   
   /* Large Japanese shadow for modals and overlays */
   .shadow-zen-xl {
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08), 0 1px 8px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease-out;
+  }
+  
+  .shadow-zen-xl:hover {
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.06);
   }
   
   .btn-primary {
-    @apply px-6 py-2.5 bg-primary text-primary-foreground rounded-sm font-normal tracking-wider transition-all duration-500 flex items-center justify-center gap-2 hover:bg-primary/90 active:translate-y-0.5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    @apply px-6 py-2.5 bg-primary text-primary-foreground rounded-md font-normal tracking-wider transition-all duration-300 flex items-center justify-center gap-2 hover:bg-primary/90 active:translate-y-0.5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transform: translateY(0);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+  }
+  
+  .btn-primary:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary:active {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    transform: translateY(1px);
   }
   
   .btn-secondary {
-    @apply px-6 py-2.5 bg-secondary text-secondary-foreground rounded-sm font-normal tracking-wider transition-all duration-500 flex items-center justify-center gap-2 hover:bg-secondary/90 active:translate-y-0.5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    @apply px-6 py-2.5 bg-secondary text-secondary-foreground rounded-md font-normal tracking-wider transition-all duration-300 flex items-center justify-center gap-2 hover:bg-secondary/90 active:translate-y-0.5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transform: translateY(0);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+  }
+  
+  .btn-secondary:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+  
+  .btn-secondary:active {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    transform: translateY(1px);
   }
   
   .input {
-    @apply w-full px-4 py-3 border border-input rounded-sm bg-background/80 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground/40 transition-all duration-300;
+    @apply w-full px-4 py-3 border border-input rounded-md bg-background/90 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-300;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.02);
   }
   
-  /* Japanese aesthetic glass effect */
+  .input:hover {
+    @apply border-primary/30;
+  }
+  
+  .input:focus {
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.02), 0 0 0 3px rgba(var(--primary), 0.15);
+  }
+  
+  /* Enhanced Japanese aesthetic glass effect */
   .glass {
-    @apply backdrop-blur-sm bg-white/60 dark:bg-black/60 border border-white/10 dark:border-white/5;
+    @apply backdrop-blur-md bg-white/70 dark:bg-black/60 border border-white/20 dark:border-white/10;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease-out, backdrop-filter 0.3s ease-out;
+  }
+  
+  .glass:hover {
+    @apply backdrop-blur-lg bg-white/75 dark:bg-black/65;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
   }
   
   /* Japanese inspired focus ring style */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-background transition-all duration-300;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-300;
   }
   
-  /* Japanese paper-inspired container */
+  /* Japanese paper-inspired container with animation */
   .washi-container {
-    @apply bg-background/95 border border-border/40 rounded-sm p-6 shadow-sm;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    @apply bg-background/95 border border-border/40 rounded-md p-6 shadow-washi;
+    background-image: 
+      linear-gradient(to right, rgba(165, 196, 209, 0.02), rgba(225, 212, 212, 0.03)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   }
   
-  /* Japanese divider */
+  .washi-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06), 0 4px 15px rgba(0, 0, 0, 0.03);
+  }
+  
+  /* Japanese divider with animation */
   .jp-divider {
-    @apply my-8 border-t border-primary/10 relative;
+    @apply my-8 border-t border-primary/20 relative;
     height: 1px;
   }
   
@@ -364,13 +551,20 @@
     position: absolute;
     height: 4px;
     width: 40px;
-    @apply bg-primary/40 top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm;
+    @apply bg-primary/50 top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md;
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
   }
   
-  /* Zen navigation styles */
+  .jp-divider:hover::after {
+    width: 60px;
+    @apply bg-primary/70;
+  }
+  
+  /* Enhanced Zen navigation styles with animation */
   .zen-nav-item {
-    @apply py-3 px-4 transition-all duration-300 relative text-foreground/70 hover:text-foreground;
+    @apply py-3 px-4 transition-all duration-300 relative text-foreground/70 hover:text-foreground rounded-md;
     letter-spacing: 0.05em;
+    transition: all 0.3s ease-out;
   }
   
   .zen-nav-item::after {
@@ -379,57 +573,102 @@
     left: 0;
     bottom: 0;
     width: 0;
-    height: 1px;
+    height: 2px;
     @apply bg-primary/60 transition-all duration-500;
+    transition: width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  
+  .zen-nav-item:hover {
+    @apply bg-primary/5;
   }
   
   .zen-nav-item:hover::after {
-    width: 30%;
+    width: 40%;
   }
   
   .zen-nav-item.active {
-    @apply text-primary;
+    @apply text-primary bg-primary/10;
   }
   
   .zen-nav-item.active::after {
-    width: 40%;
+    width: 50%;
+    height: 2px;
     @apply bg-primary;
   }
   
-  /* Message bubble styles */
+  /* Enhanced Message bubble styles with animation */
   .message-bubble-user {
-    @apply rounded-sm px-4 py-3 shadow-zen;
-    background-color: hsl(var(--accent)/10%);
-    border-right: 2px solid hsl(var(--accent)/30%);
+    @apply rounded-md px-5 py-4 shadow-zen;
+    background: linear-gradient(to bottom right, hsla(var(--accent)/15%), hsla(var(--accent)/5%));
+    border-right: 3px solid hsl(var(--accent)/40%);
+    transform: translateY(0);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  
+  .message-bubble-user:hover {
+    transform: translateY(-2px);
+    @apply shadow-washi;
   }
   
   .message-bubble-assistant {
-    @apply rounded-sm px-4 py-3 shadow-zen;
-    background-color: hsl(var(--primary)/10%);
-    border-left: 2px solid hsl(var(--primary)/30%);
+    @apply rounded-md px-5 py-4 shadow-zen;
+    background: linear-gradient(to bottom right, hsla(var(--primary)/15%), hsla(var(--primary)/5%));
+    border-left: 3px solid hsl(var(--primary)/40%);
+    transform: translateY(0);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  
+  .message-bubble-assistant:hover {
+    transform: translateY(-2px);
+    @apply shadow-washi;
+  }
+  
+  /* New pulsating accent effect for highlights */
+  .accent-pulse {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .accent-pulse::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    @apply bg-secondary/20;
+    opacity: 0;
+    border-radius: inherit;
+    z-index: -1;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
   }
 }
 
-/* Gentle Japanese animations */
+/* Enhanced Gentle Japanese animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(15px); opacity: 0; }
+  from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes gentleReveal {
-  0% { opacity: 0; transform: translateY(5px); }
+  0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 /* Traditional brush stroke animation */
 @keyframes brushStroke {
-  0% { width: 0; opacity: 0; }
-  100% { width: 100%; opacity: 1; }
+  0% { width: 0; opacity: 0; transform: translateX(-5%); }
+  100% { width: 100%; opacity: 1; transform: translateX(0); }
 }
 
 /* Zen ripple effect animation */
@@ -438,23 +677,43 @@
   100% { transform: scale(4); opacity: 0; }
 }
 
+/* Soft floating animation */
+@keyframes softFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Gentle rotation */
+@keyframes gentleRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.7s ease-out forwards;
+  animation: fadeIn 0.8s ease-out forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.7s ease-out forwards;
+  animation: slideUp 0.8s ease-out forwards;
 }
 
 .animate-gentle-reveal {
-  animation: gentleReveal 0.5s ease-out forwards;
+  animation: gentleReveal 0.6s ease-out forwards;
 }
 
 .animate-brush-stroke {
-  animation: brushStroke 1.2s ease-in-out forwards;
+  animation: brushStroke 1.5s ease-in-out forwards;
 }
 
-/* Japanese ink ripple effect */
+.animate-soft-float {
+  animation: softFloat 6s ease-in-out infinite;
+}
+
+.animate-gentle-rotate {
+  animation: gentleRotate 30s linear infinite;
+}
+
+/* Enhanced Japanese ink ripple effect */
 .zen-ripple {
   position: relative;
   overflow: hidden;
@@ -469,30 +728,30 @@
   top: 0;
   left: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, currentColor 10%, transparent 10.01%);
+  background-image: radial-gradient(circle, rgba(var(--primary), 0.3) 10%, transparent 10.01%);
   background-repeat: no-repeat;
   background-position: 50%;
   transform: scale(10, 10);
   opacity: 0;
-  transition: transform 0.6s, opacity 0.8s;
+  transition: transform 0.8s, opacity 1s;
 }
 
 .zen-ripple:active::after {
   transform: scale(0, 0);
-  opacity: 0.3;
+  opacity: 0.4;
   transition: 0s;
 }
 
-/* Page transitions */
+/* Enhanced Page transitions */
 .page-transition-enter {
   opacity: 0;
-  transform: translateY(5px);
+  transform: translateY(10px);
 }
 
 .page-transition-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.5s, transform 0.5s;
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
 }
 
 .page-transition-exit {
@@ -501,7 +760,7 @@
 
 .page-transition-exit-active {
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.5s ease-in;
 }
 
 /* Japanese-inspired layout classes */

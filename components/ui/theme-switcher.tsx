@@ -14,9 +14,34 @@ import { cn } from "@/lib/utils";
 
 const themeOptions = [
   {
+    value: "ethereal",
+    label: "Ethereal Japanese",
+    description: "Wabi-sabi cream, matcha green and cherry blossom accents",
+  },
+  {
+    value: "vibrant",
+    label: "Vibrant",
+    description: "Bold Japanese colors with bright blues and pinks",
+  },
+  {
     value: "traditional",
     label: "Traditional",
     description: "Classic Japanese colors with Indigo blue and warm accents",
+  },
+  {
+    value: "sakura",
+    label: "Cherry Blossom",
+    description: "Soft pink hues celebrating the beauty of sakura",
+  },
+  {
+    value: "kyoto",
+    label: "Kyoto Garden",
+    description: "Fresh green palette inspired by moss gardens",
+  },
+  {
+    value: "sometsuke",
+    label: "Porcelain",
+    description: "Blue and white inspired by traditional porcelain",
   },
   {
     value: "sado",
@@ -27,16 +52,6 @@ const themeOptions = [
     value: "zen",
     label: "Zen Garden",
     description: "Minimalist monochrome palette inspired by rock gardens",
-  },
-  {
-    value: "sakura",
-    label: "Cherry Blossom",
-    description: "Soft pink hues celebrating the beauty of sakura",
-  },
-  {
-    value: "sometsuke",
-    label: "Porcelain",
-    description: "Blue and white inspired by traditional porcelain",
   },
 ];
 

@@ -8,8 +8,8 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="traditional"
-      themes={["traditional", "sado", "zen", "sakura", "sometsuke"]}
+      defaultTheme="ethereal"
+      themes={["ethereal", "vibrant", "traditional", "sado", "zen", "sakura", "sometsuke", "kyoto"]}
       enableSystem={false}
       disableTransitionOnChange
       {...props}

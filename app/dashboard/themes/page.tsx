@@ -9,34 +9,52 @@ import DashboardLayout from '@/components/dashboard-layout';
 
 const themeOptions = [
   {
+    value: "ethereal",
+    label: "Ethereal Japanese",
+    description: "Wabi-sabi cream, matcha green and cherry blossom accents",
+    colors: ["#60A77B", "#E3ACAC", "#A5C4D1", "#D4C4A8", "#F5EFE0"],
+  },
+  {
+    value: "vibrant",
+    label: "Vibrant",
+    description: "Bold Japanese colors with bright blues and pinks",
+    colors: ["#1C6DD0", "#F86E8B", "#C9EED3", "#F8C651", "#1340B6"],
+  },
+  {
     value: "traditional",
     label: "Traditional",
     description: "Classic Japanese colors with Indigo blue and warm accents",
-    colors: ["#3B5D7A", "#EBBFC4", "#C6DACA", "#EBDBB8", "#24426A"],
-  },
-  {
-    value: "sado",
-    label: "Tea Ceremony",
-    description: "Warm earth tones inspired by the art of tea ceremony",
-    colors: ["#73573F", "#EBC4AF", "#DDD4BE", "#CCB173", "#AD6E51"],
-  },
-  {
-    value: "zen",
-    label: "Zen Garden",
-    description: "Minimalist monochrome palette inspired by rock gardens",
-    colors: ["#4D4D4D", "#CDC0B5", "#D9D9D9", "#A99E91", "#666666"],
+    colors: ["#226A9F", "#F7A8AC", "#A9E0B8", "#F9D675", "#1B4080"],
   },
   {
     value: "sakura",
     label: "Cherry Blossom",
     description: "Soft pink hues celebrating the beauty of sakura",
-    colors: ["#A24057", "#EAAFC3", "#E5D2CA", "#E4B9AE", "#7B4857"],
+    colors: ["#D51E62", "#F992CC", "#F0CAB9", "#F5937D", "#A02654"],
+  },
+  {
+    value: "kyoto",
+    label: "Kyoto Garden",
+    description: "Fresh green palette inspired by moss gardens",
+    colors: ["#0D9B63", "#F2D04B", "#C2E8E4", "#ECA23E", "#0F6647"],
   },
   {
     value: "sometsuke",
     label: "Porcelain",
     description: "Blue and white inspired by traditional porcelain",
-    colors: ["#234173", "#A9B4D6", "#C7D4DE", "#8FC6D9", "#172F52"],
+    colors: ["#0A43A6", "#8C9FE6", "#A7D6EB", "#48C7E6", "#0A2A61"],
+  },
+  {
+    value: "sado",
+    label: "Tea Ceremony",
+    description: "Warm earth tones inspired by the art of tea ceremony",
+    colors: ["#8F471C", "#F9B186", "#E5CA89", "#E9B939", "#AD6E51"],
+  },
+  {
+    value: "zen",
+    label: "Zen Garden",
+    description: "Minimalist monochrome palette inspired by rock gardens",
+    colors: ["#404040", "#CFBFB1", "#E6E6E6", "#B39B87", "#262626"],
   },
 ];
 

@@ -105,13 +105,13 @@ export default function ChatInterface({
   
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background to-background/90">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-primary/10 backdrop-blur-md flex items-center justify-between bg-background/90 rounded-sm shadow-washi">
+      {/* Chat Header with enhanced styling */}
+      <div className="p-5 border-b border-primary/10 backdrop-blur-md flex items-center justify-between bg-gradient-to-r from-background/90 to-background/70 rounded-md shadow-washi">
         <div className="flex items-center">
-          <div className="flex-shrink-0 rounded-sm bg-primary/10 h-10 w-10 flex items-center justify-center text-xl shadow-washi">
+          <div className="flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-primary/10 h-12 w-12 flex items-center justify-center text-xl shadow-zen transform transition-transform duration-500 hover:rotate-3 hover:scale-110">
             {subjectIcon}
           </div>
-          <div className="ml-3">
+          <div className="ml-4">
             {editingTitle ? (
               <div className="flex items-center">
                 <Input
@@ -120,44 +120,50 @@ export default function ChatInterface({
                   onChange={(e) => setTitleInput(e.target.value)}
                   onBlur={handleSaveTitle}
                   onKeyDown={handleTitleKeyDown}
-                  className="h-9 text-base font-medium rounded-full shadow-inner focus-ring"
+                  className="h-10 text-base font-medium rounded-md shadow-zen focus-ring bg-background/50 border-primary/20"
                 />
               </div>
             ) : (
               <div className="flex items-center">
-                <h2 className="text-base font-light tracking-wide mr-2 text-foreground">{conversation.title}</h2>
+                <h2 className="text-base font-light tracking-wider mr-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                  {conversation.title}
+                </h2>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 rounded-sm hover:bg-primary/10 transition-colors duration-300" 
+                  className="h-8 w-8 rounded-md hover:bg-primary/10 transition-all duration-300 hover:shadow-zen" 
                   onClick={handleStartEditingTitle}
                 >
                   <Edit className="h-3.5 w-3.5" />
                 </Button>
               </div>
             )}
-            <div className="text-xs text-muted-foreground">
-              {studySubjects.find(s => s.id === conversation.subject)?.name} • {
-                conversation.messages.length === 0 
+            <div className="text-xs text-muted-foreground flex items-center mt-1">
+              <span className="bg-primary/10 px-2 py-0.5 rounded-sm text-primary-foreground/90 mr-2">
+                {studySubjects.find(s => s.id === conversation.subject)?.name}
+              </span>
+              <span className="opacity-70">
+                {conversation.messages.length === 0 
                   ? 'New conversation'
                   : `${conversation.messages.length} messages`
-              }
+                }
+              </span>
             </div>
           </div>
         </div>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-sm hover:bg-primary/10">
+            <Button variant="ghost" size="icon" className="rounded-md hover:bg-primary/10 h-9 w-9 transition-colors duration-300">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-sm border border-primary/10 shadow-zen backdrop-blur-md">
-            <DropdownMenuItem onClick={handleStartEditingTitle} className="rounded-lg focus:bg-primary/20">
+          <DropdownMenuContent align="end" className="rounded-md border border-primary/10 shadow-zen-xl backdrop-blur-md animate-gentle-reveal">
+            <DropdownMenuItem onClick={handleStartEditingTitle} className="rounded-sm focus:bg-primary/10 hover:bg-primary/5 transition-colors duration-200">
               <Edit className="h-4 w-4 mr-2" />
               <span>Rename</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onOpenApiSettings} className="rounded-lg focus:bg-primary/20">
+            <DropdownMenuItem onClick={onOpenApiSettings} className="rounded-sm focus:bg-primary/10 hover:bg-primary/5 transition-colors duration-200">
               <KeyRound className="h-4 w-4 mr-2" />
               <span>API Settings</span>
             </DropdownMenuItem>
@@ -260,23 +266,23 @@ export default function ChatInterface({
         </div>
       </ScrollArea>
       
-      {/* Input Area */}
-      <div className="p-4 border-t border-primary/20 bg-background/80 backdrop-blur-md">
+      {/* Input Area with enhanced styling */}
+      <div className="p-5 border-t border-primary/20 bg-gradient-to-b from-background/90 to-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto relative">
-          <div className="relative flex items-center">
+          <div className="relative flex items-center group">
             <Input
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
-              className="pr-12 rounded-sm shadow-zen border-input focus-ring"
+              className="pr-14 rounded-md shadow-zen border-input focus-ring group-hover:shadow-washi transition-all duration-300"
               disabled={!isModelInitialized}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!inputValue.trim() || isLoading || !isModelInitialized}
-              className="absolute right-1 h-9 w-9 rounded-sm bg-primary/10 text-primary shadow-zen hover:bg-primary/20 transition-all duration-300"
+              className="absolute right-2 h-10 w-10 rounded-md bg-gradient-to-br from-primary/80 to-primary text-primary-foreground shadow-zen hover:shadow-washi transition-all duration-300 hover:-translate-y-1"
               aria-label="Send message"
             >
               <Send className="h-4 w-4" />
@@ -284,8 +290,8 @@ export default function ChatInterface({
           </div>
           
           {!isModelInitialized && (
-            <div className="mt-2 text-center text-sm text-muted-foreground bg-primary/10 rounded-sm p-2 shadow-zen border border-primary/20">
-              <KeyRound className="h-4 w-4 inline mr-1" />
+            <div className="mt-3 text-center text-sm text-muted-foreground bg-gradient-to-r from-primary/5 to-primary/10 rounded-md p-3 shadow-zen border border-primary/20 animate-pulse">
+              <KeyRound className="h-4 w-4 inline mr-2" />
               <span>Please set up your API key in settings to start chatting</span>
             </div>
           )}
