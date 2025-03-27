@@ -193,7 +193,7 @@ export default function ChatInterface({
               >
                 <div className="flex items-start gap-4 max-w-[85%]">
                   {message.role === "assistant" && (
-                    <Avatar className="h-9 w-9 mt-1 border-2 border-primary/30 p-0.5 shadow-zen">
+                    <Avatar className="h-9 w-9 mt-1 border-2 border-secondary/50 p-0.5 shadow-zen">
                       <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                         <Flower className="h-4 w-4 text-primary-foreground" />
                       </div>
@@ -222,8 +222,8 @@ export default function ChatInterface({
                   </div>
                   
                   {message.role === "user" && (
-                    <Avatar className="h-9 w-9 mt-1 border-2 border-secondary/30 p-0.5 shadow-zen">
-                      <div className="h-full w-full rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center text-secondary-foreground font-medium">
+                    <Avatar className="h-9 w-9 mt-1 border-2 border-accent/50 p-0.5 shadow-zen">
+                      <div className="h-full w-full rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-primary-foreground font-medium">
                         U
                       </div>
                     </Avatar>
