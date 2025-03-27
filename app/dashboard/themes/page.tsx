@@ -8,42 +8,42 @@ import { Check, Grape, Cherry, FlameKindling, Leaf } from "lucide-react";
 
 const themeOptions = [
   {
-    value: "blackberry",
+    value: "theme-blackberry",
     label: "Blackberry",
     description: "Deep purple with lavender accents",
     colors: ["#5D3FD3", "#C1A7F7", "#DCD6ED", "#DBD0F5", "#180A4A"],
     icon: Grape,
   },
   {
-    value: "blueberry",
+    value: "theme-blueberry",
     label: "Blueberry",
     description: "Deep blue with sky blue highlights",
     colors: ["#3D70D3", "#A7C1F7", "#D6E0ED", "#D0DBF5", "#0A1A4A"],
     icon: Grape,
   },
   {
-    value: "pomegranate",
+    value: "theme-pomegranate",
     label: "Pomegranate",
     description: "Rich crimson with soft pink accents",
     colors: ["#D33D4E", "#F7A7B3", "#EDD6DA", "#F5D0D8", "#4A0A15"],
     icon: FlameKindling,
   },
   {
-    value: "cherry",
+    value: "theme-cherry",
     label: "Cherry",
     description: "Vibrant pink with soft magenta tones",
     colors: ["#D33D9E", "#F7A7E0", "#EDD6E5", "#F5D0ED", "#4A0A3A"],
     icon: Cherry,
   },
   {
-    value: "tangerine",
+    value: "theme-tangerine",
     label: "Tangerine",
     description: "Warm orange with golden highlights",
     colors: ["#F5AD3D", "#F9D6A7", "#EDE2D6", "#F5E2D0", "#4A290A"],
     icon: FlameKindling,
   },
   {
-    value: "lime",
+    value: "theme-lime",
     label: "Lime",
     description: "Fresh green with bright highlights",
     colors: ["#8DD33D", "#D3F7A7", "#E1EDD6", "#E8F5D0", "#0B4A0A"],

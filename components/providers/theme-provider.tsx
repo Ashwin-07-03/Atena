@@ -8,19 +8,8 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="blackberry"
-      themes={["blackberry", "blueberry", "pomegranate", "cherry", "tangerine", "lime"]}
+      defaultTheme="theme-blackberry"
       enableSystem={false}
-      value={{
-        blackberry: "theme-blackberry",
-        blueberry: "theme-blueberry",
-        pomegranate: "theme-pomegranate", 
-        cherry: "theme-cherry",
-        tangerine: "theme-tangerine",
-        lime: "theme-lime",
-        dark: "dark",
-        light: "light",
-      }}
       disableTransitionOnChange
       {...props}
     >
