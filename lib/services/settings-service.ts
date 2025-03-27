@@ -12,7 +12,7 @@ export interface UserProfile {
   major: string;
 }
 
-export type ThemeType = 'light' | 'dark' | 'system';
+export type ThemeType = 'system';
 export type StudySessionDuration = 25 | 30 | 45 | 60;
 export type StudySessionFormat = 'pomodoro' | 'fixed' | 'flexible';
 export type AIPersona = 'tutor' | 'mentor' | 'coach' | 'friend';
@@ -219,23 +219,9 @@ export const useSettingsStore = create(
 );
 
 // Helper functions to work with settings
-export function applyTheme(theme: ThemeType): void {
-  if (typeof window === 'undefined') return;
-  
-  const root = window.document.documentElement;
-  
-  // Remove existing theme classes
-  root.classList.remove('light', 'dark');
-  
-  // If system theme, check user preference
-  if (theme === 'system') {
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    root.classList.add(systemTheme);
-    return;
-  }
-  
-  // Otherwise apply the specified theme
-  root.classList.add(theme);
+export function applyTheme(theme: 'system'): void {
+  // No-op function to maintain compatibility
+  return;
 }
 
 // Utility function to update font size
@@ -273,7 +259,6 @@ export function applyHighContrast(enabled: boolean): void {
 // Export a function that initializes the theme based on stored settings
 export function initializeTheme(): void {
   const settings = useSettingsStore.getState().settings;
-  applyTheme(settings.appearance.theme);
   applyFontSize(settings.appearance.fontSize);
   applyHighContrast(settings.appearance.highContrastMode);
 } 

@@ -28,10 +28,8 @@ import { ModelSettings } from "@/components/ui/model-settings";
 // Settings Service
 import { 
   useSettingsStore, 
-  applyTheme, 
   applyFontSize, 
   applyHighContrast,
-  ThemeType,
   StudySessionDuration,
   StudySessionFormat,
   AIPersona,
@@ -62,10 +60,9 @@ export default function SettingsPage() {
 
   // Apply current settings on initial load
   useEffect(() => {
-    applyTheme(settings.appearance.theme);
     applyFontSize(settings.appearance.fontSize);
     applyHighContrast(settings.appearance.highContrastMode);
-  }, [settings.appearance.theme, settings.appearance.fontSize, settings.appearance.highContrastMode]);
+  }, [settings.appearance.fontSize, settings.appearance.highContrastMode]);
 
   // Save all changes
   const handleSaveChanges = () => {
@@ -73,7 +70,6 @@ export default function SettingsPage() {
     updateProfile(profileForm);
     
     // Apply visual changes
-    applyTheme(settings.appearance.theme);
     applyFontSize(settings.appearance.fontSize);
     applyHighContrast(settings.appearance.highContrastMode);
     
@@ -474,27 +470,21 @@ export default function SettingsPage() {
               
               <Card>
                 <CardHeader>
-                  <CardTitle>Theme Settings</CardTitle>
+                  <CardTitle>Font Size</CardTitle>
                   <CardDescription>
-                    Customize the look and feel of the application
+                    Customize the font size of the application
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Theme</h3>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Font Size</h3>
                     <div className="grid grid-cols-3 gap-4">
                       <div 
-                        className={`relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 bg-background p-2 hover:border-primary ${settings.appearance.theme === 'light' ? 'border-primary' : 'border-border'}`}
-                        onClick={() => handleAppearanceChange('theme', 'light')}
+                        className={`relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 bg-background p-2 hover:border-primary ${settings.appearance.fontSize === 'small' ? 'border-primary' : 'border-border'}`}
+                        onClick={() => handleAppearanceChange('fontSize', 'small')}
                       >
-                        <div className="mb-2 rounded-md border bg-white p-2 shadow-sm">
-                          <div className="space-y-2">
-                            <div className="h-2 w-8 rounded-lg bg-gray-400" />
-                            <div className="h-2 w-16 rounded-lg bg-gray-300" />
-                          </div>
-                        </div>
-                        <span className="text-xs font-medium">Light</span>
-                        {settings.appearance.theme === 'light' && (
+                        <div className="text-sm">Small</div>
+                        {settings.appearance.fontSize === 'small' && (
                           <div className="absolute right-2 top-2 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                             <Check className="h-3 w-3" />
                           </div>
@@ -502,17 +492,11 @@ export default function SettingsPage() {
                       </div>
                       
                       <div 
-                        className={`relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 bg-background p-2 hover:border-primary ${settings.appearance.theme === 'dark' ? 'border-primary' : 'border-border'}`}
-                        onClick={() => handleAppearanceChange('theme', 'dark')}
+                        className={`relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 bg-background p-2 hover:border-primary ${settings.appearance.fontSize === 'medium' ? 'border-primary' : 'border-border'}`}
+                        onClick={() => handleAppearanceChange('fontSize', 'medium')}
                       >
-                        <div className="mb-2 rounded-md border bg-gray-900 p-2 shadow-sm">
-                          <div className="space-y-2">
-                            <div className="h-2 w-8 rounded-lg bg-gray-700" />
-                            <div className="h-2 w-16 rounded-lg bg-gray-800" />
-                          </div>
-                        </div>
-                        <span className="text-xs font-medium">Dark</span>
-                        {settings.appearance.theme === 'dark' && (
+                        <div className="text-base">Medium</div>
+                        {settings.appearance.fontSize === 'medium' && (
                           <div className="absolute right-2 top-2 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                             <Check className="h-3 w-3" />
                           </div>
@@ -520,61 +504,24 @@ export default function SettingsPage() {
                       </div>
                       
                       <div 
-                        className={`relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 bg-background p-2 hover:border-primary ${settings.appearance.theme === 'system' ? 'border-primary' : 'border-border'}`}
-                        onClick={() => handleAppearanceChange('theme', 'system')}
+                        className={`relative flex aspect-square flex-col items-center justify-center rounded-xl border-2 bg-background p-2 hover:border-primary ${settings.appearance.fontSize === 'large' ? 'border-primary' : 'border-border'}`}
+                        onClick={() => handleAppearanceChange('fontSize', 'large')}
                       >
-                        <div className="mb-2 rounded-md border bg-gradient-to-br from-white to-gray-900 p-2 shadow-sm">
-                          <div className="space-y-2">
-                            <div className="h-2 w-8 rounded-lg bg-gray-500" />
-                            <div className="h-2 w-16 rounded-lg bg-gray-600" />
-                          </div>
-                        </div>
-                        <span className="text-xs font-medium">System</span>
-                        {settings.appearance.theme === 'system' && (
+                        <div className="text-lg">Large</div>
+                        {settings.appearance.fontSize === 'large' && (
                           <div className="absolute right-2 top-2 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                             <Check className="h-3 w-3" />
                           </div>
                         )}
                       </div>
                     </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Font Size</h3>
-                    <div className="flex flex-col space-y-2">
-                      <div className="grid grid-cols-3 gap-4">
-                        <Button 
-                          variant={settings.appearance.fontSize === "small" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleAppearanceChange('fontSize', 'small')}
-                        >
-                          Small
-                        </Button>
-                        <Button 
-                          variant={settings.appearance.fontSize === "medium" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleAppearanceChange('fontSize', 'medium')}
-                        >
-                          Medium
-                        </Button>
-                        <Button 
-                          variant={settings.appearance.fontSize === "large" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleAppearanceChange('fontSize', 'large')}
-                        >
-                          Large
-                        </Button>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Preview: 
-                        <span className={settings.appearance.fontSize === "small" ? "text-sm" : 
-                                        settings.appearance.fontSize === "medium" ? "text-base" : 
-                                        "text-lg"}>
-                          This is how your text will appear
-                        </span>
-                      </div>
+                    <div className="text-sm text-muted-foreground">
+                      Preview: 
+                      <span className={settings.appearance.fontSize === "small" ? "text-sm" : 
+                                      settings.appearance.fontSize === "medium" ? "text-base" : 
+                                      "text-lg"}>
+                        This is how your text will appear
+                      </span>
                     </div>
                   </div>
                   

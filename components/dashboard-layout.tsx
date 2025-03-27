@@ -16,11 +16,9 @@ import {
   MessageSquare,
   Cherry,
   Flower,
-  Palette,
   Grape
 } from 'lucide-react';
 import { Logo } from './ui/logo';
-import { ThemeSwitcher } from './ui/theme-switcher';
 
 interface NavItemProps {
   href: string;
@@ -80,7 +78,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Grape size={20} className="text-primary mr-2 animate-wiggle" />
               <Logo size="md" className="animate-gentle-reveal" />
             </div>
-            <ThemeSwitcher />
           </div>
           <p className="text-sm text-muted-foreground mt-2 tracking-wider">
             Study Assistant
@@ -105,7 +102,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           <div className="fruit-slice-divider my-6"></div>
 
-          <NavItem href="/dashboard/themes" icon={<Palette size={18} />} label="Themes" />
           <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" />
         </nav>
         

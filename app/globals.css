@@ -5,265 +5,48 @@
 @tailwind components;
 @tailwind utilities;
 
-:root,
-.theme-blackberry {
-  /* Fruit-inspired default color palette (Blackberry) */
-  --background: 250 30% 97%; /* Light lavender: #F3F1FA */
-  --foreground: 250 90% 15%; /* Deep blackberry: #180A4A */
-
-  --card: 250 30% 99%;
-  --card-foreground: 250 90% 15%;
-
-  --popover: 250 30% 99%;
-  --popover-foreground: 250 90% 15%;
-
-  --primary: 250 70% 50%; /* Blackberry: #5D3FD3 */
-  --primary-foreground: 250 30% 98%;
-
-  --secondary: 270 70% 75%; /* Lavender: #C1A7F7 */
-  --secondary-foreground: 270 90% 20%;
-
-  --muted: 250 20% 85%; /* Soft lilac: #DCD6ED */
-  --muted-foreground: 250 30% 30%;
-
-  --accent: 270 50% 85%; /* Pale violet: #DBD0F5 */
-  --accent-foreground: 270 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 250 90% 25%; /* Deep blackberry: #261168 */
-  --berry-medium: 250 70% 60%; /* Medium blackberry: #7153E0 */
-  --berry-light: 250 70% 85%; /* Light blackberry: #D4CAF7 */
-  --berry-pale: 250 40% 95%; /* Pale blackberry: #EBE7F7 */
-
-  --border: 250 30% 90%;
-  --input: 250 30% 90%;
-  --ring: 250 70% 50%;
-
-  --radius: 0.6rem;
-
-  /* Default theme */
-  --theme: "blackberry";
-}
-
-/* Blueberry Theme */
-.theme-blueberry {
-  --background: 210 30% 97%; /* Light sky: #F0F5FA */
-  --foreground: 210 90% 15%; /* Deep blue: #0A1A4A */
-
-  --card: 210 30% 99%;
-  --card-foreground: 210 90% 15%;
-
-  --popover: 210 30% 99%;
-  --popover-foreground: 210 90% 15%;
-
-  --primary: 210 70% 50%; /* Blueberry: #3D70D3 */
-  --primary-foreground: 210 30% 98%;
-
-  --secondary: 220 60% 75%; /* Soft blue: #A7C1F7 */
-  --secondary-foreground: 220 80% 20%;
-
-  --muted: 210 20% 85%; /* Pale blue: #D6E0ED */
-  --muted-foreground: 210 30% 30%;
-
-  --accent: 220 40% 85%; /* Light blue: #D0DBF5 */
-  --accent-foreground: 220 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 210 90% 25%; /* Deep blueberry: #0F2668 */
-  --berry-medium: 210 70% 60%; /* Medium blueberry: #5385E0 */
-  --berry-light: 210 70% 85%; /* Light blueberry: #C4D6F7 */
-  --berry-pale: 210 40% 95%; /* Pale blueberry: #E7EFF7 */
-
-  --border: 210 30% 90%;
-  --input: 210 30% 90%;
-  --ring: 210 70% 50%;
-}
-
-/* Pomegranate Theme */
-.theme-pomegranate {
-  --background: 355 30% 97%; /* Light rose: #FAF1F3 */
-  --foreground: 355 90% 15%; /* Deep crimson: #4A0A15 */
-
-  --card: 355 30% 99%;
-  --card-foreground: 355 90% 15%;
-
-  --popover: 355 30% 99%;
-  --popover-foreground: 355 90% 15%;
-
-  --primary: 355 70% 50%; /* Pomegranate: #D33D4E */
-  --primary-foreground: 355 30% 98%;
-
-  --secondary: 355 70% 75%; /* Soft pink: #F7A7B3 */
-  --secondary-foreground: 355 80% 20%;
-
-  --muted: 355 20% 85%; /* Pale rose: #EDD6DA */
-  --muted-foreground: 355 30% 30%;
-
-  --accent: 340 40% 85%; /* Light pink: #F5D0D8 */
-  --accent-foreground: 340 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 355 90% 25%; /* Deep pomegranate: #68111E */
-  --berry-medium: 355 70% 60%; /* Medium pomegranate: #E05367 */
-  --berry-light: 355 70% 85%; /* Light pomegranate: #F7C4CA */
-  --berry-pale: 355 40% 95%; /* Pale pomegranate: #F7E7E9 */
-
-  --border: 355 30% 90%;
-  --input: 355 30% 90%;
-  --ring: 355 70% 50%;
-}
-
-/* Cherry Theme */
-.theme-cherry {
-  --background: 340 30% 97%; /* Light pink: #FAF1F7 */
-  --foreground: 340 90% 15%; /* Deep cherry: #4A0A3A */
-
-  --card: 340 30% 99%;
-  --card-foreground: 340 90% 15%;
-
-  --popover: 340 30% 99%;
-  --popover-foreground: 340 90% 15%;
-
-  --primary: 340 70% 50%; /* Cherry: #D33D9E */
-  --primary-foreground: 340 30% 98%;
-
-  --secondary: 325 70% 75%; /* Soft pink: #F7A7E0 */
-  --secondary-foreground: 325 80% 20%;
-
-  --muted: 340 20% 85%; /* Pale pink: #EDD6E5 */
-  --muted-foreground: 340 30% 30%;
-
-  --accent: 330 40% 85%; /* Light pink: #F5D0ED */
-  --accent-foreground: 330 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 340 90% 25%; /* Deep cherry: #681153 */
-  --berry-medium: 340 70% 60%; /* Medium cherry: #E053BF */
-  --berry-light: 340 70% 85%; /* Light cherry: #F7C4EE */
-  --berry-pale: 340 40% 95%; /* Pale cherry: #F7E7F5 */
-
-  --border: 340 30% 90%;
-  --input: 340 30% 90%;
-  --ring: 340 70% 50%;
-}
-
-/* Tangerine Theme */
-.theme-tangerine {
-  --background: 30 30% 97%; /* Light peach: #FAF6F1 */
-  --foreground: 30 90% 15%; /* Deep orange: #4A290A */
-
-  --card: 30 30% 99%;
-  --card-foreground: 30 90% 15%;
-
-  --popover: 30 30% 99%;
-  --popover-foreground: 30 90% 15%;
-
-  --primary: 30 90% 60%; /* Tangerine: #F5AD3D */
-  --primary-foreground: 30 30% 12%;
-
-  --secondary: 40 80% 80%; /* Soft peach: #F9D6A7 */
-  --secondary-foreground: 40 90% 20%;
-
-  --muted: 30 30% 85%; /* Pale peach: #EDE2D6 */
-  --muted-foreground: 30 50% 25%;
-
-  --accent: 35 60% 85%; /* Light gold: #F5E2D0 */
-  --accent-foreground: 35 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 30 90% 30%; /* Deep tangerine: #8C4F15 */
-  --berry-medium: 30 90% 65%; /* Medium tangerine: #F9B653 */
-  --berry-light: 30 80% 85%; /* Light tangerine: #F9E0C4 */
-  --berry-pale: 30 50% 95%; /* Pale tangerine: #F7F0E7 */
-
-  --border: 30 30% 90%;
-  --input: 30 30% 90%;
-  --ring: 30 90% 60%;
-}
-
-/* Lime Theme */
-.theme-lime {
-  --background: 80 30% 97%; /* Light lime: #F7FAF1 */
-  --foreground: 100 90% 15%; /* Deep green: #0B4A0A */
-
-  --card: 80 30% 99%;
-  --card-foreground: 100 90% 15%;
-
-  --popover: 80 30% 99%;
-  --popover-foreground: 100 90% 15%;
-
-  --primary: 95 70% 50%; /* Lime: #8DD33D */
-  --primary-foreground: 95 30% 10%;
-
-  --secondary: 85 70% 75%; /* Soft lime: #D3F7A7 */
-  --secondary-foreground: 85 90% 20%;
-
-  --muted: 90 30% 85%; /* Pale lime: #E1EDD6 */
-  --muted-foreground: 90 40% 25%;
-
-  --accent: 75 60% 85%; /* Light lime: #E8F5D0 */
-  --accent-foreground: 75 80% 20%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  /* Fruit-inspired accent colors */
-  --berry-dark: 95 90% 25%; /* Deep lime: #335C11 */
-  --berry-medium: 95 70% 60%; /* Medium lime: #A2E053 */
-  --berry-light: 95 70% 85%; /* Light lime: #E2F7C4 */
-  --berry-pale: 95 40% 95%; /* Pale lime: #F0F7E7 */
-
-  --border: 80 30% 90%;
-  --input: 80 30% 90%;
-  --ring: 95 70% 50%;
-}
-
-.dark {
-  --background: 225 50% 8%; /* Deep navy: #0C1220 */
-  --foreground: 210 20% 90%; /* Soft white: #DEE5F0 */
-
-  --card: 225 50% 10%;
-  --card-foreground: 210 20% 90%;
-
-  --popover: 225 50% 10%;
-  --popover-foreground: 210 20% 90%;
-
-  --primary: 250 70% 50%; /* Vibrant purple: #5D3FD3 */
-  --primary-foreground: 250 30% 98%;
-
-  --secondary: 270 50% 30%;
-  --secondary-foreground: 270 50% 95%;
-
-  --muted: 225 30% 20%;
-  --muted-foreground: 225 30% 75%;
-
-  --accent: 270 30% 25%;
-  --accent-foreground: 270 30% 95%;
-
-  /* Darker accent colors */
-  --berry-dark: 250 90% 15%;
-  --berry-medium: 250 70% 40%;
-  --berry-light: 250 50% 65%;
-  --berry-pale: 250 30% 75%;
-
-  --border: 225 50% 20%;
-  --input: 225 50% 20%;
-  --ring: 250 70% 50%;
+:root {
+  /* Modern Vibrant Color Palette */
+  --background: 230 25% 98%; /* Soft cloud white: #F8FAFD */
+  --foreground: 230 35% 20%; /* Deep slate: #2A3347 */
+
+  --card: 230 30% 99%;
+  --card-foreground: 230 35% 20%;
+
+  --popover: 230 30% 99%;
+  --popover-foreground: 230 35% 20%;
+
+  /* Primary: Vibrant Purple */
+  --primary: 265 89% 78%; /* #BE9EFF */
+  --primary-foreground: 265 35% 15%;
+
+  /* Secondary: Soft Teal */
+  --secondary: 180 96% 85%; /* #ADFFFA */
+  --secondary-foreground: 180 35% 15%;
+
+  /* Accent: Coral Pink */
+  --accent: 350 100% 88%; /* #FFB5C2 */
+  --accent-foreground: 350 35% 15%;
+
+  /* Muted: Lavender Gray */
+  --muted: 250 25% 90%;
+  --muted-foreground: 250 25% 30%;
+
+  /* Destructive: Soft Red */
+  --destructive: 0 90% 75%;
+  --destructive-foreground: 0 35% 15%;
+
+  /* Gradient Colors */
+  --gradient-start: 265 89% 78%; /* Purple */
+  --gradient-mid: 230 96% 85%; /* Blue */
+  --gradient-end: 180 96% 85%; /* Teal */
+
+  /* Interactive Elements */
+  --border: 230 25% 85%;
+  --input: 230 25% 85%;
+  --ring: 265 89% 78%;
+
+  --radius: 1rem;
 }
 
 @layer base {

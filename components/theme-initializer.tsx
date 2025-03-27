@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSettingsStore, applyTheme, applyFontSize, applyHighContrast } from "@/lib/services/settings-service";
+import { useSettingsStore, applyFontSize, applyHighContrast } from "@/lib/services/settings-service";
 
 export function ThemeInitializer() {
   const settings = useSettingsStore((state) => state.settings);
 
   useEffect(() => {
-    // Apply theme settings on initial load
-    applyTheme(settings.appearance.theme);
+    // Apply accessibility settings on initial load
     applyFontSize(settings.appearance.fontSize);
     applyHighContrast(settings.appearance.highContrastMode);
     

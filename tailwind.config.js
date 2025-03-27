@@ -103,11 +103,16 @@ module.exports = {
         'zen': '0 1px 3px rgba(0, 0, 0, 0.1)',
         'zen-xl': '0 8px 20px rgba(0, 0, 0, 0.08), 0 1px 5px rgba(0, 0, 0, 0.02)',
         'washi': '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02)',
+        'glow': '0 0 15px rgba(190, 158, 255, 0.5)',
+        'neon': '0 0 20px rgba(173, 255, 250, 0.6)',
+        'warm': '0 0 15px rgba(255, 181, 194, 0.5)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+        'float': '0 10px 40px -15px rgba(0, 0, 0, 0.1)',
   		},
   		borderRadius: {
   			lg: "var(--radius)",
-  			md: "calc(var(--radius) - 2px)",
-  			sm: "calc(var(--radius) - 4px)"
+  			md: "calc(var(--radius) - 0.4rem)",
+  			sm: "calc(var(--radius) - 0.6rem)"
   		},
   		keyframes: {
   			"accordion-down": {
@@ -139,6 +144,23 @@ module.exports = {
           "0%": { width: "0%", opacity: 0 },
           "100%": { width: "100%", opacity: 1 },
         },
+        "gentle-bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" }
+        },
+        "pulse-soft": {
+          "0%, 100%": { opacity: 1 },
+          "50%": { opacity: 0.8 }
+        },
+        "gradient-flow": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" }
+        }
   		},
   		animation: {
   			"accordion-down": "accordion-down 0.2s ease-out",
@@ -148,6 +170,10 @@ module.exports = {
   			"zoom-in": "zoom-in-50 0.3s ease-out",
         "gentle-reveal": "gentle-reveal 0.5s ease-out forwards",
         "brush-stroke": "brush-stroke 1.2s ease-in-out forwards",
+        "gentle-bounce": "gentle-bounce 2s ease-in-out infinite",
+        "float": "float 3s ease-in-out infinite",
+        "pulse-soft": "pulse-soft 2s ease-in-out infinite",
+        "gradient-flow": "gradient-flow 8s ease infinite"
   		},
       /* Japanese-inspired spacing */
       spacing: {
@@ -171,6 +197,14 @@ module.exports = {
         'zen': '0.04em',
         'wide': '0.08em',
       },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--gradient-start), var(--gradient-end))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--gradient-start), var(--gradient-mid), var(--gradient-end))',
+        'gradient-shine': 'linear-gradient(120deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end))',
+      },
+      backdropBlur: {
+        'xs': '2px',
+      }
   	}
   },
   plugins: [require("tailwindcss-animate")],

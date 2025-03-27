@@ -8,7 +8,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="theme-blackberry"
+      defaultTheme="system"
       enableSystem={false}
       disableTransitionOnChange
       {...props}
