@@ -6,28 +6,28 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap text-sm font-normal tracking-wider transition-all duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
+          "bg-primary text-primary-foreground shadow-zen hover:bg-primary/90 active:translate-y-0.5 rounded-sm border border-transparent",
         destructive:
-          "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:translate-y-0.5 rounded-sm border border-transparent",
         outline:
-          "border border-primary/30 bg-background shadow-sm hover:border-primary/50 hover:bg-primary/10 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
+          "border border-input bg-background/50 hover:bg-accent/10 hover:border-accent/50 hover:text-accent-foreground active:translate-y-0.5 rounded-sm",
         secondary:
-          "bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]",
-        ghost: "hover:bg-primary/10 hover:text-primary-foreground hover:scale-[1.02] active:scale-[0.98]",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/90 active:translate-y-0.5 rounded-sm border border-transparent",
+        ghost: "hover:bg-accent/10 hover:text-accent-foreground active:translate-y-0.5",
         link: "text-primary underline-offset-4 hover:underline",
-        subtle: "bg-muted/50 text-foreground hover:bg-muted/80 hover:scale-[1.02] active:scale-[0.98] shadow-sm",
-        flat: "border border-primary/20 bg-transparent hover:bg-primary/10 hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]",
-        icon: "h-9 w-9 p-0 hover:bg-primary/10 hover:scale-[1.05] active:scale-[0.95]",
+        subtle: "bg-sky/10 text-foreground hover:bg-sky/20 active:translate-y-0.5 rounded-sm border border-transparent",
+        flat: "border border-input bg-transparent hover:bg-sky/10 hover:border-sky/30 active:translate-y-0.5 rounded-sm",
+        icon: "h-9 w-9 p-0 rounded-sm hover:bg-accent/10 hover:text-accent-foreground hover:border-accent/20",
       },
       size: {
-        default: "h-10 px-5 py-2.5",
-        sm: "h-8 rounded-full px-3.5 text-xs",
-        lg: "h-11 rounded-full px-8 text-base",
+        default: "h-10 px-6 py-2.5",
+        sm: "h-8 px-4 py-2 text-xs",
+        lg: "h-11 px-8 py-3 text-base",
         icon: "h-9 w-9",
       },
     },

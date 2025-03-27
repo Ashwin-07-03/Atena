@@ -7,75 +7,75 @@
 
 :root {
   /* Japanese-inspired zen garden color palette */
-  --background: 43 30% 92%; /* Wabi-Sabi Cream: #F5EFE0 */
-  --foreground: 215 10% 46%; /* Misty Mountain Gray: #9DA4AB */
+  --background: 40 30% 95%; /* Washi Paper: #F8F5EF */
+  --foreground: 200 10% 35%; /* Sumi Ink: #4A5A64 */
 
   --card: 0 0% 100%;
-  --card-foreground: 215 10% 31%;
+  --card-foreground: 200 10% 25%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 215 10% 31%;
+  --popover-foreground: 200 10% 25%;
 
-  --primary: 215 10% 49%; /* Misty Mountain Gray */
-  --primary-foreground: 43 30% 98%;
+  --primary: 200 15% 42%; /* Indigo Blue: #536D7F */
+  --primary-foreground: 40 30% 98%;
 
-  --secondary: 352 21% 88%; /* Cherry Blossom Blush: #F1D4D4 */
-  --secondary-foreground: 355 25% 35%;
+  --secondary: 355 30% 85%; /* Sakura Pink: #F2D1D6 */
+  --secondary-foreground: 355 30% 30%;
 
-  --muted: 120 16% 81%; /* Matcha Green: #C5D8C5 */
-  --muted-foreground: 125 20% 25%;
+  --muted: 150 15% 85%; /* Matcha Green: #D7E4D8 */
+  --muted-foreground: 150 20% 25%;
 
-  --accent: 35 29% 75%; /* River Stone Beige: #D4C4A8 */
-  --accent-foreground: 35 29% 25%;
+  --accent: 30 30% 85%; /* Kinari Beige: #EBE0CC */
+  --accent-foreground: 30 30% 25%;
 
-  --destructive: 0 84.2% 60.2%;
+  --destructive: 0 70% 55%;
   --destructive-foreground: 210 40% 98%;
 
   /* Japanese zen garden accent colors */
-  --indigo: 150 27% 24%; /* Deep Indigo: #2C4C3B */
-  --terracotta: 18 50% 46%; /* Soft Terracotta: #B05F3C */
-  --sky: 200 39% 73%; /* Pale Sky Blue: #A5C4D1 */
+  --indigo: 210 35% 30%; /* Ai Indigo: #2B4C69 */
+  --terracotta: 20 45% 50%; /* Akadobe: #BD6A52 */
+  --sky: 190 40% 75%; /* Asagi Blue: #A2C7D2 */
 
-  --border: 35 29% 85%;
-  --input: 35 29% 85%;
-  --ring: 200 39% 73%; /* Pale Sky Blue */
+  --border: 30 30% 90%;
+  --input: 30 30% 90%;
+  --ring: 190 40% 75%; /* Asagi Blue */
 
   --radius: 0.25rem; /* Japanese aesthetic prefers subtler corners */
 }
 
 .dark {
-  --background: 215 25% 12%;
-  --foreground: 43 30% 92%;
+  --background: 200 15% 10%; /* Sumi Night: #141A1E */
+  --foreground: 40 30% 90%; /* Washi Light: #EBE5D9 */
 
-  --card: 215 25% 12%;
-  --card-foreground: 43 30% 92%;
+  --card: 200 15% 12%;
+  --card-foreground: 40 30% 90%;
 
-  --popover: 215 25% 12%;
-  --popover-foreground: 43 30% 92%;
+  --popover: 200 15% 12%;
+  --popover-foreground: 40 30% 90%;
 
-  --primary: 215 10% 49%;
-  --primary-foreground: 43 30% 98%;
+  --primary: 200 15% 45%;
+  --primary-foreground: 40 30% 98%;
 
-  --secondary: 352 21% 35%;
-  --secondary-foreground: 355 25% 90%;
+  --secondary: 355 25% 30%;
+  --secondary-foreground: 355 30% 90%;
 
-  --muted: 120 16% 25%;
-  --muted-foreground: 125 20% 90%;
+  --muted: 150 15% 20%;
+  --muted-foreground: 150 20% 90%;
 
-  --accent: 35 29% 35%;
-  --accent-foreground: 35 29% 95%;
+  --accent: 30 25% 30%;
+  --accent-foreground: 30 30% 95%;
 
   /* Japanese zen garden dark mode accent colors */
-  --indigo: 150 27% 18%;
-  --terracotta: 18 50% 36%;
-  --sky: 200 39% 36%;
+  --indigo: 210 35% 20%;
+  --terracotta: 20 45% 35%;
+  --sky: 190 40% 35%;
 
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 215 10% 30%;
-  --input: 215 10% 30%;
-  --ring: 200 39% 40%;
+  --border: 200 15% 25%;
+  --input: 200 15% 25%;
+  --ring: 190 40% 40%;
 }
 
 @layer base {
@@ -188,7 +188,7 @@
   
   /* Japanese divider */
   .jp-divider {
-    @apply my-8 border-t border-primary/10 relative;
+    @apply my-8 border-t border-sky/10 relative;
     height: 1px;
   }
   
@@ -197,7 +197,7 @@
     position: absolute;
     height: 4px;
     width: 40px;
-    @apply bg-accent/50 top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm;
+    @apply bg-sky/40 top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm;
   }
   
   /* Zen navigation styles */
@@ -232,14 +232,14 @@
   /* Message bubble styles */
   .message-bubble-user {
     @apply rounded-sm px-4 py-3 shadow-zen;
-    background-color: hsl(var(--accent)/5%);
-    border-right: 2px solid hsl(var(--accent)/20%);
+    background-color: hsl(var(--accent)/10%);
+    border-right: 2px solid hsl(var(--accent)/30%);
   }
   
   .message-bubble-assistant {
     @apply rounded-sm px-4 py-3 shadow-zen;
-    background-color: hsl(var(--primary)/5%);
-    border-left: 2px solid hsl(var(--primary)/20%);
+    background-color: hsl(var(--sky)/10%);
+    border-left: 2px solid hsl(var(--sky)/30%);
   }
 }
 
