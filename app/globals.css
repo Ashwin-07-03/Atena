@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -6,503 +6,359 @@
 @tailwind utilities;
 
 :root {
-  /* New fluffy pastel color scheme */
-  --background: 260 25% 98%;
-  --foreground: 224 71% 4.9%;
+  /* Japanese-inspired zen garden color palette */
+  --background: 43 30% 92%; /* Wabi-Sabi Cream: #F5EFE0 */
+  --foreground: 215 10% 46%; /* Misty Mountain Gray: #9DA4AB */
 
   --card: 0 0% 100%;
-  --card-foreground: 224 71% 4.9%;
+  --card-foreground: 215 10% 31%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 224 71% 4.9%;
+  --popover-foreground: 215 10% 31%;
 
-  --primary: 246 75% 83%;  /* Soft Lavender */
-  --primary-foreground: 246 50% 25%;
+  --primary: 215 10% 49%; /* Misty Mountain Gray */
+  --primary-foreground: 43 30% 98%;
 
-  --secondary: 24 100% 86%; /* Muted Peach */
-  --secondary-foreground: 24 50% 30%;
+  --secondary: 352 21% 88%; /* Cherry Blossom Blush: #F1D4D4 */
+  --secondary-foreground: 355 25% 35%;
 
-  --muted: 195 53% 82%; /* Gentle Sky Blue */
-  --muted-foreground: 220 8.9% 46.1%;
+  --muted: 120 16% 81%; /* Matcha Green: #C5D8C5 */
+  --muted-foreground: 125 20% 25%;
 
-  --accent: 39 100% 94%; /* Warm Cream */
-  --accent-foreground: 24 9.8% 10%;
+  --accent: 35 29% 75%; /* River Stone Beige: #D4C4A8 */
+  --accent-foreground: 35 29% 25%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 262 83% 58%; /* Deep Periwinkle accent */
+  /* Japanese zen garden accent colors */
+  --indigo: 150 27% 24%; /* Deep Indigo: #2C4C3B */
+  --terracotta: 18 50% 46%; /* Soft Terracotta: #B05F3C */
+  --sky: 200 39% 73%; /* Pale Sky Blue: #A5C4D1 */
 
-  --radius: 0.75rem;  /* Rounded corners */
+  --border: 35 29% 85%;
+  --input: 35 29% 85%;
+  --ring: 200 39% 73%; /* Pale Sky Blue */
+
+  --radius: 0.25rem; /* Japanese aesthetic prefers subtler corners */
 }
 
 .dark {
-  --background: 224 71% 4%;
-  --foreground: 213 31% 91%;
+  --background: 215 25% 12%;
+  --foreground: 43 30% 92%;
 
-  --card: 224 71% 4%;
-  --card-foreground: 213 31% 91%;
+  --card: 215 25% 12%;
+  --card-foreground: 43 30% 92%;
 
-  --popover: 224 71% 4%;
-  --popover-foreground: 213 31% 91%;
+  --popover: 215 25% 12%;
+  --popover-foreground: 43 30% 92%;
 
-  --primary: 246 54% 70%; /* Dark mode Soft Lavender */
-  --primary-foreground: 246 100% 94%;
+  --primary: 215 10% 49%;
+  --primary-foreground: 43 30% 98%;
 
-  --secondary: 24 50% 50%; /* Dark mode Muted Peach */
-  --secondary-foreground: 24 100% 98%;
+  --secondary: 352 21% 35%;
+  --secondary-foreground: 355 25% 90%;
 
-  --muted: 195 33% 40%; /* Dark mode Gentle Sky Blue */
-  --muted-foreground: 215 20.2% 75.1%;
+  --muted: 120 16% 25%;
+  --muted-foreground: 125 20% 90%;
 
-  --accent: 39 70% 35%; /* Dark mode Warm Cream */
-  --accent-foreground: 39 100% 94%;
+  --accent: 35 29% 35%;
+  --accent-foreground: 35 29% 95%;
+
+  /* Japanese zen garden dark mode accent colors */
+  --indigo: 150 27% 18%;
+  --terracotta: 18 50% 36%;
+  --sky: 200 39% 36%;
 
   --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 0 0% 98%;
 
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 263.4 70% 50.4%;
+  --border: 215 10% 30%;
+  --input: 215 10% 30%;
+  --ring: 200 39% 40%;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+  
+  html {
+    font-feature-settings: "palt" 1; /* Japanese optimized font alignment */
+  }
+  
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Montserrat', 'Inter', sans-serif;
-    line-height: 1.6;
-    letter-spacing: 0.01em;
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    
+    /* Subtle paper texture */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
   }
   
-  /* Custom scrollbar */
+  /* Japanese inspired typography */
+  h1 {
+    @apply text-3xl md:text-4xl tracking-wide;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl tracking-wide;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+  
+  p {
+    @apply text-base leading-relaxed;
+  }
+  
+  /* Zen-inspired scroll experience */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
-    background: hsl(var(--background));
-    border-radius: 4px;
+    background: transparent;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted));
-    border-radius: 4px;
-    transition: background 0.2s ease;
+    @apply bg-accent/30 rounded-full;
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary));
+    @apply bg-accent/50;
   }
 }
 
-/* Buttons & Interactive elements */
+/* Japanese inspired UI Components */
 @layer components {
   .card {
-    @apply bg-white dark:bg-background rounded-xl p-6 shadow-sm backdrop-blur-md border border-primary/10 transition-all duration-200;
-    background: linear-gradient(
-      180deg, 
-      hsl(var(--background) / 0.8) 0%, 
-      hsl(var(--background)) 100%
-    );
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    @apply bg-card/90 rounded-sm p-6 border border-accent/10 shadow-sm backdrop-blur-sm transition-all duration-500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.01);
+  }
+  
+  /* Japanese shadow style */
+  .shadow-zen {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   }
   
   .btn-primary {
-    @apply px-4 py-2 bg-primary text-primary-foreground rounded-full font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98];
-    background: linear-gradient(120deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+    @apply px-6 py-2.5 bg-primary text-primary-foreground rounded-sm font-normal tracking-wider transition-all duration-500 flex items-center justify-center gap-2 hover:bg-primary/90 active:translate-y-0.5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .btn-secondary {
-    @apply px-4 py-2 bg-secondary text-secondary-foreground rounded-full font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98];
-    background: linear-gradient(120deg, hsl(var(--secondary)), hsl(var(--secondary) / 0.8));
+    @apply px-6 py-2.5 bg-secondary text-secondary-foreground rounded-sm font-normal tracking-wider transition-all duration-500 flex items-center justify-center gap-2 hover:bg-secondary/90 active:translate-y-0.5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
   
   .input {
-    @apply w-full px-4 py-3 border border-input rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 shadow-sm;
+    @apply w-full px-4 py-3 border border-input rounded-sm bg-background/80 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground/40 transition-all duration-300;
   }
   
-  /* Frosted glass effect */
+  /* Japanese aesthetic glass effect */
   .glass {
-    @apply backdrop-blur-md bg-white/50 dark:bg-black/50 border border-white/20 dark:border-white/10;
+    @apply backdrop-blur-sm bg-white/60 dark:bg-black/60 border border-white/10 dark:border-white/5;
   }
   
-  /* Custom focus ring style */
+  /* Japanese inspired focus ring style */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-sky/50 focus-visible:ring-offset-1 focus-visible:ring-offset-background transition-all duration-300;
   }
   
-  /* Fluffy bubble */
-  .fluffy-bubble {
-    @apply rounded-3xl shadow-md;
-    background: linear-gradient(
-      180deg, 
-      hsl(var(--primary) / 0.3) 0%, 
-      hsl(var(--primary) / 0.1) 100%
-    );
-    backdrop-filter: blur(4px);
-    border: 1px solid hsl(var(--primary) / 0.2);
+  /* Japanese paper-inspired container */
+  .washi-container {
+    @apply bg-background/95 border border-border/40 rounded-sm p-6 shadow-sm;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+  
+  /* Japanese divider */
+  .jp-divider {
+    @apply my-8 border-t border-primary/10 relative;
+    height: 1px;
+  }
+  
+  .jp-divider::after {
+    content: "";
+    position: absolute;
+    height: 4px;
+    width: 40px;
+    @apply bg-accent/50 top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm;
+  }
+  
+  /* Zen navigation styles */
+  .zen-nav-item {
+    @apply py-3 px-4 transition-all duration-300 relative text-foreground/70 hover:text-foreground;
+    letter-spacing: 0.05em;
+  }
+  
+  .zen-nav-item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    @apply bg-primary/60 transition-all duration-500;
+  }
+  
+  .zen-nav-item:hover::after {
+    width: 30%;
+  }
+  
+  .zen-nav-item.active {
+    @apply text-primary;
+  }
+  
+  .zen-nav-item.active::after {
+    width: 40%;
+    @apply bg-primary;
   }
   
   /* Message bubble styles */
   .message-bubble-user {
-    @apply rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm;
-    background: linear-gradient(
-      135deg, 
-      hsl(var(--primary)) 0%, 
-      hsl(var(--primary) / 0.8) 100%
-    );
-    border: 1px solid hsl(var(--primary) / 0.2);
+    @apply rounded-sm px-4 py-3 shadow-zen;
+    background-color: hsl(var(--accent)/5%);
+    border-right: 2px solid hsl(var(--accent)/20%);
   }
   
   .message-bubble-assistant {
-    @apply rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm;
-    background: linear-gradient(
-      135deg, 
-      hsl(var(--accent)) 0%, 
-      hsl(var(--accent) / 0.7) 100%
-    );
-    border: 1px solid hsl(var(--accent) / 0.2);
+    @apply rounded-sm px-4 py-3 shadow-zen;
+    background-color: hsl(var(--primary)/5%);
+    border-left: 2px solid hsl(var(--primary)/20%);
   }
 }
 
-/* Animations */
+/* Gentle Japanese animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(10px); opacity: 0; }
+  from { transform: translateY(15px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes scaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+@keyframes gentleReveal {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Soft Bounce animation */
-@keyframes softBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+/* Traditional brush stroke animation */
+@keyframes brushStroke {
+  0% { width: 0; opacity: 0; }
+  100% { width: 100%; opacity: 1; }
 }
 
-/* Aurora animation */
-@keyframes aurora {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* Zen ripple effect animation */
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(4); opacity: 0; }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.7s ease-out forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.5s ease-out forwards;
+  animation: slideUp 0.7s ease-out forwards;
 }
 
-.animate-scale-in {
-  animation: scaleIn 0.4s ease-out forwards;
+.animate-gentle-reveal {
+  animation: gentleReveal 0.5s ease-out forwards;
 }
 
-.animate-soft-bounce {
-  animation: softBounce 2s ease-in-out infinite;
+.animate-brush-stroke {
+  animation: brushStroke 1.2s ease-in-out forwards;
 }
 
-/* Aurora animation class with gradient */
-.animate-aurora {
-  background: linear-gradient(
-    90deg, 
-    hsl(var(--primary) / 0.3), 
-    hsl(var(--secondary) / 0.3), 
-    hsl(var(--accent) / 0.3), 
-    hsl(var(--muted) / 0.3)
-  );
-  background-size: 300% 100%;
-  animation: aurora 15s ease infinite;
+/* Japanese ink ripple effect */
+.zen-ripple {
+  position: relative;
+  overflow: hidden;
 }
 
-/* Staggered animations for lists */
-.stagger-item:nth-child(1) { animation-delay: 0.05s; }
-.stagger-item:nth-child(2) { animation-delay: 0.1s; }
-.stagger-item:nth-child(3) { animation-delay: 0.15s; }
-.stagger-item:nth-child(4) { animation-delay: 0.2s; }
-.stagger-item:nth-child(5) { animation-delay: 0.25s; }
-.stagger-item:nth-child(6) { animation-delay: 0.3s; }
-.stagger-item:nth-child(7) { animation-delay: 0.35s; }
-.stagger-item:nth-child(8) { animation-delay: 0.4s; }
-
-/* Hover effects */
-.hover-lift {
-  transition: transform 0.2s ease;
+.zen-ripple::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, currentColor 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.6s, opacity 0.8s;
 }
 
-.hover-lift:hover {
-  transform: translateY(-2px);
+.zen-ripple:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
 }
 
 /* Page transitions */
-.page-enter {
+.page-transition-enter {
   opacity: 0;
+  transform: translateY(5px);
 }
 
-.page-enter-active {
+.page-transition-enter-active {
   opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
   transition: opacity 0.3s;
 }
 
-.page-exit {
-  opacity: 1;
+/* Japanese-inspired layout classes */
+.zen-layout {
+  @apply max-w-screen-xl mx-auto px-4 md:px-6 lg:px-8;
 }
 
-.page-exit-active {
-  opacity: 0;
-  transition: opacity 0.3s;
+.ma-space {
+  @apply my-16 md:my-24; /* Ma - intentional empty space */
 }
 
-/* Form focus effect */
-.focus-ring {
-  position: relative;
-  z-index: 1;
+.asymmetric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.618fr; /* Golden ratio for asymmetry */
+  @apply gap-6 md:gap-12;
 }
 
-.focus-ring:focus-within::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: calc(var(--radius) + 3px);
-  border: 1px solid hsl(var(--ring));
-  z-index: -1;
-}
-
-/* Flashcard animations */
-.perspective {
-  perspective: 1000px;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
-
-.preserve-3d {
-  transform-style: preserve-3d;
-}
-
-/* Smooth transitions */
-.transition-transform {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 500ms;
-}
-
-/* Study session progress */
-.study-progress-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.study-progress-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.study-progress-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.study-progress-exit-active {
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* FullCalendar Styles */
-.fc .fc-toolbar-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.fc .fc-button {
-  background-color: hsl(var(--primary));
-  border-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  font-weight: 500;
-  text-transform: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-.fc .fc-button:hover {
-  background-color: hsl(var(--primary) / 0.9);
-  border-color: hsl(var(--primary) / 0.9);
-}
-
-.fc .fc-button-primary:not(:disabled).fc-button-active,
-.fc .fc-button-primary:not(:disabled):active {
-  background-color: hsl(var(--primary) / 0.8);
-  border-color: hsl(var(--primary) / 0.8);
-  color: hsl(var(--primary-foreground));
-}
-
-.fc .fc-button:focus,
-.fc .fc-button-primary:focus {
-  box-shadow: 0 0 0 0.2rem hsl(var(--ring) / 0.25);
-}
-
-.fc .fc-button-primary:disabled {
-  background-color: hsl(var(--primary) / 0.5);
-  border-color: hsl(var(--primary) / 0.5);
-}
-
-.fc-theme-standard .fc-scrollgrid,
-.fc-theme-standard td,
-.fc-theme-standard th {
-  border-color: hsl(var(--border));
-}
-
-.fc .fc-daygrid-day.fc-day-today {
-  background-color: hsl(var(--accent) / 0.7);
-}
-
-.fc .fc-col-header-cell-cushion,
-.fc .fc-daygrid-day-number {
-  color: hsl(var(--foreground));
-  text-decoration: none;
-}
-
-.fc-event {
-  border-radius: 0.25rem;
-  border: none;
-  padding: 0.125rem 0.25rem;
-  font-size: 0.875rem;
-}
-
-/* Compact mode styling */
-.compact-calendar .fc-toolbar {
-  flex-wrap: wrap;
-  row-gap: 0.5rem;
-  margin-bottom: 0.5rem !important;
-}
-
-.compact-calendar .fc-toolbar-title {
-  font-size: 1rem;
-}
-
-.compact-calendar .fc .fc-button {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-}
-
-.compact-calendar .fc-header-toolbar {
-  margin-bottom: 0.5em !important;
-}
-
-.compact-calendar .fc .fc-daygrid-day {
-  height: 3rem;
-}
-
-.compact-calendar .fc .fc-timegrid-slot {
-  height: 2rem !important;
-}
-
-/* Colors for events */
-.fc-event.fc-event-primary {
-  background-color: hsl(var(--primary) / 0.8);
-  color: hsl(var(--primary-foreground));
-}
-
-.fc-event.fc-event-accent {
-  background-color: hsl(var(--accent) / 0.8);
-  color: hsl(var(--accent-foreground));
-}
-
-.fc-event.fc-event-secondary {
-  background-color: hsl(var(--secondary) / 0.8);
-  color: hsl(var(--secondary-foreground));
-}
-
-.fc-event.fc-event-blue {
-  background-color: hsl(215, 90%, 62%, 0.8);
-  color: white;
-}
-
-.fc-event.fc-event-green {
-  background-color: hsl(142, 71%, 45%, 0.8);
-  color: white;
-}
-
-.fc-event.fc-event-yellow {
-  background-color: hsl(47, 96%, 67%, 0.8);
-  color: black;
-}
-
-.fc-event.fc-event-purple {
-  background-color: hsl(283, 39%, 53%, 0.8);
-  color: white;
-}
-
-.fc-event.fc-event-orange {
-  background-color: hsl(27, 96%, 61%, 0.8);
-  color: white;
-}
-
-.fc .fc-timegrid-slot {
-  height: 3rem;
-}
-
-.fc .fc-timegrid-now-indicator-line {
-  border-color: red;
-}
-
-/* Mobile optimizations */
-@media (max-width: 640px) {
-  .fc .fc-toolbar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .asymmetric-grid {
+    grid-template-columns: 1fr;
   }
   
-  .fc .fc-toolbar-chunk {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .fc .fc-daygrid-day-number {
-    padding: 0.1rem;
-  }
-
-  .fc .fc-col-header-cell-cushion {
-    padding: 0.1rem;
-  }
-  
-  .fc .fc-timegrid-slot {
-    height: 2rem;
-  }
-  
-  .fc-timegrid-event {
-    min-height: 1.5rem !important;
+  .jp-divider::after {
+    width: 30px;
   }
 } 

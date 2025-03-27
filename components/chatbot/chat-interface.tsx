@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Edit, MoreHorizontal, Settings, KeyRound, Sparkles } from 'lucide-react';
+import { Send, Edit, MoreHorizontal, Settings, KeyRound, Sparkles, Flower, Cherry } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -106,9 +106,9 @@ export default function ChatInterface({
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background to-background/90">
       {/* Chat Header */}
-      <div className="p-4 border-b border-primary/20 backdrop-blur-md flex items-center justify-between bg-background/90 rounded-b-xl shadow-sm">
+      <div className="p-4 border-b border-accent/10 backdrop-blur-md flex items-center justify-between bg-background/90 rounded-sm shadow-washi">
         <div className="flex items-center">
-          <div className="flex-shrink-0 rounded-full bg-primary/30 h-11 w-11 flex items-center justify-center text-xl shadow-inner animate-soft-bounce">
+          <div className="flex-shrink-0 rounded-sm bg-bamboo/20 h-10 w-10 flex items-center justify-center text-xl shadow-washi">
             {subjectIcon}
           </div>
           <div className="ml-3">
@@ -125,11 +125,11 @@ export default function ChatInterface({
               </div>
             ) : (
               <div className="flex items-center">
-                <h2 className="text-base font-medium mr-2 text-foreground">{conversation.title}</h2>
+                <h2 className="text-base font-light tracking-wide mr-2 text-foreground">{conversation.title}</h2>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 rounded-full hover:bg-primary/20 hover:text-primary-foreground transition-colors" 
+                  className="h-7 w-7 rounded-sm hover:bg-accent/10 transition-colors duration-300" 
                   onClick={handleStartEditingTitle}
                 >
                   <Edit className="h-3.5 w-3.5" />
@@ -148,11 +148,11 @@ export default function ChatInterface({
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/20">
+            <Button variant="ghost" size="icon" className="rounded-sm hover:bg-accent/10">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-xl border border-primary/20 shadow-lg backdrop-blur-md">
+          <DropdownMenuContent align="end" className="rounded-sm border border-accent/10 shadow-zen backdrop-blur-md">
             <DropdownMenuItem onClick={handleStartEditingTitle} className="rounded-lg focus:bg-primary/20">
               <Edit className="h-4 w-4 mr-2" />
               <span>Rename</span>
@@ -173,10 +173,10 @@ export default function ChatInterface({
               <div className="fluffy-bubble p-5 mb-6 animate-soft-bounce">
                 <Logo showText={false} size="lg" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-foreground">
+              <h3 className="text-xl font-light tracking-wide mb-3 text-foreground">
                 Welcome to your {studySubjects.find(s => s.id === conversation.subject)?.name} Study Session
               </h3>
-              <p className="text-muted-foreground max-w-md px-4 py-3 rounded-xl bg-muted/30 backdrop-blur-sm border border-primary/10 shadow-sm">
+              <p className="text-muted-foreground max-w-md px-4 py-3 rounded-sm bg-accent/5 backdrop-blur-sm border-l border-accent/20 shadow-zen">
                 Ask any {studySubjects.find(s => s.id === conversation.subject)?.name.toLowerCase()} questions, 
                 request explanations, or get help with specific problems. I'm here to assist your learning!
               </p>
@@ -195,7 +195,7 @@ export default function ChatInterface({
                   {message.role === "assistant" && (
                     <Avatar className="h-9 w-9 mt-1 border-2 border-accent/30 p-0.5 shadow-md">
                       <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                        <Sparkles className="h-4 w-4 text-primary-foreground" />
+                        <Flower className="h-4 w-4 text-primary-foreground" />
                       </div>
                     </Avatar>
                   )}
@@ -239,7 +239,7 @@ export default function ChatInterface({
               <div className="flex items-start gap-4">
                 <Avatar className="h-9 w-9 border-2 border-accent/30 p-0.5 shadow-md">
                   <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                    <Sparkles className="h-4 w-4 text-primary-foreground" />
+                    <Flower className="h-4 w-4 text-primary-foreground" />
                   </div>
                 </Avatar>
                 <div className="message-bubble-assistant flex items-center">
@@ -270,13 +270,13 @@ export default function ChatInterface({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
-              className="pr-12 rounded-full shadow-inner border-primary/30 focus-ring"
+              className="pr-12 rounded-sm shadow-zen border-accent/30 focus-ring"
               disabled={!isModelInitialized}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!inputValue.trim() || isLoading || !isModelInitialized}
-              className="absolute right-1 h-9 w-9 rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-md hover:shadow-lg transition-all"
+              className="absolute right-1 h-9 w-9 rounded-sm bg-accent/10 text-accent-foreground shadow-zen hover:bg-accent/20 transition-all duration-300"
               aria-label="Send message"
             >
               <Send className="h-4 w-4" />
