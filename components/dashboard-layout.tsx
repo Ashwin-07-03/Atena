@@ -15,9 +15,11 @@ import {
   BarChart,
   MessageSquare,
   Cherry,
-  Flower
+  Flower,
+  Palette
 } from 'lucide-react';
 import { Logo } from './ui/logo';
+import { ThemeSwitcher } from './ui/theme-switcher';
 
 interface NavItemProps {
   href: string;
@@ -53,11 +55,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 border-r border-sky/10 bg-background/90 backdrop-blur-sm md:min-h-screen flex flex-col shadow-washi relative overflow-hidden">
+      <aside className="w-full md:w-64 border-r border-primary/10 bg-background/90 backdrop-blur-sm md:min-h-screen flex flex-col shadow-washi relative overflow-hidden">
         {/* Japanese-inspired decorative elements */}
         <div className="absolute top-0 right-0 w-32 h-32 opacity-5 pointer-events-none">
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="40" fill="currentColor" className="text-sky" />
+            <circle cx="50" cy="50" r="40" fill="currentColor" className="text-primary" />
             <path d="M50,10 A40,40 0 0,1 90,50 A40,40 0 0,1 50,90 A40,40 0 0,1 10,50 A40,40 0 0,1 50,10 Z" 
                   fill="none" stroke="currentColor" strokeWidth="0.5" className="text-primary" />
           </svg>
@@ -70,10 +72,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </svg>
         </div>
 
-        <div className="p-6 border-b border-sky/10 flex flex-col items-start">
-          <div className="flex items-center">
+        <div className="p-6 border-b border-primary/10 flex flex-col items-start">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center">
             <Cherry size={20} className="text-secondary mr-2 animate-gentle-reveal" />
             <Logo size="md" className="animate-gentle-reveal" />
+            </div>
+            <ThemeSwitcher />
           </div>
           <p className="text-sm text-muted-foreground mt-2 tracking-wider">
             Study Assistant
@@ -87,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NavItem href="/dashboard/study" icon={<Clock size={18} />} label="Study Sessions" />
           <NavItem href="/dashboard/resources" icon={<BookOpen size={18} />} label="Resources" />
           
-          <div className="jp-divider my-6 border-sky/10"></div>
+          <div className="jp-divider my-6 border-primary/10"></div>
           
           <div className="text-xs uppercase tracking-wider text-foreground/40 mb-2">Tools</div>
           <NavItem href="/dashboard/flashcards" icon={<FileText size={18} />} label="Flashcards" />
@@ -101,10 +106,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
         
-        <div className="p-6 border-t border-sky/10 md:block hidden">
-          <div className="p-4 rounded-sm bg-sky/10 border border-sky/5 relative overflow-hidden">
+        <div className="p-6 border-t border-primary/10 md:block hidden">
+          <div className="p-4 rounded-sm bg-primary/10 border border-primary/5 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 opacity-5 pointer-events-none">
-              <Flower size={64} className="text-sky" />
+              <Flower size={64} className="text-primary" />
             </div>
             <div className="flex items-center space-x-3 relative z-10">
               <div className="w-10 h-10 rounded-sm bg-secondary shadow-washi flex items-center justify-center text-secondary-foreground font-normal">
@@ -124,7 +129,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.015] pointer-events-none">
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="60" cy="40" r="30" fill="currentColor" className="text-sky" />
+            <circle cx="60" cy="40" r="30" fill="currentColor" className="text-primary" />
           </svg>
         </div>
         

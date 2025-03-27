@@ -106,9 +106,9 @@ export default function ChatInterface({
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background to-background/90">
       {/* Chat Header */}
-      <div className="p-4 border-b border-sky/10 backdrop-blur-md flex items-center justify-between bg-background/90 rounded-sm shadow-washi">
+      <div className="p-4 border-b border-primary/10 backdrop-blur-md flex items-center justify-between bg-background/90 rounded-sm shadow-washi">
         <div className="flex items-center">
-          <div className="flex-shrink-0 rounded-sm bg-sky/10 h-10 w-10 flex items-center justify-center text-xl shadow-washi">
+          <div className="flex-shrink-0 rounded-sm bg-primary/10 h-10 w-10 flex items-center justify-center text-xl shadow-washi">
             {subjectIcon}
           </div>
           <div className="ml-3">
@@ -129,7 +129,7 @@ export default function ChatInterface({
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 rounded-sm hover:bg-sky/10 transition-colors duration-300" 
+                  className="h-7 w-7 rounded-sm hover:bg-primary/10 transition-colors duration-300" 
                   onClick={handleStartEditingTitle}
                 >
                   <Edit className="h-3.5 w-3.5" />
@@ -148,16 +148,16 @@ export default function ChatInterface({
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-sm hover:bg-sky/10">
+            <Button variant="ghost" size="icon" className="rounded-sm hover:bg-primary/10">
               <MoreHorizontal className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="rounded-sm border border-sky/10 shadow-zen backdrop-blur-md">
-            <DropdownMenuItem onClick={handleStartEditingTitle} className="rounded-lg focus:bg-sky/20">
+          <DropdownMenuContent align="end" className="rounded-sm border border-primary/10 shadow-zen backdrop-blur-md">
+            <DropdownMenuItem onClick={handleStartEditingTitle} className="rounded-lg focus:bg-primary/20">
               <Edit className="h-4 w-4 mr-2" />
               <span>Rename</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onOpenApiSettings} className="rounded-lg focus:bg-sky/20">
+            <DropdownMenuItem onClick={onOpenApiSettings} className="rounded-lg focus:bg-primary/20">
               <KeyRound className="h-4 w-4 mr-2" />
               <span>API Settings</span>
             </DropdownMenuItem>
@@ -176,7 +176,7 @@ export default function ChatInterface({
               <h3 className="text-xl font-light tracking-wide mb-3 text-foreground">
                 Welcome to your {studySubjects.find(s => s.id === conversation.subject)?.name} Study Session
               </h3>
-              <p className="text-muted-foreground max-w-md px-4 py-3 rounded-sm bg-sky/5 backdrop-blur-sm border-l border-sky/20 shadow-zen">
+              <p className="text-muted-foreground max-w-md px-4 py-3 rounded-sm bg-primary/5 backdrop-blur-sm border-l border-primary/20 shadow-zen">
                 Ask any {studySubjects.find(s => s.id === conversation.subject)?.name.toLowerCase()} questions, 
                 request explanations, or get help with specific problems. I'm here to assist your learning!
               </p>
@@ -193,8 +193,8 @@ export default function ChatInterface({
               >
                 <div className="flex items-start gap-4 max-w-[85%]">
                   {message.role === "assistant" && (
-                    <Avatar className="h-9 w-9 mt-1 border-2 border-sky/30 p-0.5 shadow-md">
-                      <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-sky flex items-center justify-center">
+                    <Avatar className="h-9 w-9 mt-1 border-2 border-primary/30 p-0.5 shadow-zen">
+                      <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                         <Flower className="h-4 w-4 text-primary-foreground" />
                       </div>
                     </Avatar>
@@ -203,10 +203,10 @@ export default function ChatInterface({
                   <div className="flex flex-col">
                     <div
                       className={cn(
-                        "shadow-md",
+                        "shadow-zen",
                         message.role === "user" 
-                          ? "message-bubble-user text-primary-foreground" 
-                          : "message-bubble-assistant text-accent-foreground"
+                          ? "message-bubble-user text-foreground" 
+                          : "message-bubble-assistant text-foreground"
                       )}
                     >
                       <div className="whitespace-pre-wrap">{message.content}</div>
@@ -222,8 +222,8 @@ export default function ChatInterface({
                   </div>
                   
                   {message.role === "user" && (
-                    <Avatar className="h-9 w-9 mt-1 border-2 border-primary/30 p-0.5 shadow-md">
-                      <div className="h-full w-full rounded-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-primary-foreground font-medium">
+                    <Avatar className="h-9 w-9 mt-1 border-2 border-secondary/30 p-0.5 shadow-zen">
+                      <div className="h-full w-full rounded-full bg-gradient-to-br from-secondary to-accent flex items-center justify-center text-secondary-foreground font-medium">
                         U
                       </div>
                     </Avatar>
@@ -237,8 +237,8 @@ export default function ChatInterface({
           {isLoading && (
             <div className="flex justify-start animate-fade-in">
               <div className="flex items-start gap-4">
-                <Avatar className="h-9 w-9 border-2 border-sky/30 p-0.5 shadow-md">
-                  <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-sky flex items-center justify-center">
+                <Avatar className="h-9 w-9 border-2 border-primary/30 p-0.5 shadow-zen">
+                  <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                     <Flower className="h-4 w-4 text-primary-foreground" />
                   </div>
                 </Avatar>
@@ -261,7 +261,7 @@ export default function ChatInterface({
       </ScrollArea>
       
       {/* Input Area */}
-      <div className="p-4 border-t border-sky/20 bg-background/80 backdrop-blur-md">
+      <div className="p-4 border-t border-primary/20 bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto relative">
           <div className="relative flex items-center">
             <Input
@@ -270,13 +270,13 @@ export default function ChatInterface({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
-              className="pr-12 rounded-sm shadow-zen border-sky/30 focus-ring"
+              className="pr-12 rounded-sm shadow-zen border-input focus-ring"
               disabled={!isModelInitialized}
             />
             <Button
               onClick={handleSendMessage}
               disabled={!inputValue.trim() || isLoading || !isModelInitialized}
-              className="absolute right-1 h-9 w-9 rounded-sm bg-accent/10 text-accent-foreground shadow-zen hover:bg-accent/20 transition-all duration-300"
+              className="absolute right-1 h-9 w-9 rounded-sm bg-primary/10 text-primary shadow-zen hover:bg-primary/20 transition-all duration-300"
               aria-label="Send message"
             >
               <Send className="h-4 w-4" />
@@ -284,7 +284,7 @@ export default function ChatInterface({
           </div>
           
           {!isModelInitialized && (
-            <div className="mt-2 text-center text-sm text-muted-foreground bg-accent/30 rounded-lg p-2 shadow-sm border border-sky/20">
+            <div className="mt-2 text-center text-sm text-muted-foreground bg-primary/10 rounded-sm p-2 shadow-zen border border-primary/20">
               <KeyRound className="h-4 w-4 inline mr-1" />
               <span>Please set up your API key in settings to start chatting</span>
             </div>

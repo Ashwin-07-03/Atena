@@ -2,12 +2,13 @@ import "@/styles/globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Providers } from "@/app/providers"
+import { ThemeProvider } from "@/components/providers/theme-provider"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
-  title: "Atena - AI-Powered Learning Platform",
-  description: "Your personal AI assistant for more effective studying",
+  title: "Atena - Your Study Assistant",
+  description: "AI-powered study assistant to help you excel in your studies",
 }
 
 export default function RootLayout({
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`font-sans ${inter.variable}`}>
-        <Providers>{children}</Providers>
+        <ThemeProvider>
+          <Providers>{children}</Providers>
+        </ThemeProvider>
       </body>
     </html>
   )
