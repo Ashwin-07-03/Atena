@@ -220,7 +220,7 @@ export function getCurrentModel(provider: ModelProvider): string {
     case 'gemini': return 'gemini-1.5-pro';
     case 'openai': return 'gpt-4-turbo';
     case 'anthropic': return 'claude-3-opus-20240229';
-    default: return availableModels[provider][0].id;
+    default: return availableModels[provider as ModelProvider][0].id;
   }
 }
 
