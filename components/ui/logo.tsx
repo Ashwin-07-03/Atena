@@ -31,7 +31,7 @@ export function Logo({
       <div className="relative">
         <Image
           src="/logo.png"
-          alt="Atena Logo"
+          alt="ATENA Logo"
           width={logo}
           height={logo}
           className="object-contain"

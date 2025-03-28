@@ -6,7 +6,7 @@ import DashboardPreview from '@/components/sections/dashboard-preview';
 
 export const metadata: Metadata = {
   title: 'Atena - Intelligent Study Management',
-  description: 'AI-powered study management tailored to your learning style.',
+  description: 'Study management tailored to your learning style.',
 };
 
 export default function HomePage() {

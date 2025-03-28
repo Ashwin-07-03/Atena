@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
   title: "Atena - Your Study Assistant",
-  description: "AI-powered study assistant to help you excel in your studies",
+  description: "Study assistant to help you excel in your studies",
 }
 
 export default function RootLayout({
