@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import EnhancedHero from '@/components/hero/enhanced-hero';
 import { Grape, Brain, BookOpen, ArrowRight, LineChart, CheckCircle, Calendar } from 'lucide-react';
+import DashboardPreview from '@/components/sections/dashboard-preview';
 
 export const metadata: Metadata = {
   title: 'Atena - Intelligent Study Management',
@@ -101,28 +102,9 @@ export default function HomePage() {
           <p className="text-lg mb-10 max-w-2xl mx-auto text-muted-foreground">
             Explore our AI-powered dashboard with smart study tools, including an intelligent Pomodoro timer that adapts to your learning style.
           </p>
-          <div className="relative rounded-xl overflow-hidden shadow-juice border border-primary/15 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80 pointer-events-none z-10"></div>
-            <img 
-              src="/dashboard-preview.png" 
-              alt="Atena Dashboard Preview" 
-              className="w-full rounded-xl"
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement;
-                target.style.display = 'none';
-                const fallbackEl = target.parentElement?.querySelector('div[data-fallback="true"]');
-                if (fallbackEl) {
-                  (fallbackEl as HTMLDivElement).style.display = 'flex';
-                }
-              }}
-            />
-            <div 
-              data-fallback="true"
-              className="hidden w-full h-[400px] items-center justify-center bg-primary/5 rounded-xl" 
-            >
-              <p className="text-muted-foreground">Dashboard Preview Image</p>
-            </div>
-          </div>
+          
+          <DashboardPreview />
+          
           <Link 
             href="/dashboard" 
             className="btn-primary inline-flex mt-10 py-3 px-8 items-center gap-2 group"
