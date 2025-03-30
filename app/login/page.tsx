@@ -41,7 +41,7 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="inline-block transition-transform hover:scale-105">
-            <span className="text-4xl font-bold text-primary">Atena</span>
+            <span className="text-4xl font-bold text-primary">ATENA</span>
           </Link>
           <h2 className="mt-6 text-3xl font-extrabold text-foreground">
             Sign in to your account
